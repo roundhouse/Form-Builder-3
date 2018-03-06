@@ -1,0 +1,42 @@
+{# @var craft \craft\web\twig\variables\CraftVariable #}
+{#
+/**
+ * Form Builder plugin for Craft CMS 3.x
+ *
+ * Form Builder index.twig
+ *
+ * @author    Vadim Goncharov (owldesign)
+ * @copyright Copyright (c) 2018 Roundhouse Agency (roundhousepdx)
+ * @link      https://roundhouseagency.com
+ * @package   FormBuilder
+ * @since     3.0.0
+ */
+#}
+
+{% extends "_layouts/cp" %}
+{% import "_includes/forms" as forms %}
+
+{% do view.registerAssetBundle("roundhouse\\formbuilder\\assetbundles\\formbuilder\\FormBuilder") %}
+
+{# Link for the ? icon at the bottom of the page #}
+{% set docsUrl = "https://github.com/roundhouse/form-builder/blob/master/README.md" %}
+
+{# The title of this CP section #}
+{% set title = "Form Builder" %}
+
+{# The URL to this plugin's base CP section #}
+{% set pluginCpUrl = url('form-builder') %}
+
+
+{# Content that should appear in the page header#}
+{% set extraPageHeaderHtml %}
+    <div class="buttons">
+        <a href="{{ pluginCpUrl }}" class="btn submit add icon">{{ "Click Me!"|t('form-builder') }}</a>
+    </div>
+{% endset %}
+
+{# The content of the CP Section#}
+{% set content %}
+    <h2>{{ "Index CP Section body goes here"|t('form-builder') }}</h2>
+    <p class="textline"></p>
+{% endset %}

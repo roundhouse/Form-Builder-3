@@ -1,0 +1,48 @@
+{
+    "name": "roundhouse/form-builder",
+    "description": "Craft CMS plugin that lets you create and manage forms for your front-end.",
+    "type": "craft-plugin",
+    "version": "3.0.0",
+    "keywords": [
+        "craft",
+        "cms",
+        "craftcms",
+        "craft-plugin",
+        "form builder"
+    ],
+    "support": {
+        "docs": "https://github.com/roundhouse/Form-Builder-3/blob/master/README.md",
+        "issues": "https://github.com/roundhouse/Form-Builder-3/issues"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Roundhouse Agency",
+            "homepage": "https://roundhouseagency.com"
+        },
+        {
+            "name": "Vadim Goncharov",
+            "homepage": "https://owl-design.net"
+        }
+    ],
+    "require": {
+        "craftcms/cms": "3.0.0-RC14"
+    },
+    "autoload": {
+        "psr-4": {
+          "roundhouse\\formbuilder\\": "src/"
+        }
+    },
+    "extra": {
+        "name": "Form Builder",
+        "handle": "form-builder",
+        "schemaVersion": "3.0.0",
+        "hasCpSettings": true,
+        "hasCpSection": true,
+        "changelogUrl": "https://raw.githubusercontent.com/roundhouse/Form-Builder-3/master/CHANGELOG.md",
+        "components": {
+            "app": "roundhouse\\formbuilder\\services\\App"
+        },
+        "class": "roundhouse\\formbuilder\\FormBuilder"
+    }
+}

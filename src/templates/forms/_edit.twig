@@ -1,0 +1,150 @@
+{% extends "_layouts/cp" %}
+
+{% set bodyClass = 'formbuilder fb-edit-form' %}
+{% set pluginCpUrl = url('form-builder') %}
+
+{% set docLinks = {
+    'formSettings': 'https://google.com/', 
+    'formDatabase': 'https://yahoo.com/', 
+    'formOptions': 'https://bing.com/',
+    'formSpamProtection': 'https://bing.com/'
+} %}
+
+{% set groups = craft.formBuilder.getAllGroups() %}
+{% if not groups %}
+    {% exit 404 %}
+{% endif %}
+
+{% set groupId = craft.app.request.getQueryParam('groupId') %}
+{% set statusId = form.statusId is defined ? form.statusId  %}
+
+{% if not groupId %}
+    {% if form.id %}
+        {% set groupId = form.groupId %}
+    {% else %}
+        {% set groupId = groups[0].id %}
+    {% endif %}
+{% endif %}
+
+{% set details = true %}
+
+{% block header %}
+    {% include 'form-builder/_includes/_header' ignore missing with { title: title } %}
+{% endblock %}
+
+{% block main %}
+    <input type="hidden" name="action" value="form-builder/forms/save">
+    {{ redirectInput('form-builder/forms/group/{groupId}') }}
+    
+    {% if form.id %}
+        <input type="hidden" name="formId" value="{{ form.id }}">
+        <input type="hidden" name="fieldLayoutId" value="{{ form.fieldLayoutId }}">
+    {% endif %}
+
+    {% set availableFields = form.fieldLayoutId is defined and form.fieldLayoutId ? form.getFieldLayout().getFields() : null %}
+
+    {% set fieldsOption = [] %}
+    {% set fieldsOption = [{label: 'Select Field', value: ''}] %}
+    {% for field in availableFields %}
+        {% set type = field |getClass(field) %}
+        {# TODO: only get plain text fields here? maybe? #}
+        {# {% if type == 'PlainText' %} #}
+            {% set fieldsOption = fieldsOption|merge([{ label: field.name, value: field.handle }]) %}
+        {# {% endif %} #}
+    {% endfor %}
+
+    {% set errors = form.getErrors() %}
+
+    {% set tabs = [
+        {
+            tabId: 0,
+            class: 'tab',
+            label: 'Fields',
+            url: '#tab-fields'
+        },
+        {
+            tabId: 1,
+            class: 'tab',
+            label: 'Settings',
+            url: '#tab-fields-settings'
+        }
+    ] %}
+
+
+    <div id="content-container">
+        <div id="content">
+            {% include 'form-builder/forms/_includes/fields/fields' ignore missing %}
+
+            {% hook 'formBuilderNotificationsHtml' %}
+
+            {# Craft::$app->view->hook('formBuilderNotificationsHtml', function(&$context) {
+                $context['foo'] = 'bar';
+                return 'Hey!';
+            }); #}
+        </div>
+    </div>
+
+    <div id="details">
+        <div id="settings">
+            <section class="form-settings-tout cmp-tout theme-white">
+                <header>
+                    <span class="tout-title">{{ "Settings" |t('form-builder') }}</span>
+                    <a href="{{ docLinks['formSettings'] }}" class="docs-link" target="_blank"><i class="fas fa-info"></i></a>
+                </header>
+                <div class="body">
+                    {% include 'form-builder/forms/_includes/settings/basic-settings' ignore missing %}
+                </div>
+            </section>
+
+            <section class="form-options-tout cmp-tout theme-white">
+                <header>
+                    <span class="tout-title">{{ "Database" |t('form-builder') }}</span>
+                    <a href="{{ docLinks['formDatabase'] }}" class="docs-link" target="_blank"><i class="fas fa-info"></i></a>
+                </header>
+                <div class="body">
+                    {% include 'form-builder/forms/_includes/settings/save-entries' ignore missing %}
+                </div>
+            </section>
+
+            <section class="form-options-tout cmp-tout theme-white">
+                <header>
+                    <span class="tout-title">{{ "Options" |t('form-builder') }}</span>
+                    <a href="{{ docLinks['formOptions'] }}" class="docs-link" target="_blank"><i class="fas fa-info"></i></a>
+                </header>
+                <div class="body">
+                    {% include 'form-builder/forms/_includes/options/submit-button' ignore missing %}
+                    {% include 'form-builder/forms/_includes/options/redirect' ignore missing %}
+                    {% include 'form-builder/forms/_includes/options/messages' ignore missing %}
+                    {# {% include 'form-builder/forms/_includes/options/ajax' ignore missing %} #}
+                    {# {% include 'form-builder/forms/_includes/options/terms-conditions' ignore missing %} #}
+                </div>
+            </section>
+
+            <section class="spam-protection-tout cmp-tout theme-white">
+                <header>
+                    <span class="tout-title">{{ "Spam Protection" |t('form-builder') }}</span>
+                    <a href="{{ docLinks['formSpamProtection'] }}" class="docs-link" target="_blank"><i class="fas fa-info"></i></a>
+                </header>
+                <div class="body">
+                    {% include 'form-builder/forms/_includes/spam/honeypot' ignore missing %}
+                    {% include 'form-builder/forms/_includes/spam/timed' ignore missing %}
+                </div>
+            </section>
+
+            <div class="pane meta save-form-meta last">
+                <button type="submit" href="#" class="btns btn-info save-form">{{ "Save Form" |t('form-builder') }}<span class="btn-hint">&#8984; + S</span></button>
+            </div>
+
+            {% if formId is defined %}
+                <div class="pane meta delete-form-meta last">
+                    <a href="#" class="btns btn-danger delete-form" data-id="{{ form.id }}">{{ "Delete Form" |t('form-builder') }}</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+{% endblock %}
+
+{% js %}
+    {% if form and not form.handle %}new Craft.HandleGenerator('#formName', '#formHandle');{% endif %}
+{% endjs %}

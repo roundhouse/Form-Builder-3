@@ -1,0 +1,24 @@
+{%- namespace 'fields' -%}
+{% for tab in tabs %}
+    {% set fieldset = craft.formBuilder.getTabSettings(tab.id) %}
+    {% set tabClass = fieldset.options.class is defined ? fieldset.options.class : null %}
+    {% set tabId = fieldset.options.id is defined ? fieldset.options.id : null %}
+
+    <div class="{{ tab.name | camel(tab.name) }} {{ tabClass }}" {% if tabId %}id="{{ tabId }}"{% endif %}>
+        {%- set fields = tab.getFields() %}
+        {% for field in fields -%}
+            {%- if field -%}
+                {% include "form-builder/frontend/field" with {
+                    form:       form,
+                    field:      field,
+                    required:   field.required,
+                    element:    entry,
+                    options:    options,
+                    static:     null
+                } only %}
+            {%- endif %}
+
+        {% endfor %}
+    </div>
+{% endfor %}
+{%- endnamespace -%}

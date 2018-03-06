@@ -1,0 +1,50 @@
+{% import "form-builder/_includes/_components" as components %}
+
+{% set container = {
+    title: 'Messages' |t,
+    info: 'Enter a custom message for submissions success or error.' |t,
+    icon: null,
+    toggle: true,
+    class: null,
+    id: null
+} %}
+
+{% set inputs = {
+    0: {
+        type: 'text',
+        name: 'options[messages][success]',
+        value: form.options.messages.success is defined ? form.options.messages.success : '',
+        class: 'hidden',
+        id: null,
+        hint: 'SUCCESS'
+    },
+    1: {
+        type: 'text',
+        name: 'options[messages][error]',
+        value: form.options.messages.error is defined ? form.options.messages.error : '',
+        class: 'hidden',
+        id: null,
+        hint: 'ERROR'
+    },
+    2: {
+        type: 'checkbox',
+        name: 'options[messages][enabled]',
+        value: '1',
+        checked: form.options.messages.enabled is defined and form.options.messages.enabled == '1' ? true : false,
+        class: 'hidden',
+        id: null
+    },
+} %}
+
+{% set modal = {
+    title: 'Messages' |t,
+    instructions: 'Enter a custom message for submissions success or error.' |t,
+    successMessage: 'Messages Updated' |t,
+    inputs: inputs
+} %}
+
+{{ components.optionItem(
+    container,
+    modal,
+    inputs
+) }}

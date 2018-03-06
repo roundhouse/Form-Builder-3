@@ -1,0 +1,24 @@
+{% include 'form-builder/_includes/_navigation.twig' ignore missing %}
+
+<section id="page-header">
+    <div class="page-header">
+        <h1>{{ title }}</h1>
+    </div>
+
+    {% if createForm is defined and createForm %}
+        {% set newFormUrl = url('form-builder/forms/new', (groupId is defined ? { groupId: groupId } : { groupId: 1 })) %}
+        <a href="{{ newFormUrl }}" id="new-form-btn" class="btns btn-info submit"><i class="fas fa-plus"></i><span class="txt">{{ "Create New Form"|t('form-builder') }}</span></a>
+    {% endif %}
+
+    {% if createNotification is defined and createNotification %}
+        {% set newNotificationUrl = url('form-builder/notifications/new', (type is defined ? { type: type } : { type: 'email' })) %}
+        <a href="{{ newNotificationUrl }}" id="new-form-btn" class="btns btn-info submit"><i class="fas fa-plus"></i><span class="txt">{{ "Create New Notification"|t('form-builder') }}</span></a>
+    {% endif %}
+
+</section>
+
+<script type="text/javascript">
+    window.FormBuilder = {
+        pageTitle: '{{ _context.title is defined ? _context.title : '' }}'
+    }
+</script>

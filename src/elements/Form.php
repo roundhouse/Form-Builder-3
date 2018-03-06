@@ -1,0 +1,447 @@
+<?php
+/**
+ * Form Builder plugin for Craft CMS 3.x
+ *
+ * Craft CMS plugin that lets you create and manage forms for your front-end.
+ *
+ * @link      https://roundhouseagency.com
+ * @copyright Copyright (c) 2018 Roundhouse Agency (roundhousepdx)
+ */
+
+namespace roundhouse\formbuilder\elements;
+
+use roundhouse\formbuilder\FormBuilder;
+use roundhouse\formbuilder\elements\db\FormQuery;
+use roundhouse\formbuilder\records\Form as FormRecord;
+
+use Craft;
+use craft\base\Element;
+use craft\helpers\Json;
+use craft\helpers\UrlHelper;
+use craft\db\Query;
+use craft\elements\db\ElementQuery;
+use craft\elements\db\ElementQueryInterface;
+use craft\validators\HandleValidator;
+use craft\validators\UniqueValidator;
+use craft\behaviors\FieldLayoutBehavior;
+use yii\base\InvalidConfigException;
+use yii\base\Exception;
+
+/**
+ * Form Element
+ *
+ * @author    Vadim Goncharov (owldesign)
+ * @package   FormBuilder
+ * @since     3.0.0
+ */
+class Form extends Element
+{
+
+    // Constants
+    // =========================================================================
+
+    const STATUS_ENABLED = 'enabled';
+    const STATUS_DISABLED = 'disabled';
+
+    // Properties
+    // =========================================================================
+
+    public $name;
+    public $handle;
+    public $group;
+    public $groupId = 1;
+    public $status;
+    public $statusId = 1;
+    public $options;
+    public $spam;
+    public $notifications;
+    public $settings;
+    public $twig;
+    public $totalEntries;
+
+    // Static Methods
+    // =========================================================================
+
+    /**
+     * Returns the display name of this class.
+     *
+     * @return string The display name of this class.
+     */
+    public static function displayName(): string
+    {
+        return FormBuilder::t('Form');
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function refHandle()
+    {
+        return 'formbuilderForm';
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function hasContent(): bool
+    {
+        return false;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function hasTitles(): bool
+    {
+        return true;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function isLocalized(): bool
+    {
+        return false;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function hasStatuses(): bool
+    {
+        return true;
+    }
+
+    // Public Methods
+    // =========================================================================
+
+    /**
+     * Returns the field context this element's content uses.
+     *
+     * @access protected
+     * @return string
+     */
+    public function getFieldContext(): string
+    {
+        return 'global';
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getCpEditUrl()
+    {
+        return UrlHelper::cpUrl(
+            'form-builder/forms/'.$this->id
+        );
+    }
+
+    /**
+     * Use the forms name as its string representation.
+     *
+     * @return string
+     */
+    public function __toString(): string
+    {
+        return (string)$this->name;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function statuses(): array
+    {
+        return [
+            self::STATUS_ENABLED => FormBuilder::t('Enabled'),
+            self::STATUS_DISABLED => FormBuilder::t('Disabled')
+        ];
+    }
+
+
+    /**
+     * @inheritdoc
+     *
+     * @return FormQuery The newly created [[FormQuery]] instance.
+     */
+    public static function find(): ElementQueryInterface
+    {
+        return new FormQuery(get_called_class());
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected static function defineSources(string $context = null): array
+    {
+        $sources = [
+            [
+                'key'   => '*',
+                'label' => FormBuilder::t('All Forms')
+            ]
+        ];
+
+        $groups = FormBuilder::$plugin->groups->getAllGroups();
+
+        foreach ($groups as $group) {
+            $key = 'group:' . $group->id;
+            $settings = Json::decode($group->settings);
+            
+            if (!empty($settings)) {
+                $icon = $settings['icon']['name'];
+            } else {
+                $icon = null;
+            }
+
+            $sources[] = [
+                'key'      => $key,
+                'label'    => FormBuilder::t($group->name),
+                'icon'     => $icon,
+                'data'     => ['id' => $group->id],
+                'criteria' => ['groupId' => $group->id]
+            ];
+        }
+
+        return $sources;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function behaviors()
+    {
+        $behaviors = parent::behaviors();
+        $behaviors['fieldLayout'] = [
+            'class' => FieldLayoutBehavior::class,
+            'elementType' => __CLASS__
+        ];
+
+        return $behaviors;
+    }
+
+    /**
+     * Returns the validation rules for attributes.
+     *
+     * Validation rules are used by [[validate()]] to check if attribute values are valid.
+     * Child classes may override this method to declare different validation rules.
+     *
+     * More info: http://www.yiiframework.com/doc-2.0/guide-input-validation.html
+     *
+     * @return array
+     */
+    public function rules()
+    {
+        return [
+            [['id', 'groupId', 'fieldLayoutId', 'statusId'], 'number', 'integerOnly' => true],
+            [['handle'], HandleValidator::class, 'reservedWords' => ['id', 'dateCreated', 'dateUpdated', 'uid', 'title']],
+            [['name', 'handle'], UniqueValidator::class, 'targetClass' => FormRecord::class],
+            [['name', 'handle'], 'required'],
+            [['name', 'handle'], 'string', 'max' => 255]
+        ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getFieldLayout()
+    {
+        $behavior = $this->getBehavior('fieldLayout');
+        
+        return $behavior->getFieldLayout();
+    }
+
+    /**
+     * Returns the HTML for the element’s editor HUD.
+     *
+     * @return string The HTML for the editor HUD
+     */
+    public function getEditorHtml(): string
+    {
+        $html = Craft::$app->getView()->renderTemplateMacro('_includes/forms', 'textField', [
+            [
+                'label' => Craft::t('app', 'Title'),
+                'siteId' => $this->siteId,
+                'id' => 'title',
+                'name' => 'title',
+                'value' => $this->title,
+                'errors' => $this->getErrors('title'),
+                'first' => true,
+                'autofocus' => true,
+                'required' => true
+            ]
+        ]);
+
+        $html .= parent::getEditorHtml();
+
+        return $html;
+    }
+
+    // Indexes, etc.
+    // -------------------------------------------------------------------------
+
+    /**
+     * @inheritdoc
+     */
+    protected function tableAttributeHtml(string $attribute): string
+    {
+        switch ($attribute) {
+            case 'name':
+                break;
+            case 'handle':
+                return '<span class="copy-handle" data-handle="' . $this->handle . '"  data-clipboard-text="' . $this->handle . '">
+                            <code>' . $this->handle . '</code>
+                            <span class="icon">
+                                <i class="far fa-copy"></i>
+                            </span>
+                        </span>';
+                break;
+            case 'group':
+                $group = FormBuilder::$plugin->groups->getGroupById($this->groupId);
+                $settings = Json::decode($group->settings);
+                if (!empty($settings)) {
+                    $icon = $settings['icon']['name'];
+                    return '<span class="group"><i class="far fa-'. $icon .'"></i><span class="group-name">'. $group .'</span></span>';
+                } else {
+                    return '<span>'. $group .'</span>';
+                }
+
+                break;
+            case 'totalEntries':
+                $totalEntries = (new Query())
+                    ->select('COUNT(*) as [[value]]')
+                    ->from(['{{%formbuilder_entries}}'])
+                    ->where(['formbuilder_entries.formId' => $this->id])
+                    ->scalar();
+
+                return $totalEntries;
+                break;
+            case 'twig':
+                return '<span class="twig-snippet" data-handle="'. $this->handle . '" data-clipboard-text="{{ craft.formBuilder.form(\''.$this->handle.'\') }}">
+                            <code>' . FormBuilder::t("Click to copy") . '<span class="icon"><i class="far fa-copy"></i></span></code>
+                        </span>';
+                break;
+        }
+
+        return parent::tableAttributeHtml($attribute);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected static function defineSearchableAttributes(): array
+    {
+        return ['name', 'handle', 'group'];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected static function defineSortOptions(): array
+    {
+        $attributes = [
+            'formbuilder_forms.name'    => FormBuilder::t('Form Name'),
+            'formbuilder_forms.groupId' => FormBuilder::t('Group'),
+            'elements.dateCreated'      => FormBuilder::t('Date Created'),
+            'elements.dateUpdated'      => FormBuilder::t('Date Updated'),
+        ];
+
+        return $attributes;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected static function defineTableAttributes(): array
+    {
+        $attributes['name']         = ['label' => FormBuilder::t('Name')];
+        $attributes['handle']       = ['label' => FormBuilder::t('Handle')];
+        $attributes['group']        = ['label' => FormBuilder::t('Group')];
+        $attributes['totalEntries'] = ['label' => FormBuilder::t('Total Entries')];
+        $attributes['twig']         = ['label' => FormBuilder::t('Twig Snippet')];
+
+        return $attributes;
+    }
+
+    protected static function defineDefaultTableAttributes(string $source): array
+    {
+        $attributes = ['name', 'handle', 'group', 'totalEntries', 'twig'];
+
+        return $attributes;
+    }
+
+
+    // Events
+    // -------------------------------------------------------------------------
+
+    /**
+     * Performs actions before an element is saved.
+     *
+     * @param bool $isNew Whether the element is brand new
+     *
+     * @return bool Whether the element should be saved
+     */
+    // public function beforeSave(bool $isNew): bool
+    // {
+    //     return true;
+    // }
+
+    /**
+     * Performs actions after an element is saved.
+     *
+     * @param bool $isNew Whether the element is brand new
+     *
+     * @return void
+     */
+    // public function afterSave(bool $isNew)
+    // {
+    //     if (!$isNew) {
+    //         $record = FormRecord::findOne($this->id);
+
+    //         if (!$record) {
+    //             throw new Exception('Invalid form ID: '.$this->id);
+    //         }
+    //     } else {
+    //         $record = new FormRecord();
+    //         $record->id = $this->id;
+    //     }
+
+    //     Craft::dd($this->getFieldLayout());
+
+    //     $record->name = $this->name;
+    //     $record->handle = $this->handle;
+    //     $record->fieldLayoutId = $record->getFieldLayout()->id;
+    //     $record->groupId = $this->groupId;
+    //     $record->statusId = $this->statusId;
+    //     $record->options = $this->options;
+    //     $record->spam = $this->spam;
+    //     $record->notifications = $this->notifications;
+    //     $record->settings = $this->settings;
+    //     $record->save(false);
+
+    //     parent::afterSave($isNew);
+    // }
+
+    /**
+     * Performs actions before an element is deleted.
+     *
+     * @return bool Whether the element should be deleted
+     */
+    public function beforeDelete(): bool
+    {
+        if ($this->fieldLayoutId !== null) {
+            Craft::$app->getFields()->deleteLayoutById($this->fieldLayoutId);
+        }
+
+        return parent::beforeDelete();
+    }
+
+    /**
+     * Performs actions after an element is deleted.
+     *
+     * @return void
+     */
+    // public function afterDelete()
+    // {
+    // }
+
+
+}

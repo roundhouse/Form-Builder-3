@@ -1,0 +1,76 @@
+{% set currentPage = craft.app.request.getSegment(2) %}
+
+<section id="formbuilder-nav">
+    
+    <div class="fb-logo">
+        {% include 'form-builder/_includes/icons/formbuilder-icon' ignore missing %}
+    </div>
+
+    <div class="fb-nav">
+        <a href="{{ url('form-builder') }}" {% if currentPage == null %}class="active"{% endif %}>{{ "Dashboard"|t('form-builder') }}</a>
+        <a href="{{ url('form-builder/forms') }}" {% if currentPage == 'forms' %}class="active"{% endif %}>{{ "Forms"|t('form-builder') }}</a>
+        <a href="{{ url('form-builder/entries') }}" {% if currentPage == 'entries' %}class="active"{% endif %}>{{ "Entries"|t('form-builder') }}</a>
+    </div>
+    
+    <div class="fb-utility">
+        <div class="fb-utility-btn fb-alerts-container" data-type="alerts">
+            <span class="fb-badge">4</span>
+            <span class="icon"><i class="fas fa-bell"></i></span>
+            <div class="utility-menu">
+                <div class="wrapper">
+                    <header>
+                        <p>{{ "Alerts"|t('form-builder') }}</p>
+                    </header>
+                    <div class="body"></div>
+                    <footer></footer>
+                </div>
+            </div>
+        </div>
+
+        <div class="fb-utility-btn fb-unread-container" data-type="unread">
+            <span class="fb-badge">
+                <div class="loader hidden">
+                    {% include 'form-builder/_includes/icons/loader-circle' ignore missing with {
+                        width: '7px',
+                        height: '7px',
+                        strokeColor: '#fff'
+                    } %}
+                </div>
+                <span class="count">{# {{ craft.formBuilder.getUnreadEntries() }} #}</span>
+            </span>
+
+            <span class="icon">
+                <i class="fas fa-inbox"></i>
+            </span>
+
+            <div id="unread-notifications" class="utility-menu">
+                <div class="wrapper">
+                    <header>
+                        <p>{{ "Unread Submissions"|t('form-builder') }}</p>
+                    </header>
+                    <div class="body"></div>
+                    <footer></footer>
+                </div>
+            </div>
+        </div>
+
+       {#  <div class="fb-utility-btn fb-settings-container" data-type="settings">
+            <span class="icon"><i class="fas fa-cog"></i></span>
+
+            <div class="utility-menu">
+                <div class="wrapper">
+                    <header>
+                        <p>{{ "Settings"|t('form-builder') }}</p>
+                    </header>
+                    <div class="body"></div>
+                    <footer></footer>
+                </div>
+            </div>
+        </div> #}
+        
+        <div class="fb-mobile-nav">
+            <span class="icon"><i class="fas fa-bars"></i></span>
+        </div>
+    </div>
+
+</section>

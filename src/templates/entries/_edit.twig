@@ -1,0 +1,45 @@
+{% extends "_layouts/cp" %}
+
+{% set bodyClass = 'formbuilder fb-entry-edit' %}
+{% set pluginCpUrl = url('form-builder') %}
+
+{% block header %}
+    {% include 'form-builder/_includes/_header' ignore missing with { title: title } %}
+{% endblock %}
+
+{% block main %}
+    <input type="hidden" name="action" value="form-builder/entries/save">
+    {{ redirectInput('form-builder/entries/{groupId}') }}
+
+    {% if entry.id %}
+        <input type="hidden" name="entryId" value="{{ entry.id }}">
+    {% endif %}
+
+    <div id="content-container">
+        <div id="content">
+            {% set tabs = entry.getFieldLayout().getTabs() %}
+
+            {% for tab in tabs %}
+                <div class="fieldset">
+                    {% set fields = tab.getFields() %}
+                    
+                    {% for field in fields %}
+                        {% set value = attribute(entry, field.handle) %}
+                        <div class="entry-field">
+                            <span class="entry-label">{{ field.name }}</span>
+                            <span class="entry-value">{{ value }}</span>
+                        </div>
+                    {% endfor %}
+                
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div id="details">
+        <div id="settings">
+            settings
+        </div>
+    </div>
+
+{% endblock %}

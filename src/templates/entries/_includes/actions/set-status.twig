@@ -1,0 +1,10 @@
+{% set statuses = craft.formBuilder.getEntryStatuses() %}
+
+<div class="btn menubtn">{{ "Set status"|t('app') }}</div>
+<div class="menu">
+    <ul>
+        {% for status in statuses %}
+            <li><a class="formsubmit" data-param="status" data-value="{{ status.handle }}"><span class="status {{ status.color}}"></span> {{ status.name }}</a></li>
+        {% endfor %}
+    </ul>
+</div>

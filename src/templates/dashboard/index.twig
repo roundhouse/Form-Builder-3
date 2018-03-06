@@ -1,0 +1,13 @@
+{% extends "_layouts/cp" %}
+{% import "_includes/forms" as forms %}
+
+{% set title = "Dashboard"|t('form-builder') %}
+{% set bodyClass = 'formbuilder fb-dashboard' %}
+
+{% block header %}
+    {% include 'form-builder/_includes/_header' ignore missing with { title: title } %}
+{% endblock %}
+
+{% block main %}
+    <h2>{{ "Dashboard index"|t('form-builder') }}</h2>
+{% endblock %}

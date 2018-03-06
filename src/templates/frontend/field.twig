@@ -1,0 +1,20 @@
+{% set entry            = element is defined ? element : null %}
+{%- set label           = field.name is defined ? field.name : null %}
+{%- set name            = field.handle is defined ? field.handle : null %}
+{%- set required        = field.required is defined and field.required ? true : false %}
+{%- set options         = attribute(options.fields, name) is defined ? attribute(options.fields, name) : {} %}
+{%- set value           = (entry ? entry.getFieldValue(field.handle) : field.normalizeValue(null)) %}
+{%- set instructions    = (field.instructions is defined ? field.instructions : null) %}
+{%- set input           = craft.formBuilder.getInputHtml(value, entry, field, form) %}
+
+<div class="form-group {% if required %}field-required{% endif %}">
+    <label{% if name %} for="{{ name }}"{% endif %}>
+        {{- label|raw|t -}}
+    </label>
+
+    {% if instructions %}
+        <span class="instructions">{{ instructions|md|replace('/&amp;(\\w+);/', '&$1;')|raw }}</span>
+    {% endif %}
+
+    {{ input|raw }}
+</div>
