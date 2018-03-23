@@ -10,27 +10,16 @@
 
 namespace roundhouse\formbuilder\records;
 
-use roundhouse\formbuilder\FormBuilder;
-
-use Craft;
 use craft\db\ActiveRecord;
+use yii\db\ActiveQueryInterface;
 
-/**
- * FormGroup Record
- *
- *
- * @author    Vadim Goncharov (owldesign)
- * @package   FormBuilder
- * @since     3.0.0
- */
 class Group extends ActiveRecord
 {
     // Public Static Methods
     // =========================================================================
 
-     /**
-     *
-     * @return string the table name
+    /**
+     * @inheritdoc
      */
     public static function tableName()
     {
@@ -38,7 +27,7 @@ class Group extends ActiveRecord
     }
 
     /**
-     * Returns the tag group’s tags.
+     * Returns the form's groups.
      *
      * @return ActiveQueryInterface The relational query object.
      */

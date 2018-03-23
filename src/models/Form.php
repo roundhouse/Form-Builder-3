@@ -10,27 +10,19 @@
 
 namespace roundhouse\formbuilder\models;
 
-use roundhouse\formbuilder\FormBuilder;
-use roundhouse\formbuilder\elements\Form as FormElement;
-use roundhouse\formbuilder\records\FormRecord;
-
 use Craft;
 use craft\base\Model;
 use craft\behaviors\FieldLayoutBehavior;
 use craft\validators\HandleValidator;
 use craft\validators\UniqueValidator;
 
-/**
- * FormModel
- *
- * @author    Vadim Goncharov (owldesign)
- * @package   FormBuilder
- * @since     3.0.0
- */
+use roundhouse\formbuilder\records\FormRecord;
+
 class Form extends Model
 {
     // Public Properties
     // =========================================================================
+
     public $id;
     public $fieldLayoutId;
     public $name;
@@ -47,6 +39,9 @@ class Form extends Model
     // Public Methods
     // =========================================================================
 
+    /**
+     * @inheritdoc
+     */
     public function behaviors()
     {
         return [
@@ -57,6 +52,9 @@ class Form extends Model
         ];
     }
 
+    /**
+     * @inheritdoc
+     */
     public function rules()
     {
         return [
@@ -70,9 +68,7 @@ class Form extends Model
 
 
     /**
-     * Use the translated category group's name as the string representation.
-     *
-     * @return string
+     * @inheritdoc
      */
     public function __toString(): string
     {

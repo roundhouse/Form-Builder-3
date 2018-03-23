@@ -10,23 +10,11 @@
 
 namespace roundhouse\formbuilder\utilities;
 
-use roundhouse\formbuilder\FormBuilder;
-use roundhouse\formbuilder\assetbundles\formbuilderutilityutility\FormBuilderUtilityUtilityAsset;
-
 use Craft;
 use craft\base\Utility;
 
-/**
- * Form Builder Utility
- *
- * Utility is the base class for classes representing Control Panel utilities.
- *
- * https://craftcms.com/docs/plugins/utilities
- *
- * @author    Vadim Goncharov (owldesign)
- * @package   FormBuilder
- * @since     3.0.0
- */
+use roundhouse\formbuilder\assetbundles\formbuilderutilityutility\FormBuilderUtilityUtilityAsset;
+
 class FormBuilderUtility extends Utility
 {
     // Static

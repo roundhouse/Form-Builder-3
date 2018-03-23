@@ -75,12 +75,53 @@
         <div id="content">
             {% include 'form-builder/forms/_includes/fields/fields' ignore missing %}
 
-            {% hook 'formBuilderNotificationsHtml' %}
+            {#{% hook 'formBuilderNotificationsHtml' %}#}
 
             {# Craft::$app->view->hook('formBuilderNotificationsHtml', function(&$context) {
                 $context['foo'] = 'bar';
                 return 'Hey!';
             }); #}
+
+            <section class="notifications">
+                <header>
+                    <h2>{{ "Integrations"|t('form-builder') }}</h2>
+                    <p>{{ "Send notifications or save submission to 3rd party services."|t('form-builder') }}</p>
+                </header>
+
+                <div class="notify-options">
+                    {% if craft.app.plugins.isPluginInstalled('email-builder') %}
+                        {# TODO: only show notifications if templates exist #}
+                        {% set templates = craft.emailBuilder.getTemplates() %}
+                        {% if templates %}
+                            <a class="notify-item-btn btns btn-info add-email-notification" data-type="email" data-element="roundhouse\emailbuilder\elements\EmailNotification" data-context="{{ form |json_encode() }}">
+                                <i class="fas fa-plus"></i>
+                                <span>{{ "Email Notification"|t('form-builder') }}</span>
+                            </a>
+                        {% endif %}
+                    {% endif %}
+                    {% if craft.app.plugins.isPluginInstalled('formbuilder-slack-message') %}
+                        <a class="notify-item-btn btns btn-info add-slack-notification" data-type="slack" data-element="roundhouse\slacknotifier\elements\SlackNotification" data-context="{{ form |json_encode() }}">
+                            <i class="fas fa-plus"></i>
+                            <span>{{ "Slack Message"|t('form-builder') }}</span>
+                        </a>
+                    {% endif %}
+                </div>
+
+                {% if craft.app.plugins.isPluginInstalled('email-builder') %}
+                    {% set templates = craft.emailBuilder.getTemplates() %}
+                    {% if templates %}
+                        <div id="formbuilder-notifications-container" class="elements">
+                            {% set notifications = form.notifications is defined ? form.notifications %}
+                            {% for key, notification in notifications %}
+                                {% for key, notify in notification %}
+                                    {% include 'form-builder/forms/_includes/integrations/' ~ loop.parent.key ~ '/_notification' ignore missing with { notification: notify, key: key } %}
+                                {% endfor %}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                {% endif %}
+            </section>
+
         </div>
     </div>
 

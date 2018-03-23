@@ -10,35 +10,22 @@
 
 namespace roundhouse\formbuilder\services;
 
-use roundhouse\formbuilder\FormBuilder;
-use roundhouse\formbuilder\models\Tab;
-use roundhouse\formbuilder\records\Tab as TabRecord;
-use roundhouse\formbuilder\models\Tab as TabModel;
-
 use Craft;
 use craft\records\FieldLayoutTab;
 use craft\helpers\Json;
 use craft\base\Component;
-use craft\db\Query;
 
-use yii\base\Exception;
+use roundhouse\formbuilder\models\Tab;
+use roundhouse\formbuilder\records\Tab as TabRecord;
+use roundhouse\formbuilder\models\Tab as TabModel;
 
-/**
- * Tabs Service
- *
- * All of your plugin’s business logic should go in services, including saving data,
- * retrieving data, etc. They provide APIs that your controllers, template variables,
- * and other plugins can interact with.
- *
- * https://craftcms.com/docs/plugins/services
- *
- * @author    Vadim Goncharov (owldesign)
- * @package   FormBuilder
- * @since     3.0.0
- */
 class Tabs extends Component
-{   
-
+{
+    /**
+     * Get tabs
+     *
+     * @return array
+     */
     public function getTabs()
     {
         $output = [];
@@ -55,6 +42,11 @@ class Tabs extends Component
         return $output;
     }
 
+    /**
+     * Get all tab options
+     *
+     * @return array
+     */
     public function getAllTabOptions()
     {
         $tabs = $this->_getAllTabOptions();
@@ -72,6 +64,17 @@ class Tabs extends Component
     }
 
 
+    /**
+     * Save tab options
+     *
+     * @param $layoutTab
+     * @param $tab
+     * @param $formId
+     * @param $layoutId
+     * @return bool
+     * @throws \Throwable
+     * @throws \yii\db\Exception
+     */
     public function save($layoutTab, $tab, $formId, $layoutId) : bool
     {
         $tabModel               = new TabModel();
@@ -110,6 +113,12 @@ class Tabs extends Component
         return true;
     }
 
+    /**
+     * Get tab settings
+     *
+     * @param $tabId
+     * @return array|null|\yii\db\ActiveRecord
+     */
     public function getTabSettings($tabId)
     {
         $tabRecord = TabRecord::find()
@@ -130,7 +139,7 @@ class Tabs extends Component
     /**
      * Get all tab options
      *
-     * @return array
+     * @return array|\yii\db\ActiveRecord[]
      */
     private function _getAllTabOptions()
     {

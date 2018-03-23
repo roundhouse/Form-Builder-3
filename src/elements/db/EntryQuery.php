@@ -10,16 +10,10 @@
 
 namespace roundhouse\formbuilder\elements\db;
 
-use roundhouse\formbuilder\FormBuilder;
-use roundhouse\formbuilder\elements\Entry;
-use roundhouse\formbuilder\models\Form as FormModel;
-
-use Craft;
-use craft\db\Query;
-use craft\db\QueryAbortedException;
 use craft\elements\db\ElementQuery;
 use craft\helpers\Db;
-use yii\db\Connection;
+
+use roundhouse\formbuilder\FormBuilder;
 
 class EntryQuery extends ElementQuery
 {
@@ -39,11 +33,12 @@ class EntryQuery extends ElementQuery
     // Public Methods
     // =========================================================================
 
+
     /**
-     * Sets the [[formId]] property.
+     * Return Form ID
      *
-     * @param int|int[]|null $value The property value
-     * @return static self reference
+     * @param $value
+     * @return $this
      */
     public function formId($value)
     {
@@ -51,11 +46,12 @@ class EntryQuery extends ElementQuery
         return $this;
     }
 
+
     /**
-     * Sets the [[statusId]] property.
+     * Return Status ID
      *
-     * @param int|int[]|null $value The property value
-     * @return static self reference
+     * @param $value
+     * @return $this
      */
     public function statusId($value)
     {

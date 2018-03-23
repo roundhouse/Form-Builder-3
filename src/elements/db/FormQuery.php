@@ -10,16 +10,8 @@
 
 namespace roundhouse\formbuilder\elements\db;
 
-use roundhouse\formbuilder\FormBuilder;
-use roundhouse\formbuilder\models\Form as FormModel;
-use roundhouse\formbuilder\models\Group;
-
-use Craft;
-use craft\db\Query;
-use craft\db\QueryAbortedException;
 use craft\elements\db\ElementQuery;
 use craft\helpers\Db;
-use yii\db\Connection;
 
 class FormQuery extends ElementQuery
 {
@@ -39,71 +31,6 @@ class FormQuery extends ElementQuery
     // Public Methods
     // =========================================================================
 
-    /**
-     * @inheritdoc
-     */
-    public function __construct($elementType, array $config = [])
-    {
-        // Default orderBy
-        if (!isset($config['status'])) {
-            $config['status'] = 'enabled';
-        }
-
-        parent::__construct($elementType, $config);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function __set($name, $value)
-    {
-        switch ($name) {
-            case 'group':
-                $this->group($value);
-                break;
-            
-            default:
-                parent::__set($name, $value);
-        }
-    }
-
-    // /**
-    //  * @inheritdoc
-    //  */
-    // public function name($value)
-    // {
-    //     $this->name = $value;
-
-    //     return $this;
-    // }
-
-    // /**
-    //  * @inheritdoc
-    //  */
-    // public function handle($value)
-    // {
-    //     $this->handle = $value;
-
-    //     return $this;
-    // }
-
-    /**
-     * Sets the [[groupId]] property based on a given form group(s)’s handle(s).
-     *
-     * @param string|string[]|CategoryGroup|null $value The property value
-     *
-     * @return static self reference
-     */
-    public function group($value)
-    {
-        return $this;
-    }
-
-    public function groupId($value)
-    {
-        $this->groupId = $value;
-        return $this;
-    }
 
     // Protected Methods
     // =========================================================================

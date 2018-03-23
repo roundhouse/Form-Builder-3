@@ -14,21 +14,16 @@ use roundhouse\formbuilder\FormBuilder;
 
 use Craft;
 use craft\base\Element;
-use craft\web\View;
 use craft\web\Controller;
 use craft\helpers\DateTimeHelper;
 use craft\helpers\StringHelper;
-use craft\helpers\ArrayHelper;
-use yii\web\BadRequestHttpException;
-use yii\web\NotFoundHttpException;
 use yii\web\Response;
-use craft\db\Query;
 
+use roundhouse\formbuilder\events\NotificationEvent;
 use roundhouse\formbuilder\elements\Entry;
 use roundhouse\formbuilder\assets\FormBuilder as FormBuilderAsset;
 use roundhouse\formbuilder\assets\Entry as EntryAsset;
-use roundhouse\formbuilder\assets\Group as GroupAsset;
-use roundhouse\formbuilder\assets\Plugins as PluginsAsset;
+use roundhouse\formbuilder\events\EntryEvent;
 
 require_once __DIR__ . '/functions/array-group-by.php';
 
@@ -40,6 +35,12 @@ require_once __DIR__ . '/functions/array-group-by.php';
  */
 class EntriesController extends Controller
 {
+
+    // Constants
+    // =========================================================================
+    const EVENT_BEFORE_SUBMIT_ENTRY = 'beforeSubmitEntry';
+    const EVENT_AFTER_SUBMIT_ENTRY = 'afterSubmitEntry';
+    const EVENT_SEND_NOTIFICATION = 'sendNotification';
 
     // Protected Properties
     // =========================================================================
@@ -62,12 +63,6 @@ class EntriesController extends Controller
     // Public Methods
     // =========================================================================
     
-    /**
-     * Index
-     *
-     * @return Response
-     * @throws ForbiddenHttpException if the user isn't authorized to edit forms
-     */
     public function actionIndex()
     {
         $this->requireAdmin();
@@ -105,11 +100,6 @@ class EntriesController extends Controller
         return $this->renderTemplate('form-builder/entries/_edit', $variables);
     }
 
-    /**
-     * Get unread entries count
-     *
-     * @return mixed
-     */
     public function actionGetUnreadEntries()
     {
         $entries = Entry::find()
@@ -133,11 +123,6 @@ class EntriesController extends Controller
         ]);
     }
 
-    /**
-     * Get unread entries count by source
-     *
-     * @return mixed
-     */
     public function actionGetUnreadEntriesBySource()
     {
         $this->requirePostRequest();
@@ -199,6 +184,13 @@ class EntriesController extends Controller
             return null;
         }
 
+        // Fire a 'beforeSubmitEntry' event
+        if ($this->hasEventHandlers(self::EVENT_BEFORE_SUBMIT_ENTRY)) {
+            $this->trigger(self::EVENT_BEFORE_SUBMIT_ENTRY, new EntryEvent([
+                'entry' => $this->entry
+            ]));
+        }
+
         if ($saveToDatabase) {
             if (Craft::$app->getElements()->saveElement($this->entry)) {
                 $saved = true;
@@ -209,9 +201,20 @@ class EntriesController extends Controller
             $saved = true;
         }
 
+        // Fire a 'afterSubmitEntry' event
+        if ($this->hasEventHandlers(self::EVENT_AFTER_SUBMIT_ENTRY)) {
+            $this->trigger(self::EVENT_AFTER_SUBMIT_ENTRY, new EntryEvent([
+                'entry' => $this->entry
+            ]));
+        }
+
         // Notifications
         if ($saved) {
-            $this->_sendNotifications($this->form['notifications']);
+            if (FormBuilder::$plugin->isEmailBuilderPlugin()) {
+                $this->_sendNotifications($this->form['notifications']);
+            } else {
+                Craft::error(Craft::t('form-builder', 'Email Builder is not installed, cannot send notification'), __METHOD__);
+            }
             $this->_returnSuccessMessage();
         } else {
             $this->_returnErrorMessage($request);
@@ -304,8 +307,12 @@ class EntriesController extends Controller
         
     }
 
-    private function _sendNotifications()
+    private function _sendNotifications($notifications)
     {
-        return true;
+        $this->trigger(self::EVENT_SEND_NOTIFICATION, new NotificationEvent([
+            'form' => $this->form,
+            'entry' => $this->entry,
+            'notifications' => $notifications
+        ]));
     }
 }

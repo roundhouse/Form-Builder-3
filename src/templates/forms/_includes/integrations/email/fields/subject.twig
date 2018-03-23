@@ -1,0 +1,73 @@
+{% import "form-builder/_includes/_components" as components %}
+
+{% set availableFields = form.fieldLayoutId is defined and form.fieldLayoutId ? craft.app.getFields.getLayoutById(form.fieldLayoutId).getFields() : null %}
+{% set fieldsOption = [] %}
+{% set fieldsOption = [{'label': 'Select Field', 'value': ''}] %}
+{% for field in availableFields %}
+    {% if field|getClass(field) == 'PlainText' %}
+        {% set fieldsOption = fieldsOption|merge([{ 'label': field.name, 'value': field.handle }]) %}
+    {% endif %}
+{% endfor %}
+
+{% set nameSelected = 'notifications[email]['~ item ~'][subject][selected]' %}
+{% set nameText = 'notifications[email]['~ item ~'][subject][text]' %}
+{% set nameField = 'notifications[email]['~ item ~'][subject][field]' %}
+{% set nameTwig = 'notifications[email]['~ item ~'][subject][twig]' %}
+
+{% set container = {
+    title: 'Subject' |t,
+    info: null,
+    icon: null,
+    toggle: false,
+    class: null,
+    id: null
+} %}
+
+{% set inputs = {
+    0: {
+        type: 'text',
+        name: nameText,
+        value: attribute(form.notifications.email, item).subject.text is defined and attribute(form.notifications.email, item).subject.text != '' ? attribute(form.notifications.email, item).subject.text : '',
+        class: 'hidden',
+        id: null,
+        hint: 'TEXT'
+    },
+    1: {
+        type: 'select',
+        name: nameField,
+        value: attribute(form.notifications.email, item).subject.field is defined and attribute(form.notifications.email, item).subject.field != '' ? attribute(form.notifications.email, item).subject.field : '',
+        options: fieldsOption |json_encode(),
+        class: 'hidden',
+        id: null,
+        hint: 'FIELD'
+    },
+    2: {
+        type: 'text',
+        name: nameTwig,
+        value: attribute(form.notifications.email, item).subject.twig is defined and attribute(form.notifications.email, item).subject.twig != '' ? attribute(form.notifications.email, item).subject.twig : '',
+        class: 'hidden',
+        id: null,
+        hint: 'TWIG'
+    },
+    3: {
+        type: 'text',
+        name: nameSelected,
+        value: attribute(form.notifications.email, item).subject.selected is defined and attribute(form.notifications.email, item).subject.selected != '' ? attribute(form.notifications.email, item).subject.selected : '',
+        class: 'hidden',
+        id: null,
+        toggler: true
+    }
+} %}
+
+{% set modal = {
+    title: 'Custom Subject' |t,
+    instructions: 'Enter custom subject line or select a field that will be used for the custom subject line. You must toggle the label to turn it on.' |t,
+    successMessage: 'Custom Subject Updated' |t,
+    inputs: inputs
+} %}
+
+{{ components.optionItem(
+    container,
+    modal,
+    inputs
+) }}

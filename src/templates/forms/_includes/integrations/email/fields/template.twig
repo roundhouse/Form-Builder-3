@@ -1,0 +1,53 @@
+{% import "form-builder/_includes/_components" as components %}
+
+{% set templateOption = [{label: 'Select Template', value: ''}] %}
+{% for template in templates %}
+    {% set templateOption = templateOption|merge([{ label: template.name, value: template.handle }]) %}
+{% endfor %}
+
+{% set name = 'notifications[email]['~ item ~'][template][handle]' %}
+{% set enabledName = 'notifications[email]['~ item ~'][template][enabled]' %}
+{% set enabled = attribute(form.notifications.email, item) is defined and attribute(form.notifications.email, item).template.enabled ? true : false %}
+
+{% set container = {
+    title: 'Email Template' |t,
+    info: null,
+    icon: null,
+    toggle: true,
+    class: null,
+    id: null
+} %}
+
+{% set inputs = {
+    0: {
+        type: 'select',
+        name: name,
+        value: attribute(form.notifications.email, item) is defined and attribute(form.notifications.email, item).template.handle != '' ? attribute(form.notifications.email, item).template.handle : '',
+        options: templateOption |json_encode(),
+        class: 'hidden',
+        id: null,
+        hint: 'TEMPLATE',
+        required: true
+    },
+    1: {
+        type: 'checkbox',
+        name: enabledName,
+        value: '1',
+        checked: enabled,
+        class: 'hidden',
+        id: null
+    },
+} %}
+
+{% set modal = {
+    title: 'Email Template' |t,
+    instructions: 'Select email template to use for notification.' |t,
+    successMessage: 'Email Template Updated' |t,
+    inputs: inputs
+} %}
+
+{{ components.optionItem(
+    container,
+    modal,
+    inputs
+) }}

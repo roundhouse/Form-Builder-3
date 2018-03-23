@@ -13,19 +13,8 @@ namespace roundhouse\formbuilder\assets;
 use Craft;
 use craft\web\AssetBundle;
 
-/**
- * FormBuilderPluginsAsset AssetBundle
- *
- *
- * @author    Vadim Goncharov (owldesign)
- * @package   FormBuilder
- * @since     3.0.0
- */
 class Plugins extends AssetBundle
 {
-    // Public Methods
-    // =========================================================================
-
     public function init()
     {
         Craft::setAlias('@odlib', '@vendor/roundhouse/form-builder/lib/');

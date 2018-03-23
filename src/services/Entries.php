@@ -10,53 +10,54 @@
 
 namespace roundhouse\formbuilder\services;
 
-use roundhouse\formbuilder\FormBuilder;
-use roundhouse\formbuilder\elements\Form;
-use roundhouse\formbuilder\elements\Entry;
-use roundhouse\formbuilder\models\FormModel;
-use roundhouse\formbuilder\models\FormStatus as FormStatusModel;
-use roundhouse\formbuilder\models\EntryStatus as EntryStatusModel;
-use roundhouse\formbuilder\records\FormStatus as FormStatusRecord;
-use roundhouse\formbuilder\records\EntryStatus as EntryStatusRecord;
-use roundhouse\formbuilder\records\Entry as EntryRecord;
-use roundhouse\formbuilder\errors\FormNotFoundException;
-
 use Craft;
 use craft\base\Component;
-use craft\helpers\Json;
 use craft\helpers\ArrayHelper;
-use craft\db\Query;
+
+use roundhouse\formbuilder\models\EntryStatus as EntryStatusModel;
+use roundhouse\formbuilder\records\EntryStatus as EntryStatusRecord;
+use roundhouse\formbuilder\records\Entry as EntryRecord;
 
 
-/**
- * Entries Service
- *
- * @author    Vadim Goncharov (owldesign)
- * @package   FormBuilder
- * @since     3.0.0
- */
 class Entries extends Component
 {
     // Properties
     // =========================================================================
 
-    private $_allEntryIds;
     private $_allEntries;
     private $_entriesById;
 
     // Properties
     // =========================================================================
 
+    /**
+     * Get unread entries
+     *
+     * @return array
+     */
     public function getUnreadEntries(): array
     {
         return $this->getAllEntries(true);
     }
 
+    /**
+     * Get unread entries by form ID
+     *
+     * @param $formId
+     * @return int
+     */
     public function getUnreadEntriesByFormId($formId): int
     {
         return count($this->getAllEntries(true, $formId));
     }
 
+    /**
+     * Get all entries
+     *
+     * @param bool $unread
+     * @param null $formId
+     * @return array
+     */
     public function getAllEntries($unread = false, $formId = null): array
     {
         if ($this->_allEntries !== null) {
@@ -87,6 +88,11 @@ class Entries extends Component
         return $this->_allEntries;
     }
 
+    /**
+     * Get all statuses
+     *
+     * @return array
+     */
     public function getAllStatuses(): array
     {
         $statuses = EntryStatusRecord::find()
@@ -108,7 +114,13 @@ class Entries extends Component
 
         return array_values($allStatuses);
     }
-    
+
+    /**
+     * Get status by handle
+     *
+     * @param $handle
+     * @return EntryStatusRecord
+     */
     public function getStatusByHandle($handle): EntryStatusRecord
     {
         $status = EntryStatusRecord::find()
@@ -118,65 +130,11 @@ class Entries extends Component
         return $status;
     }
 
-    // public function getEntryModel(Form $form) : Entry
-    // {
-    //     $entry = new Entry();
-    //     $entry->formId = $form->id;
-
-    //     return $entry;
-    // }
-
-
     /**
-     * Saves a entry.
+     * Install default statuses
      *
-     * @param Entry $entry      The tag group to be saved
-     * @param bool     $runValidation Whether the entry should be validated
-     *
-     * @return bool Whether the tag group was saved successfully
-     * @throws EntryNotFoundException if $entry->id is invalid
-     * @throws \Throwable if reasons
+     * @throws \yii\db\Exception
      */
-    // public function save(Entry $entry, bool $runValidation = true): bool
-    // {
-    //     $entryRecord = new EntryRecord();
-
-    //     $entryRecord->formId        = $entry->formId;
-    //     $entryRecord->statusId      = $entry->statusId;
-    //     $entryRecord->title         = $entry->title;
-    //     $entryRecord->ipAddress     = $entry->ipAddress;
-    //     $entryRecord->userAgent     = $entry->userAgent;
-
-    //     if ($runValidation && !$entry->validate()) {
-    //         Craft::info('Submission is not saved due to validation error.', __METHOD__);
-    //         return false;
-    //     }
-
-    //     $transaction = Craft::$app->getDb()->beginTransaction();
-
-    //     try {
-
-    //         if (!Craft::$app->getElements()->saveElement($entry, false)) {
-    //             throw new Exception('Couldn’t save the entry.');
-    //         }
-
-    //         if (!$entry->id) {
-    //             $entry->id = $entryRecord->id;
-    //         }
-
-    //         $entryRecord->save(false);
-
-    //         $transaction->commit();
-
-    //     } catch (\Throwable $e) {
-    //         $transaction->rollBack();
-
-    //         throw $e;
-    //     }
-
-    //     return true;
-    // }
-
     public function installDefaultStatuses()
     {
         $defaultStatuses = [

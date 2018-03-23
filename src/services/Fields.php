@@ -10,33 +10,22 @@
 
 namespace roundhouse\formbuilder\services;
 
+use Craft;
+use craft\base\Component;
+use yii\base\Exception;
+
 use roundhouse\formbuilder\FormBuilder;
 use roundhouse\formbuilder\models\Field;
 use roundhouse\formbuilder\records\Field as FieldRecord;
 
-use Craft;
-use craft\helpers\Json;
-use craft\base\Component;
-use craft\db\Query;
-
-use yii\base\Exception;
-
-/**
- * Fields Service
- *
- * All of your plugin’s business logic should go in services, including saving data,
- * retrieving data, etc. They provide APIs that your controllers, template variables,
- * and other plugins can interact with.
- *
- * https://craftcms.com/docs/plugins/services
- *
- * @author    Vadim Goncharov (owldesign)
- * @package   FormBuilder
- * @since     3.0.0
- */
 class Fields extends Component
-{   
+{
 
+    /**
+     * Get fields
+     *
+     * @return array
+     */
     public function getFields()
     {
         $fields = Craft::$app->fields->getAllFields();
@@ -53,7 +42,12 @@ class Fields extends Component
 
         return $output;
     }
-    
+
+    /**
+     * Get all field options
+     *
+     * @return array
+     */
     public function getAllFieldOptions()
     {
         $field = $this->_getAllFieldOptions();
@@ -70,6 +64,13 @@ class Fields extends Component
         return $output;
     }
 
+
+    /**
+     * Get field record by field id
+     *
+     * @param int $fieldId
+     * @return array|null|\yii\db\ActiveRecord
+     */
     public function getFieldRecordByFieldId(int $fieldId)
     {
         $fieldRecord = FieldRecord::find()
@@ -79,6 +80,15 @@ class Fields extends Component
         return $fieldRecord;
     }
 
+    /**
+     * Save field options
+     *
+     * @param Field $field
+     * @return bool
+     * @throws Exception
+     * @throws \Throwable
+     * @throws \yii\db\Exception
+     */
     public function save(Field $field) : bool
     {
         $fieldRecord = FormBuilder::$plugin->fields->getFieldRecordByFieldId($field->fieldId);
@@ -124,7 +134,7 @@ class Fields extends Component
     /**
      * Get all field options
      *
-     * @return array
+     * @return array|\yii\db\ActiveRecord[]
      */
     private function _getAllFieldOptions()
     {

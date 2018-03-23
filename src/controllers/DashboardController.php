@@ -24,12 +24,6 @@ use roundhouse\formbuilder\models\Form as FormModel;
 use roundhouse\formbuilder\assets\FormBuilder as FormBuilderAsset;
 use roundhouse\formbuilder\assets\Dashboard as DashboardAsset;
 
-/**
- *
- * @author    Vadim Goncharov (owldesign)
- * @package   FormBuilder
- * @since     3.0.0
- */
 class DashboardController extends Controller
 {
 

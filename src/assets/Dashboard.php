@@ -10,23 +10,11 @@
 
 namespace roundhouse\formbuilder\assets;
 
-use Craft;
 use craft\web\AssetBundle;
 use craft\web\assets\cp\CpAsset;
 
-/**
- * Dashboard AssetBundle
- *
- *
- * @author    Vadim Goncharov (owldesign)
- * @package   FormBuilder
- * @since     3.0.0
- */
 class Dashboard extends AssetBundle
 {
-    // Public Methods
-    // =========================================================================
-
     public function init()
     {
         $this->sourcePath = "@roundhouse/formbuilder/assets";

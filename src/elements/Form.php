@@ -10,30 +10,20 @@
 
 namespace roundhouse\formbuilder\elements;
 
-use roundhouse\formbuilder\FormBuilder;
-use roundhouse\formbuilder\elements\db\FormQuery;
-use roundhouse\formbuilder\records\Form as FormRecord;
-
 use Craft;
 use craft\base\Element;
 use craft\helpers\Json;
 use craft\helpers\UrlHelper;
 use craft\db\Query;
-use craft\elements\db\ElementQuery;
 use craft\elements\db\ElementQueryInterface;
 use craft\validators\HandleValidator;
 use craft\validators\UniqueValidator;
 use craft\behaviors\FieldLayoutBehavior;
-use yii\base\InvalidConfigException;
-use yii\base\Exception;
 
-/**
- * Form Element
- *
- * @author    Vadim Goncharov (owldesign)
- * @package   FormBuilder
- * @since     3.0.0
- */
+use roundhouse\formbuilder\FormBuilder;
+use roundhouse\formbuilder\elements\db\FormQuery;
+use roundhouse\formbuilder\records\Form as FormRecord;
+
 class Form extends Element
 {
 
@@ -63,9 +53,7 @@ class Form extends Element
     // =========================================================================
 
     /**
-     * Returns the display name of this class.
-     *
-     * @return string The display name of this class.
+     * @inheritdoc
      */
     public static function displayName(): string
     {
@@ -116,10 +104,7 @@ class Form extends Element
     // =========================================================================
 
     /**
-     * Returns the field context this element's content uses.
-     *
-     * @access protected
-     * @return string
+     * @inheritdoc
      */
     public function getFieldContext(): string
     {
@@ -137,9 +122,7 @@ class Form extends Element
     }
 
     /**
-     * Use the forms name as its string representation.
-     *
-     * @return string
+     * @inheritdoc
      */
     public function __toString(): string
     {
@@ -156,7 +139,6 @@ class Form extends Element
             self::STATUS_DISABLED => FormBuilder::t('Disabled')
         ];
     }
-
 
     /**
      * @inheritdoc
@@ -219,14 +201,7 @@ class Form extends Element
     }
 
     /**
-     * Returns the validation rules for attributes.
-     *
-     * Validation rules are used by [[validate()]] to check if attribute values are valid.
-     * Child classes may override this method to declare different validation rules.
-     *
-     * More info: http://www.yiiframework.com/doc-2.0/guide-input-validation.html
-     *
-     * @return array
+     * @inheritdoc
      */
     public function rules()
     {
@@ -250,30 +225,29 @@ class Form extends Element
     }
 
     /**
-     * Returns the HTML for the element’s editor HUD.
-     *
-     * @return string The HTML for the editor HUD
+     * @inheritdoc
+     * TODO: create editor html
      */
-    public function getEditorHtml(): string
-    {
-        $html = Craft::$app->getView()->renderTemplateMacro('_includes/forms', 'textField', [
-            [
-                'label' => Craft::t('app', 'Title'),
-                'siteId' => $this->siteId,
-                'id' => 'title',
-                'name' => 'title',
-                'value' => $this->title,
-                'errors' => $this->getErrors('title'),
-                'first' => true,
-                'autofocus' => true,
-                'required' => true
-            ]
-        ]);
-
-        $html .= parent::getEditorHtml();
-
-        return $html;
-    }
+//    public function getEditorHtml(): string
+//    {
+//        $html = Craft::$app->getView()->renderTemplateMacro('_includes/forms', 'textField', [
+//            [
+//                'label' => Craft::t('app', 'Title'),
+//                'siteId' => $this->siteId,
+//                'id' => 'title',
+//                'name' => 'title',
+//                'value' => $this->title,
+//                'errors' => $this->getErrors('title'),
+//                'first' => true,
+//                'autofocus' => true,
+//                'required' => true
+//            ]
+//        ]);
+//
+//        $html .= parent::getEditorHtml();
+//
+//        return $html;
+//    }
 
     // Indexes, etc.
     // -------------------------------------------------------------------------
@@ -361,6 +335,9 @@ class Form extends Element
         return $attributes;
     }
 
+    /**
+     * @inheritdoc
+     */
     protected static function defineDefaultTableAttributes(string $source): array
     {
         $attributes = ['name', 'handle', 'group', 'totalEntries', 'twig'];
@@ -368,62 +345,11 @@ class Form extends Element
         return $attributes;
     }
 
-
     // Events
     // -------------------------------------------------------------------------
 
     /**
-     * Performs actions before an element is saved.
-     *
-     * @param bool $isNew Whether the element is brand new
-     *
-     * @return bool Whether the element should be saved
-     */
-    // public function beforeSave(bool $isNew): bool
-    // {
-    //     return true;
-    // }
-
-    /**
-     * Performs actions after an element is saved.
-     *
-     * @param bool $isNew Whether the element is brand new
-     *
-     * @return void
-     */
-    // public function afterSave(bool $isNew)
-    // {
-    //     if (!$isNew) {
-    //         $record = FormRecord::findOne($this->id);
-
-    //         if (!$record) {
-    //             throw new Exception('Invalid form ID: '.$this->id);
-    //         }
-    //     } else {
-    //         $record = new FormRecord();
-    //         $record->id = $this->id;
-    //     }
-
-    //     Craft::dd($this->getFieldLayout());
-
-    //     $record->name = $this->name;
-    //     $record->handle = $this->handle;
-    //     $record->fieldLayoutId = $record->getFieldLayout()->id;
-    //     $record->groupId = $this->groupId;
-    //     $record->statusId = $this->statusId;
-    //     $record->options = $this->options;
-    //     $record->spam = $this->spam;
-    //     $record->notifications = $this->notifications;
-    //     $record->settings = $this->settings;
-    //     $record->save(false);
-
-    //     parent::afterSave($isNew);
-    // }
-
-    /**
-     * Performs actions before an element is deleted.
-     *
-     * @return bool Whether the element should be deleted
+     * @inheritdoc
      */
     public function beforeDelete(): bool
     {
@@ -433,15 +359,4 @@ class Form extends Element
 
         return parent::beforeDelete();
     }
-
-    /**
-     * Performs actions after an element is deleted.
-     *
-     * @return void
-     */
-    // public function afterDelete()
-    // {
-    // }
-
-
 }

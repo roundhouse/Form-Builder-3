@@ -10,29 +10,15 @@
 
 namespace roundhouse\formbuilder\services;
 
-use roundhouse\formbuilder\FormBuilder;
-use roundhouse\formbuilder\records\Group as GroupRecord;
-use roundhouse\formbuilder\models\Group as GroupModel;
-use roundhouse\formbuilder\errors\GroupNotFoundException;
-
 use Craft;
 use craft\helpers\Json;
 use craft\base\Component;
 use craft\db\Query;
 
-/**
- * Groups Service
- *
- * All of your plugin’s business logic should go in services, including saving data,
- * retrieving data, etc. They provide APIs that your controllers, template variables,
- * and other plugins can interact with.
- *
- * https://craftcms.com/docs/plugins/services
- *
- * @author    Vadim Goncharov (owldesign)
- * @package   FormBuilder
- * @since     3.0.0
- */
+use roundhouse\formbuilder\records\Group as GroupRecord;
+use roundhouse\formbuilder\models\Group as GroupModel;
+use roundhouse\formbuilder\errors\GroupNotFoundException;
+
 class Groups extends Component
 {
 
@@ -46,9 +32,9 @@ class Groups extends Component
     // =========================================================================
 
     /**
-     * Returns all form groups.
+     * Get all groups
      *
-     * @return TagGroup[]
+     * @return array
      */
     public function getAllGroups(): array
     {
@@ -73,10 +59,10 @@ class Groups extends Component
     }
 
     /**
-     * Get forms by group id
+     * Get group by ID
      *
-     * @param $groupId
-     * @return mixed
+     * @param int $groupId
+     * @return null|GroupModel
      */
     public function getGroupById(int $groupId)
     {
@@ -96,14 +82,14 @@ class Groups extends Component
     }
 
     /**
-     * Saves a form group.
+     * Save group
      *
-     * @param group $group      The form group to be saved
-     * @param bool     $runValidation Whether the group should be validated
-     *
-     * @return bool Whether the tag group was saved successfully
-     * @throws GroupNotFoundException if $group->id is invalid
-     * @throws \Throwable if reasons
+     * @param GroupModel $group
+     * @param bool $runValidation
+     * @return bool
+     * @throws GroupNotFoundException
+     * @throws \Throwable
+     * @throws \yii\db\Exception
      */
     public function save(GroupModel $group, bool $runValidation = true): bool
     {
@@ -151,6 +137,13 @@ class Groups extends Component
     }
 
 
+    /**
+     * Install default form groups
+     *
+     * @throws GroupNotFoundException
+     * @throws \Throwable
+     * @throws \yii\db\Exception
+     */
     public function installDefaultGroups()
     {
         $groupSettings = [
@@ -172,6 +165,8 @@ class Groups extends Component
     // -------------------------------------------------------------------------
 
     /**
+     * Create form group
+     *
      * @return Query
      */
     private function _createFormGroupsQuery(): Query

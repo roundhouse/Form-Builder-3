@@ -10,23 +10,14 @@
 
 namespace roundhouse\formbuilder\models;
 
-use roundhouse\formbuilder\FormBuilder;
-use roundhouse\formbuilder\elements\FormElement;
-use roundhouse\formbuilder\records\FormStatusRecord;
-
 use Craft;
 use craft\base\Model;
-use craft\behaviors\FieldLayoutBehavior;
 use craft\validators\HandleValidator;
 use craft\validators\UniqueValidator;
 
-/**
- * FormStatusModel
- *
- * @author    Vadim Goncharov (owldesign)
- * @package   FormBuilder
- * @since     3.0.0
- */
+use roundhouse\formbuilder\elements\FormElement;
+use roundhouse\formbuilder\records\FormStatusRecord;
+
 class FormStatus extends Model
 {
     // Public Properties
@@ -42,6 +33,9 @@ class FormStatus extends Model
     // Public Methods
     // =========================================================================
 
+    /**
+     * @inheritdoc
+     */
     public function rules()
     {
         return [
@@ -52,11 +46,8 @@ class FormStatus extends Model
         ];
     }
 
-
     /**
-     * Use the translated category group's name as the string representation.
-     *
-     * @return string
+     * @inheritdoc
      */
     public function __toString(): string
     {
@@ -64,7 +55,7 @@ class FormStatus extends Model
     }
 
     /**
-     * @return string
+     * @inheritdoc
      */
     public function htmlLabel()
     {

@@ -13,22 +13,13 @@ namespace roundhouse\formbuilder\records;
 use craft\db\ActiveRecord;
 use yii\db\ActiveQueryInterface;
 
-/**
- * Entry Record
- *
- *
- * @author    Vadim Goncharov (owldesign)
- * @package   FormBuilder
- * @since     3.0.0
- */
 class Entry extends ActiveRecord
 {
     // Public Static Methods
     // =========================================================================
 
-     /**
-     *
-     * @return string the table name
+    /**
+     * @inheritdoc
      */
     public static function tableName()
     {
@@ -36,9 +27,9 @@ class Entry extends ActiveRecord
     }
 
     /**
-     * Returns the entry’s element.
+     * Get element
      *
-     * @return ActiveQueryInterface The relational query object.
+     * @return ActiveQueryInterface
      */
     public function getElement(): ActiveQueryInterface
     {
@@ -46,9 +37,9 @@ class Entry extends ActiveRecord
     }
 
     /**
-     * Returns the entry’s form.
+     * Return entry's form
      *
-     * @return ActiveQueryInterface The relational query object.
+     * @return ActiveQueryInterface
      */
     public function getForm(): ActiveQueryInterface
     {
@@ -56,9 +47,9 @@ class Entry extends ActiveRecord
     }
 
     /**
-     * Returns the fieldLayout.
+     * Return fieldlayout
      *
-     * @return ActiveQueryInterface The relational query object.
+     * @return ActiveQueryInterface
      */
     public function getFieldLayout(): ActiveQueryInterface
     {

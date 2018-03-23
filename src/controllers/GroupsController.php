@@ -10,33 +10,24 @@
 
 namespace roundhouse\formbuilder\controllers;
 
-use roundhouse\formbuilder\FormBuilder;
-
 use Craft;
-use craft\web\View;
 use craft\web\Controller;
-use yii\web\BadRequestHttpException;
-use yii\web\NotFoundHttpException;
-use yii\web\Response;
 
+use roundhouse\formbuilder\FormBuilder;
 use roundhouse\formbuilder\models\Group;
 
-/**
- *
- * @author    Vadim Goncharov (owldesign)
- * @package   FormBuilder
- * @since     3.0.0
- */
 class GroupsController extends Controller
 {
     /**
      * Save group
+     *
+     * @return \yii\web\Response
+     * @throws \yii\web\BadRequestHttpException
      */
     public function actionSave()
     {
         $this->requirePostRequest();
         $this->requireAcceptsJson();
-
 
         $group              = new Group();
         $group->id          = Craft::$app->getRequest()->getBodyParam('id');
@@ -44,7 +35,6 @@ class GroupsController extends Controller
         $group->settings    = Craft::$app->getRequest()->getBodyParam('settings');
 
         $isNewGroup = empty($group->id);
-
 
         if (FormBuilder::$plugin->groups->save($group)) {
             if ($isNewGroup) {

@@ -10,37 +10,25 @@
 
 namespace roundhouse\formbuilder\services;
 
-use roundhouse\formbuilder\FormBuilder;
-use roundhouse\formbuilder\elements\Form;
-use roundhouse\formbuilder\elements\Entry;
-use roundhouse\formbuilder\models\FormModel;
-use roundhouse\formbuilder\models\FormStatus as FormStatusModel;
-use roundhouse\formbuilder\records\FormStatus as FormStatusRecord;
-use roundhouse\formbuilder\records\Form as FormRecord;
-use roundhouse\formbuilder\errors\FormNotFoundException;
-
 use Craft;
 use craft\base\Component;
 use craft\helpers\Json;
 use craft\helpers\ArrayHelper;
 use craft\db\Query;
 
+use roundhouse\formbuilder\elements\Form;
+use roundhouse\formbuilder\elements\Entry;
+use roundhouse\formbuilder\models\FormStatus as FormStatusModel;
+use roundhouse\formbuilder\records\FormStatus as FormStatusRecord;
+use roundhouse\formbuilder\records\Form as FormRecord;
+use roundhouse\formbuilder\errors\FormNotFoundException;
 
-/**
- * Forms Service
- *
- * @author    Vadim Goncharov (owldesign)
- * @package   FormBuilder
- * @since     3.0.0
- */
 class Forms extends Component
 {
     // Properties
     // =========================================================================
 
     protected $formRecord;
-
-    private $_allFormIds;
     private $_allForms;
     private $_formsById;
 
@@ -48,9 +36,8 @@ class Forms extends Component
     // =========================================================================
 
     /**
-     * Constructor
-     *
-     * @param object $sliderRecord
+     * Forms constructor.
+     * @param null $formRecord
      */
     public function __construct($formRecord = null)
     {
@@ -62,6 +49,11 @@ class Forms extends Component
         }
     }
 
+    /**
+     * Get all forms
+     *
+     * @return array
+     */
     public function getAllForms(): array
     {
         if ($this->_allForms !== null) {
@@ -74,6 +66,12 @@ class Forms extends Component
         return $this->_allForms;
     }
 
+    /**
+     * Get form record by id
+     *
+     * @param int $formId
+     * @return null|Form
+     */
     public function getFormRecordById(int $formId)
     {
         if ($this->_formsById !== null && array_key_exists($formId, $this->_formsById)) {
@@ -91,6 +89,12 @@ class Forms extends Component
         return $this->_formsById[$formId] = $this->_createFormFromRecord($formRecord);
     }
 
+    /**
+     * Get form by handle
+     *
+     * @param string $handle
+     * @return null|Form
+     */
     public function getFormByHandle(string $handle)
     {
         $formRecord = FormRecord::find()
@@ -101,14 +105,13 @@ class Forms extends Component
     }
 
     /**
-     * Saves a form.
+     * Save form
      *
-     * @param Form $form      The tag group to be saved
-     * @param bool     $runValidation Whether the form should be validated
-     *
-     * @return bool Whether the tag group was saved successfully
-     * @throws FormNotFoundException if $form->id is invalid
-     * @throws \Throwable if reasons
+     * @param Form $form
+     * @return bool
+     * @throws FormNotFoundException
+     * @throws \Throwable
+     * @throws \yii\db\Exception
      */
     public function save(Form $form): bool
     {
@@ -138,7 +141,6 @@ class Forms extends Component
         $formRecord->spam               = Json::encode($form->spam);
         $formRecord->notifications      = Json::encode($form->notifications);
         $formRecord->settings           = Json::encode($form->settings);
-
 
         $transaction = Craft::$app->getDb()->beginTransaction();
 
@@ -170,12 +172,12 @@ class Forms extends Component
     }
 
     /**
-     * Deletes a form by its ID.
+     * Delete form
      *
      * @param int $formId
-     *
-     * @return bool Whether the form was deleted successfully
-     * @throws \Throwable if reasons
+     * @return bool
+     * @throws \Throwable
+     * @throws \yii\db\Exception
      */
     public function delete(int $formId): bool
     {
@@ -202,7 +204,6 @@ class Forms extends Component
                 Craft::$app->getFields()->deleteLayoutById($fieldLayoutId);
             }
 
-            // Delete Entries
             $entries = Entry::find()
                 ->status(null)
                 ->enabledForSite(false)
@@ -231,7 +232,11 @@ class Forms extends Component
     }
 
 
-
+    /**
+     * Get all statuses
+     *
+     * @return array
+     */
     public function getAllStatuses()
     {
         $statuses = FormStatusRecord::find()
@@ -253,9 +258,10 @@ class Forms extends Component
 
         return array_values($allStatuses);
     }
-    
+
     /**
-     * Install default statuses
+     * Install default form statuses
+     * @throws \yii\db\Exception
      */
     public function installDefaultStatuses()
     {
@@ -292,6 +298,12 @@ class Forms extends Component
     // Private methods
     // =========================================================================
 
+    /**
+     * Create form from record
+     *
+     * @param FormRecord|null $formRecord
+     * @return null|Form
+     */
     private function _createFormFromRecord(FormRecord $formRecord = null)
     {
         if (!$formRecord) {

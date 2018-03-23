@@ -10,27 +10,15 @@
 
 namespace roundhouse\formbuilder\records;
 
-use roundhouse\formbuilder\FormBuilder;
-
-use Craft;
 use craft\db\ActiveRecord;
 
-/**
- * EntryStatusRecord
- *
- *
- * @author    Vadim Goncharov (owldesign)
- * @package   FormBuilder
- * @since     3.0.0
- */
 class EntryStatus extends ActiveRecord
 {
     // Public Static Methods
     // =========================================================================
 
-     /**
-     *
-     * @return string the table name
+    /**
+     * @inheritdoc
      */
     public static function tableName()
     {

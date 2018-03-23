@@ -1,0 +1,45 @@
+{% import "form-builder/_includes/_components" as components %}
+
+{% set item = key is defined ? key : 'new' ~ index %}
+
+<section class="cmp-tout-alt section-collapsible" id="notification-{{ type }}-{{ index }}" data-type="{{ type }}">
+    <input type="hidden" name="notifications[{{ type }}][new{{ index }}][templateId]" value="{{ model.id }}">
+    <input type="hidden" name="settings[sections][notifications][email][new{{ index }}][collapsed]" value="0">
+    <input type="checkbox" name="settings[sections][notifications][email][new{{ index }}][collapsed]" value="1" class="section-toggle hidden">
+
+    <header>
+        <div class="titlebar">
+            <span class="tout-title"><i class="far fa-at"></i>  {{ "Email Notification" |t }}</span>
+            <div class="preview"></div>
+        </div>
+        <div class="actions">
+            <div class="status off" title="Disabled"></div>
+
+            <a class="icons collapser bodytoggle" title="Collapse" role="combobox" tabindex="0"></a>
+            <a class="icons settings last" title="Settings" role="combobox" tabindex="0"></a>
+
+            <div class="menu">
+                <ul class="padded">
+                    <li class="hidden"><a data-action="disable"><span class="status off"></span>{{ "Disable"|t }}</a></li>
+                    <li><a data-action="enable"><span class="status enabled"></span>{{ "Enable"|t }}</a></li>
+                    <li><a data-action="delete">{{ "Delete"|t }}</a></li>
+                </ul>
+            </div>
+        </div>
+    </header>
+
+    <div class="body">
+        <input type="hidden" name="notifications[email][new{{ index }}][enabled]" value="0">
+        <input type="checkbox" name="notifications[email][new{{ index }}][enabled]" value="1" class="enable-notification-section hidden">
+        {% include 'form-builder/forms/_includes/integrations/email/fields/to-email' ignore missing %}
+        {% include 'form-builder/forms/_includes/integrations/email/fields/from-name' ignore missing %}
+        {% include 'form-builder/forms/_includes/integrations/email/fields/from-email' ignore missing %}
+        {% include 'form-builder/forms/_includes/integrations/email/fields/subject' ignore missing %}
+        {% include 'form-builder/forms/_includes/integrations/email/fields/reply-to' ignore missing %}
+        {% include 'form-builder/forms/_includes/integrations/email/fields/cc' ignore missing %}
+        {% include 'form-builder/forms/_includes/email/fields/template' ignore missing %}
+        {% include 'form-builder/forms/_includes/email/fields/attachments' ignore missing %}
+        {% include 'form-builder/forms/_includes/integrations/email/fields/submission' ignore missing %}
+    </div>
+
+</section>

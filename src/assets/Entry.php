@@ -10,22 +10,10 @@
 
 namespace roundhouse\formbuilder\assets;
 
-use Craft;
 use craft\web\AssetBundle;
 
-/**
- * Entry AssetBundle
- *
- *
- * @author    Vadim Goncharov (owldesign)
- * @package   FormBuilder
- * @since     3.0.0
- */
 class Entry extends AssetBundle
 {
-    // Public Methods
-    // =========================================================================
-
     public function init()
     {
         $this->sourcePath = "@roundhouse/formbuilder/assets";

@@ -10,35 +10,19 @@
 
 namespace roundhouse\formbuilder\elements;
 
+use craft\base\Element;
+use craft\helpers\UrlHelper;
+use craft\elements\db\ElementQueryInterface;
+use yii\base\Exception;
+
 use roundhouse\formbuilder\FormBuilder;
 use roundhouse\formbuilder\elements\db\EntryQuery;
-use roundhouse\formbuilder\records\Form as FormRecord;
 use roundhouse\formbuilder\records\Entry as EntryRecord;
 use roundhouse\formbuilder\elements\actions\SetStatus;
 use roundhouse\formbuilder\elements\actions\Delete;
 
-use Craft;
-use craft\base\Element;
-use craft\helpers\Json;
-use craft\helpers\UrlHelper;
-use craft\db\Query;
-use craft\elements\db\ElementQuery;
-use craft\elements\db\ElementQueryInterface;
-use craft\validators\HandleValidator;
-use craft\validators\UniqueValidator;
-use yii\base\InvalidConfigException;
-use yii\base\Exception;
-
-/**
- * Entry Element
- *
- * @author    Vadim Goncharov (owldesign)
- * @package   FormBuilder
- * @since     3.0.0
- */
 class Entry extends Element
 {
-
     // Properties
     // =========================================================================
 
@@ -55,9 +39,7 @@ class Entry extends Element
     // =========================================================================
 
     /**
-     * Returns the display name of this class.
-     *
-     * @return string The display name of this class.
+     * @inheritdoc
      */
     public static function displayName(): string
     {
@@ -120,10 +102,7 @@ class Entry extends Element
     }
 
     /**
-     * Returns the field context this element's content uses.
-     *
-     * @access protected
-     * @return string
+     * @inheritdoc
      */
     public function getFieldContext(): string
     {
@@ -131,17 +110,18 @@ class Entry extends Element
     }
 
     /**
-     * Use the entry title as its string representation.
-     *
-     * @return string
+     * @inheritdoc
      */
     public function __toString(): string
     {
         return (string)$this->title;
     }
 
+
     /**
-     * Get Form
+     * Get entry's form
+     *
+     * @return mixed
      */
     public function getForm()
     {
@@ -150,6 +130,9 @@ class Entry extends Element
         return $this->form;
     }
 
+    /**
+     * @inheritdoc
+     */
     public function getUrl()
     {
         return UrlHelper::cpUrl('form-builder/entries/'.$this->id);
@@ -180,6 +163,9 @@ class Entry extends Element
         return $statusArray;
     }
 
+    /**
+     * @inheritdoc
+     */
     public function getStatus()
     {
         $statuses = FormBuilder::$plugin->entries->getAllStatuses();
@@ -197,7 +183,7 @@ class Entry extends Element
     /**
      * @inheritdoc
      *
-     * @return FormQuery The newly created [[FormQuery]] instance.
+     * @return EntryQuery The newly created [[EntryQuery]] instance.
      */
     public static function find(): ElementQueryInterface
     {
@@ -244,9 +230,7 @@ class Entry extends Element
     }
 
     /**
-     * Returns the entry’s CP edit URL.
-     *
-     * @return string
+     * @inheritdoc
      */
     public function getCpEditUrl(): string
     {
@@ -256,7 +240,7 @@ class Entry extends Element
     // Indexes, etc.
     // -------------------------------------------------------------------------
 
-     /**
+    /**
      * @inheritdoc
      */
     protected function tableAttributeHtml(string $attribute): string
@@ -309,6 +293,9 @@ class Entry extends Element
         return $attributes;
     }
 
+    /**
+     * @inheritdoc
+     */
     protected static function defineDefaultTableAttributes(string $source): array
     {
         $attributes = ['formId', 'dateCreated'];
@@ -321,9 +308,7 @@ class Entry extends Element
     }
 
     /**
-     * Returns each of this element’s fields.
-     *
-     * @return Field[] This element’s fields
+     * @inheritdoc
      */
     protected function fieldLayoutFields(): array
     {   
@@ -343,7 +328,6 @@ class Entry extends Element
 
     /**
      * @inheritdoc
-     * @throws Exception if reasons
      */
     public function beforeSave(bool $isNew): bool
     {
@@ -354,7 +338,6 @@ class Entry extends Element
 
     /**
      * @inheritdoc
-     * @throws Exception if reasons
      */
     public function afterSave(bool $isNew)
     {

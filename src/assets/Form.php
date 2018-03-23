@@ -10,23 +10,11 @@
 
 namespace roundhouse\formbuilder\assets;
 
-use Craft;
 use craft\web\AssetBundle;
 use craft\web\assets\cp\CpAsset;
 
-/**
- * Form AssetBundle
- *
- *
- * @author    Vadim Goncharov (owldesign)
- * @package   FormBuilder
- * @since     3.0.0
- */
 class Form extends AssetBundle
 {
-    // Public Methods
-    // =========================================================================
-
     public function init()
     {
         $this->sourcePath = "@roundhouse/formbuilder/assets";
@@ -43,7 +31,8 @@ class Form extends AssetBundle
             'js/tab-designer.js',
             'js/designer.js',
             'js/option.js',
-            'js/tags.js'
+            'js/tags.js',
+            'js/integrations.js'
         ];
 
         parent::init();

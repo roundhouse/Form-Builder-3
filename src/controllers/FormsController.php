@@ -13,7 +13,6 @@ namespace roundhouse\formbuilder\controllers;
 use roundhouse\formbuilder\FormBuilder;
 
 use Craft;
-use craft\web\View;
 use craft\web\Controller;
 use craft\helpers\Json;
 use yii\web\BadRequestHttpException;
@@ -21,38 +20,27 @@ use yii\web\NotFoundHttpException;
 use yii\web\Response;
 
 use roundhouse\formbuilder\elements\Form;
-use roundhouse\formbuilder\models\Form as FormModel;
 use roundhouse\formbuilder\assets\FormBuilder as FormBuilderAsset;
 use roundhouse\formbuilder\assets\Form as FormAsset;
 use roundhouse\formbuilder\assets\Group as GroupAsset;
 use roundhouse\formbuilder\assets\Plugins as PluginsAsset;
 
-/**
- *
- * @author    Vadim Goncharov (owldesign)
- * @package   FormBuilder
- * @since     3.0.0
- */
 class FormsController extends Controller
 {
     // Protected Properties
     // =========================================================================
 
-    /**
-     * @var    bool|array Allows anonymous access to this controller's actions.
-     *         The actions must be in 'kebab-case'
-     * @access protected
-     */
     protected $allowAnonymous = true;
 
     // Public Methods
     // =========================================================================
 
     /**
-     * Index
+     * Forms index page
      *
      * @return Response
-     * @throws ForbiddenHttpException if the user isn't authorized to edit forms
+     * @throws \yii\base\InvalidConfigException
+     * @throws \yii\web\ForbiddenHttpException
      */
     public function actionIndex()
     {
@@ -65,7 +53,6 @@ class FormsController extends Controller
         $view->registerAssetBundle(PluginsAsset::class);
 
         $groups = FormBuilder::$plugin->groups->getAllGroups();
-        $forms = FormBuilder::$plugin->forms->getAllForms();
 
         return $this->renderTemplate('form-builder/forms/index', [
             'groups' => $groups,
@@ -73,16 +60,15 @@ class FormsController extends Controller
     }
 
     /**
-     * Displays the form edit page.
+     * Edit form
      *
-     * @param int        $groupId The form group’s handle.
-     * @param int|null      $formId  The form's ID, if editing an existing form.
-     * @param Form|null $form    The form being edited, if there were any validation errors.
-     *
+     * @param int|null $formId
+     * @param Form|null $form
      * @return Response
-     * @throws NotFoundHttpException if the requested site handle is invalid
+     * @throws NotFoundHttpException
+     * @throws \yii\base\InvalidConfigException
      */
-    public function actionEdit( int $formId = null, Form $form = null): Response
+    public function actionEdit(int $formId = null, Form $form = null): Response
     {
         $variables['formId'] = $formId;
         $this->_prepEditFormVariables($variables);
@@ -116,7 +102,12 @@ class FormsController extends Controller
     }
 
     /**
-     * Safe form
+     * Save form
+     *
+     * @return null|Response
+     * @throws BadRequestHttpException
+     * @throws NotFoundHttpException
+     * @throws \yii\web\ForbiddenHttpException
      */
     public function actionSave()
     {
@@ -124,7 +115,6 @@ class FormsController extends Controller
         $this->requireAdmin();
 
         $form = $this->_getFormModel();
-        $request = Craft::$app->getRequest();
 
         $fieldLayout = Craft::$app->getFields()->assembleLayoutFromPost();
         $fieldLayout->type = Form::class;
@@ -146,9 +136,11 @@ class FormsController extends Controller
     }
 
     /**
-     * Deletes a form.
+     * Delete form
      *
      * @return Response
+     * @throws BadRequestHttpException
+     * @throws \yii\web\ForbiddenHttpException
      */
     public function actionDelete(): Response
     {
@@ -158,9 +150,16 @@ class FormsController extends Controller
         $formId = Craft::$app->getRequest()->getRequiredBodyParam('id');
 
         FormBuilder::$plugin->forms->delete($formId);
-
     }
 
+
+    /**
+     * Validate input field custom template path
+     *
+     * @return Response
+     * @throws BadRequestHttpException
+     * @throws \yii\base\Exception
+     */
     public function actionCheckInputTemplatePath(): Response
     {
         $this->requirePostRequest();
@@ -181,13 +180,13 @@ class FormsController extends Controller
 
     // Private Methods
     // =========================================================================
-    
+
     /**
-     * Fetches or creates a Form.
+     * Get form model
      *
      * @return Form
-     * @throws BadRequestHttpException if the requested form doesn't exist
-     * @throws NotFoundHttpException if the requested form cannot be found
+     * @throws BadRequestHttpException
+     * @throws NotFoundHttpException
      */
     private function _getFormModel(): Form
     {
@@ -221,12 +220,10 @@ class FormsController extends Controller
     }
 
     /**
-     * Preps form variables.
+     * Prepare form variables form post
      *
-     * @param array &$variables
-     *
-     * @return void
-     * @throws NotFoundHttpException if the requested form cannot be found
+     * @param array $variables
+     * @throws NotFoundHttpException
      */
     private function _prepEditFormVariables(array &$variables)
     {   
@@ -251,17 +248,5 @@ class FormsController extends Controller
             $variables['form']->statusId = 1;
             $variables['form']->statusId = 1;
         }
-    }
-
-    /**
-     * Prepare form model
-     *
-     * @return FormModel
-     */
-    private function _prepareNewFormModel()
-    {
-        $model = new FormModel();
-
-        return $model;
     }
 }

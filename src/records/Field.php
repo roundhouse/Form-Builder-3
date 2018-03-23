@@ -10,27 +10,16 @@
 
 namespace roundhouse\formbuilder\records;
 
-use roundhouse\formbuilder\FormBuilder;
-
-use Craft;
 use craft\db\ActiveRecord;
+use yii\db\ActiveQueryInterface;
 
-/**
- * Field Record
- *
- *
- * @author    Vadim Goncharov (owldesign)
- * @package   FormBuilder
- * @since     3.0.0
- */
 class Field extends ActiveRecord
 {
     // Public Static Methods
     // =========================================================================
 
-     /**
-     *
-     * @return string the table name
+    /**
+     * @inheritdoc
      */
     public static function tableName()
     {
@@ -38,9 +27,9 @@ class Field extends ActiveRecord
     }
 
     /**
-     * Returns the forms fieldLayout.
+     * Return fieldlayout
      *
-     * @return ActiveQueryInterface The relational query object.
+     * @return ActiveQueryInterface
      */
     public function getFieldLayout(): ActiveQueryInterface
     {
@@ -49,9 +38,9 @@ class Field extends ActiveRecord
     }
 
     /**
-     * Returns field.
+     * Get field context
      *
-     * @return ActiveQueryInterface The relational query object.
+     * @return ActiveQueryInterface
      */
     public function getField(): ActiveQueryInterface
     {
@@ -59,9 +48,9 @@ class Field extends ActiveRecord
     }
 
     /**
-     * Returns the field's form.
+     * Returns field's form
      *
-     * @return ActiveQueryInterface The relational query object.
+     * @return ActiveQueryInterface
      */
     public function getForm(): ActiveQueryInterface
     {

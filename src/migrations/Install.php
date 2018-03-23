@@ -10,48 +10,22 @@
 
 namespace roundhouse\formbuilder\migrations;
 
-use roundhouse\formbuilder\FormBuilder;
-
 use Craft;
 use craft\config\DbConfig;
 use craft\db\Migration;
 
-/**
- * Form Builder Install Migration
- *
- * If your plugin needs to create any custom database tables when it gets installed,
- * create a migrations/ folder within your plugin folder, and save an Install.php file
- * within it using the following template:
- *
- * If you need to perform any additional actions on install/uninstall, override the
- * safeUp() and safeDown() methods.
- *
- * @author    Vadim Goncharov (owldesign)
- * @package   FormBuilder
- * @since     3.0.0
- */
 class Install extends Migration
 {
     // Public Properties
     // =========================================================================
 
-    /**
-     * @var string The database driver to use
-     */
     public $driver;
 
     // Public Methods
     // =========================================================================
 
     /**
-     * This method contains the logic to be executed when applying this migration.
-     * This method differs from [[up()]] in that the DB logic implemented here will
-     * be enclosed within a DB transaction.
-     * Child classes may implement this method instead of [[up()]] if the DB logic
-     * needs to be within a transaction.
-     *
-     * @return boolean return a false value to indicate the migration fails
-     * and should not proceed further. All other return values mean the migration succeeds.
+     * @inheritdoc
      */
     public function safeUp()
     {
@@ -68,14 +42,7 @@ class Install extends Migration
     }
 
     /**
-     * This method contains the logic to be executed when removing this migration.
-     * This method differs from [[down()]] in that the DB logic implemented here will
-     * be enclosed within a DB transaction.
-     * Child classes may implement this method instead of [[down()]] if the DB logic
-     * needs to be within a transaction.
-     *
-     * @return boolean return a false value to indicate the migration fails
-     * and should not proceed further. All other return values mean the migration succeeds.
+     * @inheritdoc
      */
     public function safeDown()
     {
@@ -89,9 +56,7 @@ class Install extends Migration
     // =========================================================================
 
     /**
-     * Creates the tables needed for the Records used by the plugin
-     *
-     * @return bool
+     * Create tables
      */
     protected function createTables()
     {
@@ -199,9 +164,7 @@ class Install extends Migration
     }
 
     /**
-     * Creates the indexes needed for the Records used by the plugin
-     *
-     * @return void
+     * Create indexes
      */
     protected function createIndexes()
     {
@@ -220,9 +183,7 @@ class Install extends Migration
     }
 
     /**
-     * Creates the foreign keys needed for the Records used by the plugin
-     *
-     * @return void
+     * Add foreign keys
      */
     protected function addForeignKeys()
     {
@@ -245,9 +206,7 @@ class Install extends Migration
     }
 
     /**
-     * Removes the tables needed for the Records used by the plugin
-     *
-     * @return void
+     * Remove tables
      */
     protected function removeTables()
     {

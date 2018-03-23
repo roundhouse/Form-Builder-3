@@ -10,30 +10,16 @@
 
 namespace roundhouse\formbuilder\variables;
 
+use Craft;
+use craft\web\View;
+use craft\helpers\Template;
+use craft\helpers\StringHelper;
+use craft\helpers\Json;
+
 use roundhouse\formbuilder\FormBuilder;
 use roundhouse\formbuilder\elements\Form;
 use roundhouse\formbuilder\elements\Entry;
 
-use Craft;
-use craft\base\ElementInterface;
-use craft\web\View;
-use craft\helpers\Template;
-use craft\helpers\StringHelper;
-use craft\helpers\FileHelper;
-use craft\helpers\Json;
-
-/**
- * Form Builder Variable
- *
- * Craft allows plugins to provide their own template variables, accessible from
- * the {{ craft }} global variable (e.g. {{ craft.formBuilder }}).
- *
- * https://craftcms.com/docs/plugins/variables
- *
- * @author    Vadim Goncharov (owldesign)
- * @package   FormBuilder
- * @since     3.0.0
- */
 class FormBuilderVariable
 {
     // Public Methods
@@ -43,7 +29,9 @@ class FormBuilderVariable
      * Render form on the frontend
      *
      * @param $variables
-     * @return \Twig_Markup
+     * @return bool|\Twig_Markup
+     * @throws \Twig_Error_Loader
+     * @throws \yii\base\Exception
      */
     public function form($variables)
     {
@@ -94,8 +82,15 @@ class FormBuilderVariable
     }
 
     /**
-     * Get input HTML
+     * Get input HTML for frontend fields
      *
+     * @param $value
+     * @param Entry $entry
+     * @param $field
+     * @param Form $form
+     * @return string
+     * @throws \Twig_Error_Loader
+     * @throws \yii\base\Exception
      */
     public function getInputHtml($value, Entry $entry, $field, Form $form): string
     {
@@ -218,9 +213,8 @@ class FormBuilderVariable
     }
 
     /**
-     * Get all form groups
+     * Get all groups
      *
-     * @param $index
      * @return mixed
      */
     public function getAllGroups()
@@ -229,10 +223,9 @@ class FormBuilderVariable
     }
 
     /**
-     * Returns all forms.
+     * Get all forms
      *
      * @param string|null $indexBy
-     *
      * @return array
      */
     public function getAllForms(string $indexBy = null): array
@@ -243,7 +236,7 @@ class FormBuilderVariable
     }
 
     /**
-     * Get all form statuses
+     * Get form statuses
      *
      * @return mixed
      */
@@ -253,7 +246,7 @@ class FormBuilderVariable
     }
 
     /**
-     * Get all entry statuses
+     * Get entry statuses
      *
      * @return mixed
      */
@@ -263,9 +256,9 @@ class FormBuilderVariable
     }
 
     /**
-     * Get total number of entries
+     * Get unread entries
      *
-     * @return int
+     * @return mixed
      */
     public function getUnreadEntries()
     {
@@ -273,9 +266,10 @@ class FormBuilderVariable
     }
 
     /**
-     * Get total number of entries
+     * Get unread entries by form ID
      *
-     * @return int
+     * @param $formId
+     * @return int|string
      */
     public function getUnreadEntriesByFormId($formId)
     {
@@ -290,6 +284,7 @@ class FormBuilderVariable
     /**
      * Get tab settings
      *
+     * @param $tabId
      * @return mixed
      */
     public function getTabSettings($tabId) {

@@ -1,13 +1,17 @@
 {% block select %}
     <select name="{{ input.name }}" {% if input.class %}class="{{ input.class }}"{% endif %} {% if input.id %} id="{{ input.id }}"{% endif %}>
         {% for option in input.options|json_decode() %}
-            <option value="{{ option.value }}" {% if option.value == value %}selected{% endif %}>{{ option.label }}</option>
+            <option value="{{ option.value }}" {% if value is defined and option.value == value %}selected{% endif %}>{{ option.label }}</option>
         {% endfor %}
     </select>
 {% endblock %}
 
 {% block text %}
     <input type="{{ input.type|default('text') }}" name="{{ input.name }}" value="{{ input.value|e }}" {% if input.class %}class="{{ input.class }}"{% endif %} {% if input.id %} id="{{ input.id }}"{% endif %} />
+{% endblock %}
+
+{% block email %}
+    <input type="{{ input.type|default('email') }}" name="{{ input.name }}" value="{{ input.value|e }}" {% if input.class %}class="{{ input.class }}"{% endif %} {% if input.id %} id="{{ input.id }}"{% endif %} />
 {% endblock %}
 
 {% block checkbox %}
@@ -18,9 +22,6 @@
 {% block textarea %}
     <textarea name="{{ input.name }}" value="{{ input.value|e }}" {% if input.class %}class="{{ input.class }}"{% endif %} {% if input.id %} id="{{ input.id }}"{% endif %}>{{ input.value|e }}</textarea>
 {% endblock %}
-
-
-
 
 
 {# Repeating Item #}
@@ -35,7 +36,7 @@
                 {% if container.icon is defined and container.icon != '' %}
                     {% include 'formbuilder/_includes/icons/' ~ container.icon ignore missing %}
                 {% endif %}
-                
+
                 <span class="option-result multiple">
                     {% if values %}
                         {% for item in values %}
@@ -55,7 +56,7 @@
         </div>
 
         <div class="option-actions">
-            <a href="#" class="option-edit btns btn-add" title="{{ "Add" |t }}"><i class="far fa-plus-circle"></i></a>
+            <a href="#" class="option-edit btns btn-add btn-small" title="{{ "Add" |t }}"><i class="fas fa-plus"></i></a>
         </div>
 
     </div>
@@ -84,7 +85,7 @@
 
 
     <div class="option-item {% if enabled is defined and enabled %}option-enabled {% endif %}{% if container.class %}{{ container.class }}{% endif %}" {% if container.id %}id="{{ container.id }}"{% endif %} data-inputs="{{ inputs |json_encode() }}" data-modal="{{ modal |json_encode() }}">
-        
+
         <div class="option-title">
             <span class="option-text">
                 {% if container.icon is defined and container.icon != '' %}

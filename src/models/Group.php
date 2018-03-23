@@ -10,22 +10,12 @@
 
 namespace roundhouse\formbuilder\models;
 
-use roundhouse\formbuilder\FormBuilder;
-use roundhouse\formbuilder\elements\FormElement;
 
 use Craft;
 use craft\base\Model;
-use craft\behaviors\FieldLayoutBehavior;
-use craft\validators\HandleValidator;
-use craft\validators\UniqueValidator;
 
-/**
- * FormGroupModel
- *
- * @author    Vadim Goncharov (owldesign)
- * @package   FormBuilder
- * @since     3.0.0
- */
+use roundhouse\formbuilder\elements\FormElement;
+
 class Group extends Model
 {
     // Public Properties
@@ -38,6 +28,9 @@ class Group extends Model
     // Public Methods
     // =========================================================================
 
+    /**
+     * @inheritdoc
+     */
     public function rules()
     {
         return [
@@ -46,11 +39,8 @@ class Group extends Model
         ];
     }
 
-
     /**
-     * Use the translated category group's name as the string representation.
-     *
-     * @return string
+     * @inheritdoc
      */
     public function __toString(): string
     {
