@@ -19,7 +19,8 @@ class Entry extends AssetBundle
         $this->sourcePath = "@roundhouse/formbuilder/assets";
 
         $this->js = [
-            'js/entries.js'
+            'js/entries.js',
+            'js/charts.js'
         ];
 
         parent::init();

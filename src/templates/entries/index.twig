@@ -27,13 +27,7 @@
                         <li class="heading"><span>{{ source.heading|t('form-builder') }}</span></li>
                     {% else %}
                         <li {% if source.key != '*' %}class="group-item"{% endif %}>
-                            <a data-key="{{ source.key is defined ? source.key : key }}"
-                                {%- if source.hasThumbs is defined and source.hasThumbs %} data-has-thumbs{% endif %}
-                                {%- if source.structureId is defined and source.structureId %} data-has-structure{% endif %}
-                                {%- if source.defaultSort is defined %}{% set defaultSort = source.defaultSort %} data-default-sort="{{ defaultSort is iterable ? defaultSort|join(':') : defaultSort }}"{% endif %}
-                                {%- if source.data is defined -%}
-                                    {% for dataKey, dataVal in source.data %} data-{{ dataKey }}="{{ dataVal }}"{% endfor %}
-                                {%- endif %}>
+                            <a data-key="{{ source.key is defined ? source.key : key }}" {% if source.criteria.formId is defined %}data-form-id="{{ source.criteria.formId }}"{% endif %}>
                                 {{- source.label -}}
                                 {% if source.criteria.formId is defined %}
                                     {% set entryCount = craft.formBuilder.getUnreadEntriesByFormId(source.criteria.formId) %}
