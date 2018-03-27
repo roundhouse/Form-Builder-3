@@ -21,8 +21,8 @@ use yii\web\Response;
 
 use roundhouse\formbuilder\events\NotificationEvent;
 use roundhouse\formbuilder\elements\Entry;
-use roundhouse\formbuilder\assets\FormBuilder as FormBuilderAsset;
-use roundhouse\formbuilder\assets\Entry as EntryAsset;
+use roundhouse\formbuilder\web\assets\FormBuilder as FormBuilderAsset;
+use roundhouse\formbuilder\web\assets\Entry as EntryAsset;
 use roundhouse\formbuilder\events\EntryEvent;
 
 require_once __DIR__ . '/functions/array-group-by.php';

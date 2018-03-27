@@ -20,10 +20,10 @@ use yii\web\NotFoundHttpException;
 use yii\web\Response;
 
 use roundhouse\formbuilder\elements\Form;
-use roundhouse\formbuilder\assets\FormBuilder as FormBuilderAsset;
-use roundhouse\formbuilder\assets\Form as FormAsset;
-use roundhouse\formbuilder\assets\Group as GroupAsset;
-use roundhouse\formbuilder\assets\Plugins as PluginsAsset;
+use roundhouse\formbuilder\web\assets\FormBuilder as FormBuilderAsset;
+use roundhouse\formbuilder\web\assets\Form as FormAsset;
+use roundhouse\formbuilder\web\assets\Group as GroupAsset;
+use roundhouse\formbuilder\web\assets\Plugins as PluginsAsset;
 
 class FormsController extends Controller
 {
@@ -52,7 +52,7 @@ class FormsController extends Controller
         $view->registerAssetBundle(FormAsset::class);
         $view->registerAssetBundle(PluginsAsset::class);
 
-        $groups = FormBuilder::$plugin->groups->getAllGroups();
+        $groups = FormBuilder::getInstance()->getGroups()->getAllGroups();
 
         return $this->renderTemplate('form-builder/forms/index', [
             'groups' => $groups,

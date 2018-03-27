@@ -8,28 +8,18 @@
  * @copyright Copyright (c) 2018 Roundhouse Agency (roundhousepdx)
  */
 
-namespace roundhouse\formbuilder\assets;
+namespace roundhouse\formbuilder\web\assets;
 
 use craft\web\AssetBundle;
-use craft\web\assets\cp\CpAsset;
 
-class FormBuilder extends AssetBundle
+class Group extends AssetBundle
 {
     public function init()
     {
-        $this->sourcePath = "@roundhouse/formbuilder/assets";
-
-        $this->depends = [
-            CpAsset::class,
-            Fontawesome::class,
-        ];
+        $this->sourcePath = "@roundhouse/formbuilder/web/assets";
 
         $this->js = [
-            'js/formbuilder.js',
-        ];
-
-        $this->css = [
-            'css/formbuilder.css',
+            'js/groups.js',
         ];
 
         parent::init();

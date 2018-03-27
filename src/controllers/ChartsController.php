@@ -14,7 +14,6 @@ use Craft;
 use craft\controllers\ElementIndexesController;
 use craft\helpers\DateTimeHelper;
 use craft\helpers\ChartHelper;
-use craft\db\Query;
 
 use roundhouse\formbuilder\FormBuilder;
 
@@ -56,18 +55,9 @@ class ChartsController extends ElementIndexesController
             $query = clone $this->getElementQuery()
                 ->where(['formId' => $formId])
                 ->search(null);
-
-//            $query = (new Query())
-//                ->select('COUNT(*) as value')
-//                ->from(['{{%formbuilder_entries}}'])
-//                ->where(['formId' => $formId]);
         } else {
             $query = clone $this->getElementQuery()
                 ->search(null);
-
-//            $query = (new Query())
-//                ->select('COUNT(*) as value')
-//                ->from(['{{%formbuilder_entries}}']);
         }
 
         $dataTable = ChartHelper::getRunChartDataFromQuery($query, $startDate, $endDate, 'formbuilder_entries.dateCreated', 'count', '[[formbuilder_entries.dateCreated]]', [
@@ -76,17 +66,8 @@ class ChartsController extends ElementIndexesController
             'valueType' => 'number',
         ]);
 
-//
-//        $dataTable = ChartHelper::getRunChartDataFromQuery($query, $startDate, $endDate, 'formbuilder_entries.dateCreated','count','formbuilder_entries.dateCreated',
-//            [
-//                'intervalUnit' => $intervalUnit,
-//                'valueLabel' => FormBuilder::t('Entries'),
-//                'valueType' => 'number',
-//            ]
-//        );
-//
         $total = 0;
-//
+
         foreach($dataTable['rows'] as $row) {
             $total = $total + $row[1];
         }

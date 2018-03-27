@@ -8,23 +8,31 @@
  * @copyright Copyright (c) 2018 Roundhouse Agency (roundhousepdx)
  */
 
-namespace roundhouse\formbuilder\assets;
+namespace roundhouse\formbuilder\web\assets;
 
 use craft\web\AssetBundle;
 use craft\web\assets\cp\CpAsset;
 
-class Dashboard extends AssetBundle
+class Form extends AssetBundle
 {
     public function init()
     {
-        $this->sourcePath = "@roundhouse/formbuilder/assets";
+        $this->sourcePath = "@roundhouse/formbuilder/web/assets";
 
         $this->depends = [
             CpAsset::class,
         ];
 
         $this->js = [
-            'js/dashboard.js',
+            'js/modal.js',
+            'js/fields.js',
+            'js/forms.js',
+            'js/field-designer.js',
+            'js/tab-designer.js',
+            'js/designer.js',
+            'js/option.js',
+            'js/tags.js',
+            'js/integrations.js'
         ];
 
         parent::init();

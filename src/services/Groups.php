@@ -104,7 +104,7 @@ class Groups extends Component
             $groupRecord = GroupRecord::findOne($group->id);
 
             if (!$groupRecord) {
-                throw new GroupNotFoundException("No tag group exists with the ID '{$tagGroup->id}'");
+                throw new GroupNotFoundException("No group exists with the ID '{$group->id}'");
             } 
 
         } else {

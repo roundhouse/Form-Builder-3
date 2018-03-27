@@ -8,18 +8,20 @@
  * @copyright Copyright (c) 2018 Roundhouse Agency (roundhousepdx)
  */
 
-namespace roundhouse\formbuilder\assets;
+namespace roundhouse\formbuilder\web\assets;
 
+use Craft;
 use craft\web\AssetBundle;
 
-class Group extends AssetBundle
+class Plugins extends AssetBundle
 {
     public function init()
     {
-        $this->sourcePath = "@roundhouse/formbuilder/assets";
+        Craft::setAlias('@odlib', '@vendor/roundhouse/form-builder/lib/');
+        $this->sourcePath = "@odlib";
 
         $this->js = [
-            'js/groups.js',
+            'clipboard/clipboard.js'
         ];
 
         parent::init();

@@ -21,8 +21,8 @@ use yii\web\Response;
 
 use roundhouse\formbuilder\elements\Form;
 use roundhouse\formbuilder\models\Form as FormModel;
-use roundhouse\formbuilder\assets\FormBuilder as FormBuilderAsset;
-use roundhouse\formbuilder\assets\Dashboard as DashboardAsset;
+use roundhouse\formbuilder\web\assets\FormBuilder as FormBuilderAsset;
+use roundhouse\formbuilder\web\assets\Dashboard as DashboardAsset;
 
 class DashboardController extends Controller
 {

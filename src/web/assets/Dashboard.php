@@ -8,20 +8,23 @@
  * @copyright Copyright (c) 2018 Roundhouse Agency (roundhousepdx)
  */
 
-namespace roundhouse\formbuilder\assets;
+namespace roundhouse\formbuilder\web\assets;
 
-use Craft;
 use craft\web\AssetBundle;
+use craft\web\assets\cp\CpAsset;
 
-class Plugins extends AssetBundle
+class Dashboard extends AssetBundle
 {
     public function init()
     {
-        Craft::setAlias('@odlib', '@vendor/roundhouse/form-builder/lib/');
-        $this->sourcePath = "@odlib";
+        $this->sourcePath = "@roundhouse/formbuilder/web/assets";
+
+        $this->depends = [
+            CpAsset::class,
+        ];
 
         $this->js = [
-            'clipboard/clipboard.js'
+            'js/dashboard.js',
         ];
 
         parent::init();

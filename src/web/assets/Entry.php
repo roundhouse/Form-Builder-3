@@ -8,7 +8,7 @@
  * @copyright Copyright (c) 2018 Roundhouse Agency (roundhousepdx)
  */
 
-namespace roundhouse\formbuilder\assets;
+namespace roundhouse\formbuilder\web\assets;
 
 use craft\web\AssetBundle;
 
@@ -16,7 +16,7 @@ class Entry extends AssetBundle
 {
     public function init()
     {
-        $this->sourcePath = "@roundhouse/formbuilder/assets";
+        $this->sourcePath = "@roundhouse/formbuilder/web/assets";
 
         $this->js = [
             'js/entries.js',

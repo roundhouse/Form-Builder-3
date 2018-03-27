@@ -8,9 +8,9 @@
  * @copyright Copyright (c) 2018 Roundhouse Agency (roundhousepdx)
  */
 
-namespace roundhouse\formbuilder\twigextensions;
+namespace roundhouse\formbuilder\web\twig;
 
-class FormBuilderTwigExtension extends \Twig_Extension
+class Extensions extends \Twig_Extension
 {
     // Public Methods
     // =========================================================================
@@ -73,13 +73,13 @@ class FormBuilderTwigExtension extends \Twig_Extension
         $difference     = $now - strtotime($time);
 
         for($j = 0; $difference >= $lengths[$j] && $j < count($lengths)-1; $j++) {
-           $difference /= $lengths[$j];
+            $difference /= $lengths[$j];
         }
 
         $difference = round($difference);
 
         if($difference != 1) {
-           $periods[$j].= "s";
+            $periods[$j].= "s";
         }
 
         return "$difference $periods[$j]";
