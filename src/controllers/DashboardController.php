@@ -12,15 +12,9 @@ namespace roundhouse\formbuilder\controllers;
 
 use roundhouse\formbuilder\FormBuilder;
 
-use Craft;
-use craft\web\View;
 use craft\web\Controller;
-use yii\web\BadRequestHttpException;
-use yii\web\NotFoundHttpException;
 use yii\web\Response;
 
-use roundhouse\formbuilder\elements\Form;
-use roundhouse\formbuilder\models\Form as FormModel;
 use roundhouse\formbuilder\web\assets\FormBuilder as FormBuilderAsset;
 use roundhouse\formbuilder\web\assets\Dashboard as DashboardAsset;
 
@@ -42,10 +36,11 @@ class DashboardController extends Controller
     // =========================================================================
 
     /**
-     * Index
+     * Dashboard index page
      *
      * @return Response
-     * @throws ForbiddenHttpException if the user isn't authorized to edit forms
+     * @throws \yii\base\InvalidConfigException
+     * @throws \yii\web\ForbiddenHttpException
      */
     public function actionIndex()
     {
@@ -59,6 +54,7 @@ class DashboardController extends Controller
         $forms = FormBuilder::$plugin->forms->getAllForms();
 
         return $this->renderTemplate('form-builder/dashboard/index', [
+            'plugin' => FormBuilder::getInstance(),
             'groups' => $groups,
             'forms' => $forms,
         ]);

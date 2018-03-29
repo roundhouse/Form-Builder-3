@@ -30,6 +30,7 @@ class Entry extends Element
     public $form;
     public $formId;
     public $options;
+    public $settings;
     public $statusId = 1;
     public $ipAddress;
     public $userAgent;

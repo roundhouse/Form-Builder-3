@@ -7,7 +7,10 @@
     {% include 'form-builder/_includes/_header' ignore missing with { title: title } %}
 {% endblock %}
 
-{% block main %}
+{# TODO: refactor this to use 2 column grid with settings scrollable independently #}
+{# TODO: Add entry actions like delete etc... #}
+
+{% block content %}
     <input type="hidden" name="action" value="form-builder/entries/save">
     {{ redirectInput('form-builder/entries/{groupId}') }}
 
@@ -15,31 +18,117 @@
         <input type="hidden" name="entryId" value="{{ entry.id }}">
     {% endif %}
 
-    <div id="content-container">
-        <div id="content">
+
+    <section class="flex-container">
+        <div class="widget wide-col">
+            <header class="pad">
+                <h2>{{ "Submission"|t('form-builder') }}</h2>
+            </header>
+
+            <div class="body">
+
             {% set tabs = entry.getFieldLayout().getTabs() %}
 
             {% for tab in tabs %}
-                <div class="fieldset">
+                <div class="list">
                     {% set fields = tab.getFields() %}
-                    
+
                     {% for field in fields %}
                         {% set value = attribute(entry, field.handle) %}
-                        <div class="entry-field">
-                            <span class="entry-label">{{ field.name }}</span>
-                            <span class="entry-value">{{ value }}</span>
+                        <div class="list-item">
+                            <div class="item-meta">
+                                <span class="item-meta-title">{{ field.name }}</span>
+
+                            </div>
+                            <span class="item-title">{{ value }}</span>
                         </div>
                     {% endfor %}
-                
+
                 </div>
             {% endfor %}
+            </div>
         </div>
-    </div>
 
-    <div id="details">
-        <div id="settings">
-            settings
+        {% set form = entry.getForm() %}
+        {% set group = form.getGroup() %}
+        {% set notes = craft.formBuilder.notes(entry.id) %}
+
+        <div class="short-col">
+            <div class="widget form-widget">
+                <header class="pad">
+                    <div class="group-icon">
+                        <i class="far fa-{{ group.settings.icon.name }}"></i>
+                    </div>
+                    <div class="form-info">
+                        <h6>{{ "form"|t('form-builder') }}</h6>
+                        <h2>{{ form.name }}</h2>
+                    </div>
+                </header>
+                <div class="body">
+                    <div class="list">
+                        <div class="list-item pad">
+                            <div class="item-meta">
+                                <span class="item-meta-icon"><i class="far fa-calendar"></i></span>
+                                <span class="item-meta-title">Posted on</span>
+                            </div>
+                            <div class="item-title">
+                                {{ entry.dateCreated |date() }}
+                            </div>
+                        </div>
+                        <div class="list-item pad">
+                            <div class="item-meta">
+                                <span class="item-meta-icon"><i class="far fa-globe"></i></span>
+                                <span class="item-meta-title">IP Address</span>
+                            </div>
+                            <div class="item-title">
+                                {{ entry.ipAddress }}
+                            </div>
+                        </div>
+                        <div class="list-item pad">
+                            <div class="item-meta">
+                                <span class="item-meta-icon"><i class="far fa-browser"></i></span>
+                                <span class="item-meta-title">Browser</span>
+                            </div>
+                            <div class="item-title">
+                                {{ entry.userAgent |browser(entry.userAgent) }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="widget notes-widget" data-entry-id="{{ entry.id }}">
+                <header class="pad">
+                    <h2>{{ "Notes"|t('form-builder') }}</h2>
+                    <a href="#" id="write-note-btn">Leave a note</a>
+                </header>
+                <div class="body">
+                    <div class="loader hidden"><svg width="20px" height="20px" viewBox="0 0 42 42" xmlns="http://www.w3.org/2000/svg" stroke="#E9EFF4"><g fill="none" fill-rule="evenodd"><g transform="translate(4 3)" stroke-width="5"><circle stroke-opacity=".5" cx="18" cy="18" r="18"/><path d="M36 18c0-9.94-8.06-18-18-18"><animateTransform attributeName="transform" type="rotate" from="0 18 18" to="360 18 18" dur="1s" repeatCount="indefinite"/></path></g></g></svg></div>
+                    <div class="list">
+                        {% for note in notes %}
+                            <div class="list-item pad">
+                                <div class="item-meta">
+                                    <span class="item-meta-icon"><i class="far fa-user"></i></span>
+                                    <span class="item-meta-title">{{ note.getAuthor() }}</span>
+                                    <span class="item-meta-right">{{ note.dateCreated |date() }}</span>
+                                </div>
+
+                                <div class="item-title">
+                                    {{ note.note }}
+                                </div>
+                            </div>
+                        {% else %}
+                            <div class="list-item pad">
+                                <div class="item-title">
+                                    {{ "No notes yet, leave some."|t('form-builder') }}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
         </div>
-    </div>
+    </section>
 
 {% endblock %}

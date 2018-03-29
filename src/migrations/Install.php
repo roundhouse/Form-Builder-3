@@ -110,6 +110,8 @@ class Install extends Migration
                 'id' => $this->integer()->notNull(),
                 'title' => $this->string()->notNull(),
                 'options' => $this->text(),
+                'notes' => $this->text(),
+                'settings' => $this->text(),
                 'formId' => $this->integer()->notNull(),
                 'statusId' => $this->integer()->notNull(),
                 'ipAddress' => $this->string()->notNull(),
@@ -118,6 +120,18 @@ class Install extends Migration
                 'dateUpdated' => $this->dateTime()->notNull(),
                 'uid' => $this->uid(),
                 'PRIMARY KEY(id)',
+            ]
+        );
+
+        // Entry's Note
+        $this->createTable('{{%formbuilder_entries_notes}}', [
+                'id' => $this->primaryKey(),
+                'note' => $this->text(),
+                'entryId' => $this->integer()->notNull(),
+                'authorId' => $this->integer()->notNull(),
+                'dateCreated' => $this->dateTime()->notNull(),
+                'dateUpdated' => $this->dateTime()->notNull(),
+                'uid' => $this->uid()
             ]
         );
 
@@ -199,10 +213,13 @@ class Install extends Migration
         $this->addForeignKey($this->db->getForeignKeyName('{{%formbuilder_fields}}', 'fieldLayoutId'), '{{%formbuilder_fields}}', 'fieldLayoutId', '{{%fieldlayouts}}', 'id', 'CASCADE', null);
         $this->addForeignKey($this->db->getForeignKeyName('{{%formbuilder_fields}}', 'fieldId'), '{{%formbuilder_fields}}', 'fieldId', '{{%fields}}', 'id', 'CASCADE', null);
         $this->addForeignKey($this->db->getForeignKeyName('{{%formbuilder_fields}}', 'formId'), '{{%formbuilder_fields}}', 'formId', '{{%formbuilder_forms}}', 'id', 'CASCADE', null);
-        
+
         $this->addForeignKey($this->db->getForeignKeyName('{{%formbuilder_tabs}}', 'layoutId'), '{{%formbuilder_tabs}}', 'layoutId', '{{%fieldlayouts}}', 'id', 'CASCADE', null);
         $this->addForeignKey($this->db->getForeignKeyName('{{%formbuilder_tabs}}', 'tabId'), '{{%formbuilder_tabs}}', 'tabId', '{{%fieldlayouttabs}}', 'id', 'CASCADE', null);
         $this->addForeignKey($this->db->getForeignKeyName('{{%formbuilder_tabs}}', 'formId'), '{{%formbuilder_tabs}}', 'formId', '{{%formbuilder_forms}}', 'id', 'CASCADE', null);
+
+        $this->addForeignKey($this->db->getForeignKeyName('{{%formbuilder_entries_notes}}', 'entryId'), '{{%formbuilder_entries_notes}}', 'entryId', '{{%formbuilder_entries}}', 'id', 'CASCADE', null);
+        $this->addForeignKey($this->db->getForeignKeyName('{{%formbuilder_entries_notes}}', 'authorId'), '{{%formbuilder_entries_notes}}', 'authorId', '{{%users}}', 'id', 'CASCADE', null);
     }
 
     /**
@@ -210,6 +227,7 @@ class Install extends Migration
      */
     protected function removeTables()
     {
+        $this->dropTableIfExists('{{%formbuilder_entries_notes}}');
         $this->dropTableIfExists('{{%formbuilder_entries}}');
         $this->dropTableIfExists('{{%formbuilder_entrystatus}}');
         $this->dropTableIfExists('{{%formbuilder_fields}}');

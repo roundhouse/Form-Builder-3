@@ -49,6 +49,16 @@ class Form extends ActiveRecord
     }
 
     /**
+     * Return group
+     *
+     * @return ActiveQueryInterface
+     */
+    public function getGroup(): ActiveQueryInterface
+    {
+        return $this->hasOne(Group::class, ['id' => 'groupId']);
+    }
+
+    /**
      * Returns the forms fieldLayout.
      *
      * @return ActiveQueryInterface The relational query object.

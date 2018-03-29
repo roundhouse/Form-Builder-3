@@ -38,13 +38,6 @@
         "handle": "form-builder",
         "developer": "Roundhouse",
         "description": "Craft CMS plugin that lets you create and manage forms for your front-end.",
-        // "schemaVersion": "3.0.0",
-        // "hasCpSettings": true,
-        // "hasCpSection": true,
-        // "changelogUrl": "https://raw.githubusercontent.com/roundhouse/Form-Builder-3/master/CHANGELOG.md",
-        // "components": {
-            // "app": "roundhouse\\formbuilder\\services\\App"
-        // },
-        // "class": "roundhouse\\formbuilder\\FormBuilder"
+        "class": "roundhouse\\formbuilder\\FormBuilder"
     }
 }

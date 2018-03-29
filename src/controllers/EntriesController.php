@@ -19,7 +19,6 @@ use craft\helpers\DateTimeHelper;
 use craft\helpers\StringHelper;
 use yii\web\Response;
 
-use roundhouse\formbuilder\events\NotificationEvent;
 use roundhouse\formbuilder\elements\Entry;
 use roundhouse\formbuilder\web\assets\FormBuilder as FormBuilderAsset;
 use roundhouse\formbuilder\web\assets\Entry as EntryAsset;
@@ -62,7 +61,14 @@ class EntriesController extends Controller
     
     // Public Methods
     // =========================================================================
-    
+
+    /**
+     * Entries index page
+     *
+     * @return Response
+     * @throws \yii\base\InvalidConfigException
+     * @throws \yii\web\ForbiddenHttpException
+     */
     public function actionIndex()
     {
         $this->requireAdmin();
@@ -74,7 +80,16 @@ class EntriesController extends Controller
         return $this->renderTemplate('form-builder/entries/index');
     }
 
-    public function actionEdit( int $entryId = null, Entry $entry = null): Response
+    /**
+     * Entry single page
+     *
+     * @param int|null $entryId
+     * @param Entry|null $entry
+     * @return Response
+     * @throws \yii\base\InvalidConfigException
+     * @throws \yii\db\Exception
+     */
+    public function actionEdit(int $entryId = null, Entry $entry = null): Response
     {
         $view = $this->getView();
         $view->registerAssetBundle(FormBuilderAsset::class);
@@ -86,12 +101,10 @@ class EntriesController extends Controller
             $variables['entry'] = Entry::find()->id($entryId)->one();
             $variables['title'] = $variables['entry']->title;
             
-            // Update read status
             Craft::$app->getDb()->createCommand()
                 ->update('{{%formbuilder_entries}}', ['statusId' => 2], ['id' => $variables['entry']->id])
                 ->execute();
         }
-
 
         $variables['fullPageForm'] = true;
         $variables['continueEditingUrl'] = 'form-builder/entries/{id}';
@@ -100,6 +113,13 @@ class EntriesController extends Controller
         return $this->renderTemplate('form-builder/entries/_edit', $variables);
     }
 
+    /**
+     * Get all unread entries
+     *
+     * @return Response
+     * @throws \Twig_Error_Loader
+     * @throws \yii\base\Exception
+     */
     public function actionGetUnreadEntries()
     {
         $entries = Entry::find()
@@ -123,10 +143,20 @@ class EntriesController extends Controller
         ]);
     }
 
+
+    /**
+     * Get all unread entries by form ID
+     *
+     * @return Response
+     * @throws \Twig_Error_Loader
+     * @throws \yii\base\Exception
+     * @throws \yii\web\BadRequestHttpException
+     */
     public function actionGetUnreadEntriesBySource()
     {
         $this->requirePostRequest();
         $source = Craft::$app->getRequest()->getBodyParam('source');
+        $entries = false;
 
         if ($source) {
             $formId = StringHelper::explode($source, ':');
@@ -150,6 +180,15 @@ class EntriesController extends Controller
         ]);
     }
 
+    /**
+     * Save entry
+     *
+     * @return null
+     * @throws \Throwable
+     * @throws \craft\errors\ElementNotFoundException
+     * @throws \yii\base\Exception
+     * @throws \yii\web\BadRequestHttpException
+     */
     public function actionSave()
     {
         $this->requirePostRequest();
@@ -171,6 +210,7 @@ class EntriesController extends Controller
         $this->_spamProtection($this->entry, $request);
 
         // Terms & Conditions
+        // TODO: validate terms and conditions
         // $this->_checkTermsConditions();
 
         $this->entry->setScenario(Element::SCENARIO_LIVE);
@@ -210,11 +250,12 @@ class EntriesController extends Controller
 
         // Notifications
         if ($saved) {
-            if (FormBuilder::$plugin->isEmailBuilderPlugin()) {
-                $this->_sendNotifications($this->form['notifications']);
-            } else {
-                Craft::error(Craft::t('form-builder', 'Email Builder is not installed, cannot send notification'), __METHOD__);
-            }
+            // TODO: remove this
+//            if (FormBuilder::$plugin->isEmailBuilderPlugin()) {
+//                $this->_sendNotifications($this->form['notifications']);
+//            } else {
+//                Craft::error(Craft::t('form-builder', 'Email Builder is not installed, cannot send notification'), __METHOD__);
+//            }
             $this->_returnSuccessMessage();
         } else {
             $this->_returnErrorMessage($request);
@@ -223,10 +264,11 @@ class EntriesController extends Controller
 
     // Private Methods
     // =========================================================================
-    
+
     /**
-     * Creates an entry model
+     * Create an entry model
      *
+     * @return Entry
      */
     private function _getEntryModel(): Entry
     {
@@ -236,8 +278,11 @@ class EntriesController extends Controller
     }
 
     /**
-     * Populate an entry model
+     * Populate entry model from post
      *
+     * @param Entry $entry
+     * @param $request
+     * @throws \yii\base\Exception
      */
     private function _populateEntryModel(Entry $entry, $request)
     {
@@ -255,6 +300,12 @@ class EntriesController extends Controller
         $entry->setFieldValuesFromRequest($fieldsLocation);
     }
 
+    /**
+     * Validate spam protection
+     *
+     * @param Entry $entry
+     * @param $request
+     */
     private function _spamProtection(Entry $entry, $request)
     {
         // Honeypot
@@ -279,6 +330,9 @@ class EntriesController extends Controller
 
     /**
      * Return error message
+     *
+     * @param $request
+     * @return Response
      */
     private function _returnErrorMessage($request)
     {   
@@ -293,7 +347,12 @@ class EntriesController extends Controller
             ]);
         }
     }
-    
+
+    /**
+     * Return success message
+     *
+     * @return Response
+     */
     private function _returnSuccessMessage()
     {
         if (Craft::$app->getRequest()->getIsAjax()) {
@@ -305,14 +364,5 @@ class EntriesController extends Controller
             Craft::$app->getSession()->setFlash('success', isset($this->form['options']['messages']['success']) ? $this->form['options']['messages']['success'] : FormBuilder::t('Form submission successful.'));
         }
         
-    }
-
-    private function _sendNotifications($notifications)
-    {
-        $this->trigger(self::EVENT_SEND_NOTIFICATION, new NotificationEvent([
-            'form' => $this->form,
-            'entry' => $this->entry,
-            'notifications' => $notifications
-        ]));
     }
 }

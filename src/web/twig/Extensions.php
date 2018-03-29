@@ -32,6 +32,7 @@ class Extensions extends \Twig_Extension
             new \Twig_SimpleFilter('json_decode', [$this, 'json_decode']),
             new \Twig_SimpleFilter('getClass', [$this, 'getClass']),
             new \Twig_SimpleFilter('timeAgo', [$this, 'getTimeAgo']),
+            new \Twig_SimpleFilter('browser', [$this, 'browser']),
         ];
     }
 
@@ -83,5 +84,25 @@ class Extensions extends \Twig_Extension
         }
 
         return "$difference $periods[$j]";
+    }
+
+    public function browser($browser)
+    {
+        if(strpos($browser, 'MSIE') !== FALSE)
+            echo 'Internet explorer';
+        elseif(strpos($browser, 'Trident') !== FALSE) //For Supporting IE 11
+            echo 'Internet explorer';
+        elseif(strpos($browser, 'Firefox') !== FALSE)
+            echo 'Mozilla Firefox';
+        elseif(strpos($browser, 'Chrome') !== FALSE)
+            echo 'Google Chrome';
+        elseif(strpos($browser, 'Opera Mini') !== FALSE)
+            echo "Opera Mini";
+        elseif(strpos($browser, 'Opera') !== FALSE)
+            echo "Opera";
+        elseif(strpos($browser, 'Safari') !== FALSE)
+            echo "Safari";
+        else
+            echo 'Unknown';
     }
 }

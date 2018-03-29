@@ -151,6 +151,18 @@ class Form extends Element
     }
 
     /**
+     * Get group
+     *
+     * @return mixed
+     */
+    public function getGroup()
+    {
+        $this->group = FormBuilder::$plugin->groups->getGroupById($this->groupId);
+
+        return $this->group;
+    }
+
+    /**
      * @inheritdoc
      */
     protected static function defineSources(string $context = null): array
@@ -167,7 +179,7 @@ class Form extends Element
         foreach ($groups as $group) {
             $key = 'group:' . $group->id;
             $settings = Json::decode($group->settings);
-            
+
             if (!empty($settings)) {
                 $icon = $settings['icon']['name'];
             } else {

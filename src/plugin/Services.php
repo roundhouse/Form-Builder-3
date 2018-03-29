@@ -15,6 +15,7 @@ use roundhouse\formbuilder\services\Entries;
 use roundhouse\formbuilder\services\Fields;
 use roundhouse\formbuilder\services\Tabs;
 use roundhouse\formbuilder\services\Groups;
+use roundhouse\formbuilder\services\Notes;
 
 trait Services
 {
@@ -71,6 +72,16 @@ trait Services
         return $this->get('tabs');
     }
 
+    /**
+     * Get entry notes
+     *
+     * @return Notes
+     */
+    public function getNotes(): Notes
+    {
+        return $this->get('notes');
+    }
+
     // Private Methods
     // =========================================================================
 
@@ -84,7 +95,8 @@ trait Services
             'entries' => Entries::class,
             'groups' => Groups::class,
             'fields' => Fields::class,
-            'tabs' => Tabs::class
+            'tabs' => Tabs::class,
+            'notes' => Notes::class
         ]);
     }
 }

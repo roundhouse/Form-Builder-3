@@ -19,6 +19,7 @@ use craft\helpers\Json;
 use roundhouse\formbuilder\FormBuilder;
 use roundhouse\formbuilder\elements\Form;
 use roundhouse\formbuilder\elements\Entry;
+use roundhouse\formbuilder\elements\db\EntryQuery;
 
 class FormBuilderVariable
 {
@@ -75,7 +76,7 @@ class FormBuilderVariable
 
             return Template::raw($formHtml);
         } else {
-            $notice = '<code>'.FormBuilder::t('There is no form with handle: '. $handle).'</code>';
+            $notice = '<code>'.FormBuilder::t('There is no form with handle: '. $variables['formHandle']).'</code>';
 
             echo $notice;
         }
@@ -211,6 +212,46 @@ class FormBuilderVariable
             return '';
         }
     }
+
+
+
+    public function entries($criteria = null): EntryQuery
+    {
+        $query = Entry::find();
+
+        if ($criteria) {
+            Craft::configure($query, $criteria);
+        }
+
+        return $query;
+    }
+
+    /**
+     * Get entry's notes
+     *
+     * @param $entryId
+     * @return \roundhouse\formbuilder\services\Notes
+     */
+    public function notes($entryId)
+    {
+        return FormBuilder::$plugin->notes->getNotes($entryId);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     /**
      * Get all groups

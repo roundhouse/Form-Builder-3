@@ -13,6 +13,8 @@ namespace roundhouse\formbuilder\records;
 use craft\db\ActiveRecord;
 use yii\db\ActiveQueryInterface;
 
+use roundhouse\formbuilder\records\Note;
+
 class Entry extends ActiveRecord
 {
     // Public Static Methods
@@ -55,6 +57,16 @@ class Entry extends ActiveRecord
     {
         return $this->hasOne(FieldLayout::class,
             ['id' => 'fieldLayoutId']);
+    }
+
+    /**
+     * Return entry's notes
+     *
+     * @return ActiveQueryInterface
+     */
+    public function getNotes($entryId): ActiveQueryInterface
+    {
+        return $this->hasMany(Note::class, ['id' => $entryId]);
     }
 
 }

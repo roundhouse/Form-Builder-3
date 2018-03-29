@@ -15,6 +15,7 @@ use craft\helpers\Json;
 use craft\base\Component;
 use craft\db\Query;
 
+use roundhouse\formbuilder\models\Group;
 use roundhouse\formbuilder\records\Group as GroupRecord;
 use roundhouse\formbuilder\models\Group as GroupModel;
 use roundhouse\formbuilder\errors\GroupNotFoundException;
@@ -45,11 +46,11 @@ class Groups extends Component
                 ->all();
 
             foreach ($this->_groupsById as $key => $value) {
-                $this->_groupsById[$key] = new GroupModel($value->toArray([
-                    'id',
-                    'name',
-                    'settings'
-                ]));
+                $group = new GroupModel();
+                $group->id = $value->id;
+                $group->name = $value->name;
+                $group->settings = $value->settings;
+                $this->_groupsById[$key] = $group;
             }
 
             $this->_fetchedAllGroups = true;
@@ -78,7 +79,12 @@ class Groups extends Component
             ->where(['id' => $groupId])
             ->one();
 
-        return $this->_groupsById[$groupId] = $result ? new GroupModel($result) : null;
+        $group = new GroupModel();
+        $group->id = $result['id'];
+        $group->name = $result['name'];
+        $group->settings = Json::decode($result['settings']);
+
+        return $this->_groupsById[$groupId] = $result ? $group : null;
     }
 
     /**
