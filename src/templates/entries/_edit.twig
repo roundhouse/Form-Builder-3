@@ -38,9 +38,32 @@
                         <div class="list-item">
                             <div class="item-meta">
                                 <span class="item-meta-title">{{ field.name }}</span>
-
                             </div>
-                            <span class="item-title">{{ value }}</span>
+
+                            {% if value is iterable %}
+                                <div class="item-list">
+                                {% for element in value.all() %}
+                                    {% set elementClass = element|getClass %}
+                                    {% switch elementClass %}
+                                        {% case "Asset" %}
+                                            <div class="item-asset">
+                                                <span class="asset-thumbnail pad"><img src="{{ element.getThumbUrl(80) }}"></span>
+
+                                                <div class="asset-description pad">
+                                                    <span class="item-title asset-title">{{ element.title }}</span>
+                                                    <span class="item-title">{{ element.size|formatBytes }}</span>
+                                                    <span class="item-title download-asset"><a href="{{ element.url }}" target="_blank"><i class="far fa-download"></i></a></span>
+                                                    <div class="asset-select" data-asset-id="{{ element.id }}"><i class="far fa-check-circle"></i></div>
+                                                </div>
+                                            </div>
+                                        {% default %}
+                                    {% endswitch %}
+                                {% endfor %}
+                                </div>
+                            {% else %}
+                                <span class="item-title">{{ value }}</span>
+                            {% endif %}
+
                         </div>
                     {% endfor %}
 
@@ -92,6 +115,10 @@
                             <div class="item-title">
                                 {{ entry.userAgent |browser(entry.userAgent) }}
                             </div>
+                        </div>
+                        <div class="list-item element-actions">
+                            <button id="delete-entry" class="btns btn-danger"><span>Delete Entry</span></button>
+                            <button id="download-all-assets" class="btns btn-info hidden"><span>Download Assets</span><span class="asset-count">0</span></button>
                         </div>
                     </div>
                 </div>

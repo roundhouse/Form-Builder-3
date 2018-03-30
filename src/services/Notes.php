@@ -11,7 +11,6 @@
 namespace roundhouse\formbuilder\services;
 
 use Craft;
-use craft\helpers\Json;
 use craft\base\Component;
 
 use roundhouse\formbuilder\records\Note as NoteRecord;
@@ -19,6 +18,12 @@ use roundhouse\formbuilder\models\Note as NoteModel;
 
 class Notes extends Component
 {
+    /**
+     * Get notes
+     *
+     * @param int $entryId
+     * @return array
+     */
     public function getNotes(int $entryId)
     {
         $notes = NoteRecord::find()
@@ -42,6 +47,14 @@ class Notes extends Component
     }
 
 
+    /**
+     * Save note
+     *
+     * @param $note
+     * @return bool
+     * @throws \Throwable
+     * @throws \yii\db\Exception
+     */
     public function save($note) : bool
     {
         $note->validate();

@@ -33,6 +33,7 @@ class Extensions extends \Twig_Extension
             new \Twig_SimpleFilter('getClass', [$this, 'getClass']),
             new \Twig_SimpleFilter('timeAgo', [$this, 'getTimeAgo']),
             new \Twig_SimpleFilter('browser', [$this, 'browser']),
+            new \Twig_SimpleFilter('formatBytes', [$this, 'formatBytes']),
         ];
     }
 
@@ -86,6 +87,11 @@ class Extensions extends \Twig_Extension
         return "$difference $periods[$j]";
     }
 
+    /**
+     * Get browser from user-agent string
+     *
+     * @param $browser
+     */
     public function browser($browser)
     {
         if(strpos($browser, 'MSIE') !== FALSE)
@@ -104,5 +110,25 @@ class Extensions extends \Twig_Extension
             echo "Safari";
         else
             echo 'Unknown';
+    }
+
+    /**
+     * Format bytes to ...
+     *
+     * @param $bytes
+     * @param int $precision
+     * @return string
+     */
+    public function formatBytes($bytes, $precision = 0)
+    {
+        $units = array('B', 'KB', 'MB', 'GB', 'TB');
+        $bytes = max($bytes, 0);
+        $pow = floor(($bytes ? log($bytes) : 0) / log(1024));
+        $pow = min($pow, count($units) - 1);
+
+        // Uncomment one of the following alternatives
+        $bytes /= pow(1024, $pow);
+
+        return round($bytes, $precision) . ' ' . $units[$pow];
     }
 }
