@@ -13,6 +13,7 @@ namespace roundhouse\formbuilder;
 use Craft;
 use craft\base\Element;
 use craft\base\Plugin;
+use craft\helpers\ArrayHelper;
 use craft\services\Elements;
 use craft\services\Fields;
 use craft\services\UserPermissions;
@@ -201,6 +202,9 @@ class FormBuilder extends Plugin
         );
     }
 
+    /**
+     * Register custom events
+     */
     private function _registerCustomEvents()
     {
         Event::on(
@@ -317,6 +321,9 @@ class FormBuilder extends Plugin
         );
     }
 
+    /**
+     * Register variables
+     */
     private function _registerVariables()
     {
         Event::on(
@@ -328,6 +335,43 @@ class FormBuilder extends Plugin
             }
         );
     }
+
+    /**
+     * Register plugin CP navigation links
+     */
+    public function getCpNavItem()
+    {
+        $parent = parent::getCpNavItem();
+
+        if ($this->getSettings()->pluginName) {
+            $parent['label'] = $this->getSettings()->pluginName;
+        }
+
+        $navigation = ArrayHelper::merge($parent, [
+            'subnav' => [
+                'dashboard' => [
+                    'label' => FormBuilder::t('Dashboard'),
+                    'url' => 'form-builder'
+                ],
+                'forms' => [
+                    'label' => FormBuilder::t('Forms'),
+                    'url' => 'form-builder/forms'
+                ],
+                'entries' => [
+                    'label' => FormBuilder::t('Entries'),
+                    'url' => 'form-builder/entries'
+                ],
+                'settings' => [
+                    'label' => FormBuilder::t('Settings'),
+                    'url' => 'form-builder/settings'
+                ]
+
+            ]
+        ]);
+
+        return $navigation;
+    }
+
 
 
 }

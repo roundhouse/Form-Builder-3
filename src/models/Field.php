@@ -23,6 +23,7 @@ class Field extends Model
 {
     // Public Properties
     // =========================================================================
+    
     public $id;
     public $fieldId;
     public $fieldLayoutId;

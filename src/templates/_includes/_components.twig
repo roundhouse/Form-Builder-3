@@ -23,7 +23,6 @@
     <textarea name="{{ input.name }}" value="{{ input.value|e }}" {% if input.class %}class="{{ input.class }}"{% endif %} {% if input.id %} id="{{ input.id }}"{% endif %}>{{ input.value|e }}</textarea>
 {% endblock %}
 
-
 {# Repeating Item #}
 {% macro repeaterItem(container, modal, inputs, values) %}
     {% import _self as forms %}

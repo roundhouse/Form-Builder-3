@@ -1,0 +1,26 @@
+{% extends "_layouts/cp" %}
+{% import "_includes/forms" as forms %}
+
+{% set title = "Settings"|t('form-builder') %}
+{% set bodyClass = 'formbuilder fb-settings' %}
+{% set selectedSubnavItem = "settings" %}
+
+{% block header %}
+    {% include 'form-builder/_includes/_header' ignore missing with { title: title } %}
+{% endblock %}
+
+{% block content %}
+    <section class="flex-container">
+
+        {{ forms.textField({
+            label: 'Plugin Name',
+            instructions: 'Enter custom plugin name.',
+            id: 'pluginName',
+            name: 'pluginName',
+            value: settings['pluginName']})
+        }}
+
+        <button type="submit" class="submit">Update Settings</button>
+
+    </section>
+{% endblock %}

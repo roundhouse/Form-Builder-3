@@ -15,6 +15,8 @@ use craft\base\Component;
 use craft\helpers\Json;
 use craft\helpers\ArrayHelper;
 use craft\db\Query;
+use craft\helpers\MigrationHelper;
+use craft\helpers\StringHelper;
 
 use roundhouse\formbuilder\elements\Form;
 use roundhouse\formbuilder\elements\Entry;
@@ -22,6 +24,7 @@ use roundhouse\formbuilder\models\FormStatus as FormStatusModel;
 use roundhouse\formbuilder\records\FormStatus as FormStatusRecord;
 use roundhouse\formbuilder\records\Form as FormRecord;
 use roundhouse\formbuilder\errors\FormNotFoundException;
+use roundhouse\formbuilder\migrations\CreateContentTable;
 
 class Forms extends Component
 {
@@ -142,13 +145,66 @@ class Forms extends Component
         $formRecord->notifications      = Json::encode($form->notifications);
         $formRecord->settings           = Json::encode($form->settings);
 
+        $fieldLayout = $form->getFieldLayout();
+        $form->oldHandle = $formRecord->getOldHandle();
+        $form->oldFieldLayoutId = $formRecord->getOldFieldLayoutId();
+
+//        $oldContentTable = $this->getContentTableName($form, true);
+//        $newContentTable = $this->getContentTableName($form);
+
+//        if ($form->oldFieldLayoutId) {
+//            $oldFields = ArrayHelper::map(Craft::$app->fields->getFieldsByLayoutId($form->oldFieldLayoutId), 'handle', function ($field) {
+//               return [
+//                   'id' => $field->id,
+//                   'handle' => $field->handle,
+//                   'columnType' => $field->getContentColumnType(),
+//               ];
+//            });
+//        }
+
+//        $newFields = ArrayHelper::map($fieldLayout->getFields(), 'id', function ($field) {
+//            return [
+//                'id' => $field->id,
+//                'handle' => $field->handle,
+//                'columnType' => $field->getContentColumnType(),
+//            ];
+//        });
+
         $transaction = Craft::$app->getDb()->beginTransaction();
 
         try {
-            $fieldLayout = $form->getFieldLayout();
+//            Craft::$app->content->fieldContext = $form->getFieldContext();
+//            Craft::$app->content->contentTable = $form->getContentTable();
+
             Craft::$app->getFields()->saveLayout($fieldLayout);
             $form->fieldLayoutId = $fieldLayout->id;
             $formRecord->fieldLayoutId = $fieldLayout->id;
+
+//            if (!Craft::$app->db->tableExists($newContentTable)) {
+//                if ($oldContentTable && Craft::$app->db->tableExists($oldContentTable)) {
+//                    MigrationHelper::renameTable($oldContentTable, $newContentTable);
+//                } else {
+//                    $this->_createContentTable($newContentTable);
+//                }
+//            }
+
+//            foreach ($newFields as $handle => $field) {
+//                $columnType = $field['columnType'];
+//                $columnName = 'field_'.$field['handle'];
+//
+//                Craft::$app->getDb()->schema->refresh();
+//
+//                if (Craft::$app->getDb()->columnExists($newContentTable, $columnName)) {
+//
+//                    Craft::$app->getDb()->createCommand()
+//                        ->alterColumn($newContentTable, $columnName, $columnType)
+//                        ->execute();
+//                } else {
+//                    Craft::$app->getDb()->createCommand()
+//                        ->addColumn($newContentTable, $columnName, $columnType)
+//                        ->execute();
+//                }
+//            }
 
             if (!Craft::$app->getElements()->saveElement($form, false)) {
                 throw new Exception('Couldn’t save the form.');
@@ -231,6 +287,46 @@ class Forms extends Component
         return true;
     }
 
+    /**
+     * Get content table name
+     *
+     * @param Form $form
+     * @param bool $useOldHandle
+     * @return bool|string
+     */
+    public function getContentTableName(Form $form, $useOldHandle = false)
+    {
+        if ($useOldHandle) {
+            if (!$form->oldHandle) {
+                return false;
+            }
+
+            $handle = $form->oldHandle;
+        } else {
+            $handle = $form->handle;
+        }
+
+        $name = '_' . StringHelper::toLowerCase($handle);
+
+        return '{{%formbuildercontent' . $name . '}}';
+    }
+
+    /**
+     * Get content table
+     *
+     * @param $formId
+     * @return string
+     */
+    public function getContentTable($formId)
+    {
+        $form = $this->getFormRecordById($formId);
+
+        if ($form) {
+            return sprintf('formbuildercontent_%s', trim(strtolower($form->handle)));
+        }
+
+        return 'content';
+    }
 
     /**
      * Get all statuses
@@ -330,5 +426,22 @@ class Forms extends Component
         $form->settings = Json::decode($form->settings);
 
         return $form;
+    }
+
+    /**
+     * Create content table
+     *
+     * @param $name
+     * @throws \Throwable
+     */
+    private function _createContentTable($name)
+    {
+        $migration = new CreateContentTable([
+            'tableName' => $name
+        ]);
+
+        ob_start();
+        $migration->up();
+        ob_end_clean();
     }
 }

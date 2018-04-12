@@ -17,6 +17,9 @@ use yii\db\ActiveQueryInterface;
 
 class Form extends ActiveRecord
 {
+    private $_oldHandle;
+    private $_oldFieldLayoutId;
+
     // Public Static Methods
     // =========================================================================
 
@@ -67,5 +70,21 @@ class Form extends ActiveRecord
     {
         return $this->hasOne(FieldLayout::class,
             ['id' => 'fieldLayoutId']);
+    }
+
+    function afterFind()
+    {
+        $this->_oldHandle = $this->handle;
+        $this->_oldFieldLayoutId = $this->fieldLayoutId;
+    }
+
+    public function getOldHandle()
+    {
+        return $this->_oldHandle;
+    }
+
+    public function getOldFieldLayoutId()
+    {
+        return $this->_oldFieldLayoutId;
     }
 }

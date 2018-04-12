@@ -21,6 +21,7 @@ class FormQuery extends ElementQuery
     public $id;
     public $name;
     public $handle;
+    public $oldHandle;
     public $groupId;
     public $statusId;
     public $options;

@@ -2,18 +2,28 @@
 {% set name = name ?? null -%}
 {% set value = value ?? null -%}
 
-<div class="datewrapper"
-        {%- if block('attr') is defined %} {{ block('attr') }}{% endif %}>
+{% if field.showDate %}
+    <div class="datewrapper">
+            <input type="date"
+                name="{{ name }}"
+                value="{{ value ? value|date('short') : '' }}"
+                placeholder=" "
+                autocomplete="off"
+                size="10">
 
-        <input type="{{ type }}"
-            name="{{ name ? name~'[date]' }}"
-            value="{{ value ? value|date('short') : '' }}"
-            placeholder=" "
-            autocomplete="off"
-            size="10">
+        <div data-icon="date"></div>
+    </div>
+{% endif %}
 
-    <div data-icon="date"></div>
-    {% if name -%}
-        <input type="hidden" name="{{ name }}[timezone]" value="{{ craft.app.getTimeZone() }}">
-    {%- endif -%}
-</div>
+{% if field.showTime %}
+    <div class="timewrapper">
+            <input type="time"
+               name="{{ name }}"
+               value="{{ value ? value|time('short') : '' }}"
+               placeholder=" "
+               autocomplete="off"
+               size="10">
+
+        <div data-icon="time"></div>
+    </div>
+{% endif %}

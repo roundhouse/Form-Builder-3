@@ -2,6 +2,7 @@
 
 {% set bodyClass = 'formbuilder fb-edit-form' %}
 {% set pluginCpUrl = url('form-builder') %}
+{% set selectedSubnavItem = "forms" %}
 
 {% set docLinks = {
     'formSettings': 'https://google.com/', 
@@ -33,45 +34,45 @@
 {% endblock %}
 
 {% block main %}
-    <input type="hidden" name="action" value="form-builder/forms/save">
-    {{ redirectInput('form-builder/forms/group/{groupId}') }}
-    
-    {% if form.id %}
-        <input type="hidden" name="formId" value="{{ form.id }}">
-        <input type="hidden" name="fieldLayoutId" value="{{ form.fieldLayoutId }}">
-    {% endif %}
-
-    {% set availableFields = form.fieldLayoutId is defined and form.fieldLayoutId ? form.getFieldLayout().getFields() : null %}
-
-    {% set fieldsOption = [] %}
-    {% set fieldsOption = [{label: 'Select Field', value: ''}] %}
-    {% for field in availableFields %}
-        {% set type = field |getClass(field) %}
-        {# TODO: only get plain text fields here? maybe? #}
-        {# {% if type == 'PlainText' %} #}
-            {% set fieldsOption = fieldsOption|merge([{ label: field.name, value: field.handle }]) %}
-        {# {% endif %} #}
-    {% endfor %}
-
-    {% set errors = form.getErrors() %}
-
-    {% set tabs = [
-        {
-            tabId: 0,
-            class: 'tab',
-            label: 'Fields',
-            url: '#tab-fields'
-        },
-        {
-            tabId: 1,
-            class: 'tab',
-            label: 'Settings',
-            url: '#tab-fields-settings'
-        }
-    ] %}
-
-
     <div id="content-container">
+
+        <input type="hidden" name="action" value="form-builder/forms/save">
+        {{ redirectInput('form-builder/forms/group/{groupId}') }}
+
+        {% if form.id %}
+            <input type="hidden" name="formId" value="{{ form.id }}">
+            <input type="hidden" name="fieldLayoutId" value="{{ form.fieldLayoutId }}">
+        {% endif %}
+
+        {% set availableFields = form.fieldLayoutId is defined and form.fieldLayoutId ? form.getFieldLayout().getFields() : null %}
+
+        {% set fieldsOption = [] %}
+        {% set fieldsOption = [{label: 'Select Field', value: ''}] %}
+        {% for field in availableFields %}
+            {% set type = field |getClass(field) %}
+             {% if type == 'PlainText' or type == 'Email' %}
+                {% set fieldsOption = fieldsOption|merge([{ label: field.name, value: field.handle }]) %}
+             {% endif %}
+        {% endfor %}
+
+        {% set errors = form.getErrors() %}
+
+        {% set tabs = [
+            {
+                tabId: 0,
+                class: 'tab',
+                label: 'Fields',
+                url: '#tab-fields'
+            },
+            {
+                tabId: 1,
+                class: 'tab',
+                label: 'Settings',
+                url: '#tab-fields-settings'
+            }
+        ] %}
+
+
         <div id="content">
             {% include 'form-builder/forms/_includes/fields/fields' ignore missing %}
 
@@ -90,7 +91,6 @@
 
                 <div class="notify-options">
                     {% if craft.app.plugins.isPluginInstalled('email-builder') %}
-                        {# TODO: only show notifications if templates exist #}
                         {% set templates = craft.emailBuilder.getTemplates() %}
                         {% if templates %}
                             <a class="notify-item-btn btns btn-info add-email-notification" data-type="email" data-element="roundhouse\emailbuilder\elements\EmailNotification" data-context="{{ form |json_encode() }}">

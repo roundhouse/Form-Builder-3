@@ -189,6 +189,11 @@ class FormBuilderVariable
                 $variables['options'] = $field->options;
                 $input = Craft::$app->view->renderTemplate('form-builder/_includes/forms/checkboxGroup', $variables);
                 break;
+            case 'dropdown':
+                $variables['type'] = 'select';
+                $variables['options'] = $field->options;
+                $input = Craft::$app->view->renderTemplate('form-builder/_includes/forms/select', $variables);
+                break;
             case 'multi-select':
                 $variables['options'] = $field->options;
                 $input = Craft::$app->view->renderTemplate('form-builder/_includes/forms/multiselect', $variables);

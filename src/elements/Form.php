@@ -38,6 +38,7 @@ class Form extends Element
 
     public $name;
     public $handle;
+    public $oldHandle;
     public $group;
     public $groupId = 1;
     public $status;
@@ -48,6 +49,7 @@ class Form extends Element
     public $settings;
     public $twig;
     public $totalEntries;
+    public $oldFieldLayoutId;
 
     // Static Methods
     // =========================================================================
@@ -100,16 +102,27 @@ class Form extends Element
         return true;
     }
 
-    // Public Methods
-    // =========================================================================
-
     /**
      * @inheritdoc
      */
     public function getFieldContext(): string
     {
         return 'global';
+//        return 'formbuilder:' . $this->id;
     }
+
+    /**
+     * Returns the name of the table this element's content is stored in.
+     *
+     * @return string
+     */
+//    public function getContentTable(): string
+//    {
+//        return FormBuilder::$plugin->forms->getContentTableName($this);
+//    }
+
+    // Public Methods
+    // =========================================================================
 
     /**
      * @inheritdoc
@@ -160,6 +173,25 @@ class Form extends Element
         $this->group = FormBuilder::$plugin->groups->getGroupById($this->groupId);
 
         return $this->group;
+    }
+
+    public function getAllowedFieldTypes()
+    {
+        $allowed = [
+            'PlainText',
+            'Email',
+            'Number',
+            'Url',
+            'Assets',
+            'Dropdown',
+            'Checkboxes',
+            'MultiSelect',
+            'RadioButtons',
+            'Date',
+            'Color'
+        ];
+
+        return $allowed;
     }
 
     /**
@@ -232,34 +264,9 @@ class Form extends Element
     public function getFieldLayout()
     {
         $behavior = $this->getBehavior('fieldLayout');
-        
+
         return $behavior->getFieldLayout();
     }
-
-    /**
-     * @inheritdoc
-     * TODO: create editor html
-     */
-//    public function getEditorHtml(): string
-//    {
-//        $html = Craft::$app->getView()->renderTemplateMacro('_includes/forms', 'textField', [
-//            [
-//                'label' => Craft::t('app', 'Title'),
-//                'siteId' => $this->siteId,
-//                'id' => 'title',
-//                'name' => 'title',
-//                'value' => $this->title,
-//                'errors' => $this->getErrors('title'),
-//                'first' => true,
-//                'autofocus' => true,
-//                'required' => true
-//            ]
-//        ]);
-//
-//        $html .= parent::getEditorHtml();
-//
-//        return $html;
-//    }
 
     // Indexes, etc.
     // -------------------------------------------------------------------------

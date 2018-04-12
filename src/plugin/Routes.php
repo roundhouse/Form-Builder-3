@@ -10,6 +10,7 @@
 
 namespace roundhouse\formbuilder\plugin;
 
+use craft;
 use craft\events\RegisterUrlRulesEvent;
 use craft\web\UrlManager;
 use yii\base\Event;
@@ -30,6 +31,8 @@ trait Routes
                 $event->rules['form-builder/forms/<formId:\d+>'] = 'form-builder/forms/edit';
                 $event->rules['form-builder/entries'] = 'form-builder/entries';
                 $event->rules['form-builder/entries/<entryId:\d+>'] = 'form-builder/entries/edit';
+                $event->rules['form-builder/assets/download-files'] = 'form-builder/assets/download-files';
+                $event->rules['form-builder/settings'] = 'form-builder/settings';
             }
         );
     }

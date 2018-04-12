@@ -15,6 +15,7 @@ use roundhouse\formbuilder\FormBuilder;
 use Craft;
 use craft\web\Controller;
 use craft\helpers\Json;
+
 use yii\web\BadRequestHttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
@@ -63,12 +64,11 @@ class FormsController extends Controller
      * Edit form
      *
      * @param int|null $formId
-     * @param Form|null $form
      * @return Response
      * @throws NotFoundHttpException
      * @throws \yii\base\InvalidConfigException
      */
-    public function actionEdit(int $formId = null, Form $form = null): Response
+    public function actionEdit(int $formId = null): Response
     {
         $variables['formId'] = $formId;
         $this->_prepEditFormVariables($variables);
@@ -93,7 +93,13 @@ class FormsController extends Controller
         $view->registerJs('initFLD();');
 
 
-        $variables['title'] = 'Edit Form';
+        if ($variables['form']) {
+            $variables['title'] = 'Edit '.$variables['form']->name;
+
+        } else {
+            $variables['title'] = 'New Form';
+        }
+
         $variables['fullPageForm'] = true;
         $variables['continueEditingUrl'] = 'form-builder/forms/{id}';
         $variables['saveShortcutRedirect'] = $variables['continueEditingUrl'];
@@ -145,11 +151,16 @@ class FormsController extends Controller
     public function actionDelete(): Response
     {
         $this->requirePostRequest();
+        $this->requireAcceptsJson();
         $this->requireAdmin();
 
         $formId = Craft::$app->getRequest()->getRequiredBodyParam('id');
 
-        FormBuilder::$plugin->forms->delete($formId);
+        $success = FormBuilder::$plugin->forms->delete($formId);
+
+        return $this->asJson([
+            'success' => $success
+        ]);
     }
 
 
@@ -201,7 +212,7 @@ class FormsController extends Controller
         } else {
 
             if (($group = FormBuilder::$plugin->groups->getGroupById(Craft::$app->getRequest()->getBodyParam('groupId'))) === null) {
-                throw new BadRequestHttpException('Invalid form group ID: '.$groupId);
+                throw new BadRequestHttpException('Invalid form group');
             }
 
             $form = new Form();
@@ -245,7 +256,6 @@ class FormsController extends Controller
         } else {
             $variables['form'] = new Form();
             $variables['form']->groupId = 1;
-            $variables['form']->statusId = 1;
             $variables['form']->statusId = 1;
         }
     }

@@ -3,6 +3,7 @@
 
 {% set title = "Dashboard"|t('form-builder') %}
 {% set bodyClass = 'formbuilder fb-dashboard' %}
+{% set selectedSubnavItem = "dashboard" %}
 
 {% block header %}
     {% include 'form-builder/_includes/_header' ignore missing with { title: title } %}
@@ -61,7 +62,7 @@
 
             <div class="widget">
                 <header class="pad">
-                    <h2>{{ "Form Builder News"|t('form-builder') }}</h2>
+                    <h2>{{ "News"|t('form-builder') }}</h2>
                 </header>
 
                 <div class="body">

@@ -10,16 +10,19 @@
 
 namespace roundhouse\formbuilder\elements;
 
+use craft;
 use craft\base\Element;
 use craft\helpers\UrlHelper;
+use craft\helpers\ArrayHelper;
 use craft\elements\db\ElementQueryInterface;
-use yii\base\Exception;
+use craft\behaviors\FieldLayoutBehavior;
 
 use roundhouse\formbuilder\FormBuilder;
 use roundhouse\formbuilder\elements\db\EntryQuery;
 use roundhouse\formbuilder\records\Entry as EntryRecord;
 use roundhouse\formbuilder\elements\actions\SetStatus;
 use roundhouse\formbuilder\elements\actions\Delete;
+use roundhouse\formbuilder\elements\Form;
 
 class Entry extends Element
 {
@@ -34,7 +37,6 @@ class Entry extends Element
     public $statusId = 1;
     public $ipAddress;
     public $userAgent;
-    public $fieldLayoutId;
 
     // Static Methods
     // =========================================================================
@@ -96,10 +98,12 @@ class Entry extends Element
     public function init()
     {
         parent::init();
+        $this->setScenario(self::SCENARIO_LIVE);
 
         if ($this->formId) {
             $this->form = FormBuilder::$plugin->forms->getFormRecordById($this->formId);
         }
+
     }
 
     /**
@@ -108,6 +112,7 @@ class Entry extends Element
     public function getFieldContext(): string
     {
         return 'global';
+//        return 'formbuilder:' . $this->formId;
     }
 
     /**
@@ -145,6 +150,21 @@ class Entry extends Element
     public function getFieldLayout()
     {
         return $this->form->getFieldLayout();
+
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function behaviors()
+    {
+        $behaviors = parent::behaviors();
+        $behaviors['fieldLayout'] = [
+            'class' => FieldLayoutBehavior::class,
+            'elementType' => Form::class
+        ];
+
+        return $behaviors;
     }
 
     /**
@@ -274,9 +294,9 @@ class Entry extends Element
     protected static function defineSortOptions(): array
     {
         $attributes = [
-            'formbuilder_entries.statusId' => FormBuilder::t('Status'),
-            'formbuilder_entries.formId' => FormBuilder::t('Form'),
-            'elements.dateCreated'      => FormBuilder::t('Date Submitted')
+            'formbuilder_entries.statusId'  => FormBuilder::t('Status'),
+            'formbuilder_entries.formId'    => FormBuilder::t('Form'),
+            'elements.dateCreated'          => FormBuilder::t('Date Submitted')
         ];
 
         return $attributes;
@@ -287,12 +307,27 @@ class Entry extends Element
      */
     protected static function defineTableAttributes(): array
     {
-        $attributes['title']       = ['label' => FormBuilder::t('Title')];
-        $attributes['formId']       = ['label' => FormBuilder::t('Form')];
-        $attributes['dateCreated']  = ['label' => FormBuilder::t('Date Submitted')];
+        $attributes = [];
+        $customAttributes['title']        = ['label' => FormBuilder::t('Title')];
+        $customAttributes['formId']       = ['label' => FormBuilder::t('Form')];
+        $customAttributes['dateCreated']  = ['label' => FormBuilder::t('Date Submitted')];
 
-        return $attributes;
+        $formAttributes = Craft::$app->getElementIndexes()->getAvailableTableAttributes(Form::class);
+        unset($formAttributes['name']);
+        unset($formAttributes['handle']);
+        unset($formAttributes['group']);
+        unset($formAttributes['totalEntries']);
+        unset($formAttributes['twig']);
+
+        foreach ($customAttributes as $key => $label) {
+            $attributes[$key] = $label;
+        }
+
+        $newArray = ArrayHelper::merge($attributes, $formAttributes);
+
+        return $newArray;
     }
+
 
     /**
      * @inheritdoc
@@ -311,10 +346,9 @@ class Entry extends Element
     /**
      * @inheritdoc
      */
-    protected function fieldLayoutFields(): array
-    {   
-        $form = $this->getForm($this->formId);
-
+    public function fieldLayoutFields(): array
+    {
+        $form = $this->getForm();
         $fieldLayout = $form->getFieldLayout();
 
         if ($fieldLayout) {
@@ -324,18 +358,12 @@ class Entry extends Element
         return [];
     }
 
+
     // Events
     // -------------------------------------------------------------------------
-
-    /**
-     * @inheritdoc
-     */
-    public function beforeSave(bool $isNew): bool
-    {
-        $this->fieldLayoutId = $this->getForm()->fieldLayoutId;
-        
-        return parent::beforeSave($isNew);;
-    }
+//    public function beforeSave(bool $isNew): bool
+//    {
+//    }
 
     /**
      * @inheritdoc
@@ -344,12 +372,12 @@ class Entry extends Element
     {
         $entryRecord = new EntryRecord();
 
-        $entryRecord->id            = $this->id;
-        $entryRecord->formId        = $this->formId;
-        $entryRecord->statusId      = $this->statusId;
-        $entryRecord->title         = $this->title;
-        $entryRecord->ipAddress     = $this->ipAddress;
-        $entryRecord->userAgent     = $this->userAgent;
+        $entryRecord->id                = $this->id;
+        $entryRecord->formId            = $this->formId;
+        $entryRecord->statusId          = $this->statusId;
+        $entryRecord->title             = $this->title;
+        $entryRecord->ipAddress         = $this->ipAddress;
+        $entryRecord->userAgent         = $this->userAgent;
         $entryRecord->save(false);
 
         parent::afterSave($isNew);

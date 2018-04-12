@@ -26,12 +26,8 @@ use roundhouse\formbuilder\events\EntryEvent;
 
 require_once __DIR__ . '/functions/array-group-by.php';
 
-/**
- *
- * @author    Vadim Goncharov (owldesign)
- * @package   FormBuilder
- * @since     3.0.0
- */
+// TODO: add delete action and remove all assets and notes related to entry!
+
 class EntriesController extends Controller
 {
 
@@ -84,17 +80,16 @@ class EntriesController extends Controller
      * Entry single page
      *
      * @param int|null $entryId
-     * @param Entry|null $entry
      * @return Response
      * @throws \yii\base\InvalidConfigException
      * @throws \yii\db\Exception
      */
-    public function actionEdit(int $entryId = null, Entry $entry = null): Response
+    public function actionEdit(int $entryId = null): Response
     {
         $view = $this->getView();
         $view->registerAssetBundle(FormBuilderAsset::class);
         $view->registerAssetBundle(EntryAsset::class);
-        
+
         $variables['entryId'] = $entryId;
 
         if ($entryId) {
@@ -106,7 +101,7 @@ class EntriesController extends Controller
                 ->execute();
         }
 
-        $variables['fullPageForm'] = true;
+        $variables['fullPageForm'] = false;
         $variables['continueEditingUrl'] = 'form-builder/entries/{id}';
         $variables['saveShortcutRedirect'] = $variables['continueEditingUrl'];
 
@@ -172,6 +167,7 @@ class EntriesController extends Controller
         } else {
             $template = false;
         }
+
         return $this->asJson([
             'success' => true,
             'entries' => $entries,
@@ -194,7 +190,6 @@ class EntriesController extends Controller
         $this->requirePostRequest();
 
         $request = Craft::$app->getRequest();
-
         $formId         = $request->getBodyParam('formId');
         $this->form     = FormBuilder::$plugin->forms->getFormRecordById($formId);
         $this->post     = $request->post();
@@ -206,12 +201,9 @@ class EntriesController extends Controller
         $this->entry = $this->_getEntryModel($request);
         $this->_populateEntryModel($this->entry, $request);
 
+
         // Spam Protection
         $this->_spamProtection($this->entry, $request);
-
-        // Terms & Conditions
-        // TODO: validate terms and conditions
-        // $this->_checkTermsConditions();
 
         $this->entry->setScenario(Element::SCENARIO_LIVE);
 
@@ -250,12 +242,6 @@ class EntriesController extends Controller
 
         // Notifications
         if ($saved) {
-            // TODO: remove this
-//            if (FormBuilder::$plugin->isEmailBuilderPlugin()) {
-//                $this->_sendNotifications($this->form['notifications']);
-//            } else {
-//                Craft::error(Craft::t('form-builder', 'Email Builder is not installed, cannot send notification'), __METHOD__);
-//            }
             $this->_returnSuccessMessage();
         } else {
             $this->_returnErrorMessage($request);
@@ -286,10 +272,10 @@ class EntriesController extends Controller
      */
     private function _populateEntryModel(Entry $entry, $request)
     {
-        $entry->formId      = $this->form->id;
-        $entry->statusId    = $request->getRequiredBodyParam('statusId');
-        $entry->ipAddress   = $request->getUserIP();
-        $entry->userAgent   = $request->getHeaders()->get('user-agent');
+        $entry->formId          = $this->form->id;
+        $entry->statusId        = $request->getRequiredBodyParam('statusId');
+        $entry->ipAddress       = $request->getUserIP();
+        $entry->userAgent       = $request->getHeaders()->get('user-agent');
 
         $title = isset($this->form->settings['database']['titleFormat']) && $this->form->settings['database']['titleFormat'] != '' ? $this->form->settings['database']['titleFormat'] : 'Submission - '.DateTimeHelper::currentTimeStamp();
         $entry->title = Craft::$app->getView()->renderObjectTemplate($title, $request->getParam('fields'));

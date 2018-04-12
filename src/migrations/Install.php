@@ -186,7 +186,7 @@ class Install extends Migration
         $this->createIndex($this->db->getIndexName('{{%formbuilder_forms}}', 'handle', true), '{{%formbuilder_forms}}', 'handle', true);
         $this->createIndex($this->db->getIndexName('{{%formbuilder_forms}}', 'fieldLayoutId', true), '{{%formbuilder_forms}}', 'fieldLayoutId', true);
         $this->createIndex($this->db->getIndexName('{{%formbuilder_formgroup}}', 'name', true), '{{%formbuilder_formgroup}}', 'name', true);
-        
+
         // Additional commands depending on the db driver
         switch ($this->driver) {
             case DbConfig::DRIVER_MYSQL:
@@ -205,11 +205,11 @@ class Install extends Migration
         $this->addForeignKey($this->db->getForeignKeyName('{{%formbuilder_forms}}', 'fieldLayoutId'), '{{%formbuilder_forms}}', 'fieldLayoutId', '{{%fieldlayouts}}', 'id', 'CASCADE', null);
         $this->addForeignKey($this->db->getForeignKeyName('{{%formbuilder_forms}}', 'groupId'), '{{%formbuilder_forms}}', 'groupId', '{{%formbuilder_formgroup}}', 'id', 'CASCADE', null);
         $this->addForeignKey($this->db->getForeignKeyName('{{%formbuilder_forms}}', 'statusId'), '{{%formbuilder_forms}}', 'statusId', '{{%formbuilder_formstatus}}', 'id', 'CASCADE', null);
-        
+
         $this->addForeignKey($this->db->getForeignKeyName('{{%formbuilder_entries}}', 'id'), '{{%formbuilder_entries}}', 'id', '{{%elements}}', 'id', 'CASCADE', null);
         $this->addForeignKey($this->db->getForeignKeyName('{{%formbuilder_entries}}', 'formId'), '{{%formbuilder_entries}}', 'formId', '{{%formbuilder_forms}}', 'id', 'CASCADE', null);
         $this->addForeignKey($this->db->getForeignKeyName('{{%formbuilder_entries}}', 'statusId'), '{{%formbuilder_entries}}', 'statusId', '{{%formbuilder_entrystatus}}', 'id', 'CASCADE', null);
-        
+
         $this->addForeignKey($this->db->getForeignKeyName('{{%formbuilder_fields}}', 'fieldLayoutId'), '{{%formbuilder_fields}}', 'fieldLayoutId', '{{%fieldlayouts}}', 'id', 'CASCADE', null);
         $this->addForeignKey($this->db->getForeignKeyName('{{%formbuilder_fields}}', 'fieldId'), '{{%formbuilder_fields}}', 'fieldId', '{{%fields}}', 'id', 'CASCADE', null);
         $this->addForeignKey($this->db->getForeignKeyName('{{%formbuilder_fields}}', 'formId'), '{{%formbuilder_fields}}', 'formId', '{{%formbuilder_forms}}', 'id', 'CASCADE', null);

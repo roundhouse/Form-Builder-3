@@ -1,3 +1,5 @@
+{% set allowed = form.getAllowedFieldTypes %}
+
 {% if customizableTabs is not defined %}{% set customizableTabs = true %}{% endif %}
 {% if not customizableTabs and pretendTabName is not defined %}
     {% set pretendTabName = "Content"|t('app') %}
@@ -15,6 +17,8 @@
 ]) %}
 
 {% macro tab(form, customizableTabs, tab, tabName, tabFields) %}
+    {% set allowed = form.getAllowedFieldTypes %}
+
     <div class="fld-tab">
         <div class="tabs">
             <div class="tab sel{% if customizableTabs %} draggable{% endif %} tab-id-{{ tab.id }}" data-id="{{ tab.id }}">
@@ -26,8 +30,34 @@
         </div>
         <div class="fld-tabcontent">
             {% for field in tabFields %}
-                <div class="fld-field{% if field.required %} fld-required{% endif %}" data-id="{{ field.id }}">
+                {% set fieldType = field|getClass %}
+                <div class="fld-field{% if field.required %} fld-required{% endif %} {% if fieldType not in allowed %}not-available{% endif %}" data-id="{{ field.id }}">
                     <a class="settings icon" title="{{ 'Edit'|t('app') }}"></a>
+                    <span class="field-icon">
+                        {% if fieldType == 'PlainText' %}
+                            <i class="far fa-i-cursor"></i>
+                        {% elseif fieldType == 'Email' %}
+                            <i class="far fa-at"></i>
+                        {% elseif fieldType == 'Number' %}
+                            <i class="far fa-hashtag"></i>
+                        {% elseif fieldType == 'Assets' %}
+                            <i class="far fa-upload"></i>
+                        {% elseif fieldType == 'Url' %}
+                            <i class="far fa-globe"></i>
+                        {% elseif fieldType == 'Checkboxes' %}
+                            <i class="far fa-check-square"></i>
+                        {% elseif fieldType == 'RadioButtons' %}
+                            <i class="far fa-check-circle"></i>
+                        {% elseif fieldType == 'MultiSelect' %}
+                            <i class="far fa-check-square"></i>
+                        {% elseif fieldType == 'Color' %}
+                            <i class="far fa-paint-brush"></i>
+                        {% elseif fieldType == 'Date' %}
+                            <i class="far fa-calendar-alt"></i>
+                        {% elseif fieldType == 'Dropdown' %}
+                            <i class="far fa-caret-square-down"></i>
+                        {% endif %}
+                    </span>
                     <span>{{ field.name|t('site') }}</span>
                     <input class="id-input" type="hidden" name="fieldLayout[{{ tabName|e('url') }}][]" value="{{ field.id }}">
                     {% if field.required %}<input class="required-input" type="hidden" name="requiredFields[]" value="{{ field.id }}">{% endif %}
@@ -74,7 +104,7 @@
                     {{ macros.tab(form, customizableTabs, tab, tab.name, tab.getFields()) }}
                 {% endfor %}
             {% else %}
-                {{ macros.tab(form, customizableTabs, pretendTabName, fieldLayout.getFields()) }}
+                {{ macros.tab(form, customizableTabs, tab, pretendTabName, fieldLayout.getFields()) }}
             {% endif %}
 
             {% if form.fieldLayoutId %}
@@ -107,8 +137,34 @@
                 </div>
                 <div class="fld-tabcontent">
                     {% for field in group.fields %}
+                        {% set fieldType = field|getClass %}
                         {% set selected = fieldLayout and field.id in fieldLayout.getFieldIds() %}
-                        <div class="fld-field unused{% if selected %} hidden{% endif %}" data-id="{{ field.id }}">
+                        <div class="fld-field unused{% if selected %} hidden{% endif %} {% if fieldType not in allowed %}not-available{% endif %}" data-id="{{ field.id }}">
+                            <span class="field-icon">
+                            {% if fieldType == 'PlainText' %}
+                                <i class="far fa-i-cursor"></i>
+                            {% elseif fieldType == 'Email' %}
+                                <i class="far fa-at"></i>
+                            {% elseif fieldType == 'Number' %}
+                                <i class="far fa-hashtag"></i>
+                            {% elseif fieldType == 'Assets' %}
+                                <i class="far fa-upload"></i>
+                            {% elseif fieldType == 'Url' %}
+                                <i class="far fa-globe"></i>
+                            {% elseif fieldType == 'Checkboxes' %}
+                                <i class="far fa-check-square"></i>
+                            {% elseif fieldType == 'RadioButtons' %}
+                                <i class="far fa-check-circle"></i>
+                            {% elseif fieldType == 'MultiSelect' %}
+                                <i class="far fa-check-square"></i>
+                            {% elseif fieldType == 'Color' %}
+                                <i class="far fa-paint-brush"></i>
+                            {% elseif fieldType == 'Date' %}
+                                <i class="far fa-calendar-alt"></i>
+                            {% elseif fieldType == 'Dropdown' %}
+                                <i class="far fa-caret-square-down"></i>
+                            {% endif %}
+                            </span>
                             <span>{{ field.name|t('site') }}</span>
                         </div>
                     {% endfor %}
@@ -128,6 +184,4 @@
             requiredFieldInputName: '{{ "requiredFields[]"|namespaceInputName|e("js") }}'
         });
     };
-
-    
 {% endjs %}

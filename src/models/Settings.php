@@ -17,7 +17,7 @@ class Settings extends Model
     // Public Properties
     // =========================================================================
 
-    public $someAttribute = 'Some Default';
+    public $pluginName = 'Form Builder';
 
     // Public Methods
     // =========================================================================
@@ -28,8 +28,8 @@ class Settings extends Model
     public function rules()
     {
         return [
-            ['someAttribute', 'string'],
-            ['someAttribute', 'default', 'value' => 'Some Default'],
+            ['pluginName', 'string'],
+            ['pluginName', 'default', 'value' => 'Form Builder'],
         ];
     }
 }

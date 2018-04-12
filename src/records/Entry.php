@@ -49,17 +49,6 @@ class Entry extends ActiveRecord
     }
 
     /**
-     * Return fieldlayout
-     *
-     * @return ActiveQueryInterface
-     */
-    public function getFieldLayout(): ActiveQueryInterface
-    {
-        return $this->hasOne(FieldLayout::class,
-            ['id' => 'fieldLayoutId']);
-    }
-
-    /**
      * Return entry's notes
      *
      * @return ActiveQueryInterface

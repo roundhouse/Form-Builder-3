@@ -9,5 +9,6 @@
  */
 
 return [
+
     'Form Builder plugin loaded' => 'Form Builder plugin loaded',
 ];
