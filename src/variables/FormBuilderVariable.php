@@ -40,6 +40,11 @@ class FormBuilderVariable
         $options = isset($variables['options']) ? $variables['options'] : null;
         $submission = isset($variables['submission']) ? $variables['submission'] : null;
 
+        if (!$form) {
+            echo 'Invalid Form Handle!';
+            return false;
+        }
+
         if ($form->statusId == 2) {
             return false;
         }
@@ -121,7 +126,8 @@ class FormBuilderVariable
             'settings'      => $field,
             'form'          => $form,
             'options'       => null,
-            'class'         => ''
+            'class'         => '',
+            'id'            => ''
         ];
 
         if (isset($field->placeholder)) {
@@ -140,12 +146,17 @@ class FormBuilderVariable
             $variables['rows'] = $field->initialRows;
         }
         
-        $fieldOptions = FormBuilder::$plugin->fields->getFieldRecordByFieldId($field->id);
+        $fieldOptions = FormBuilder::$plugin->fields->getFieldRecordByFieldId($field->id, $form->id);
 
         if ($fieldOptions) {
             $options = Json::decode($fieldOptions->options);
+
             if (isset($options['class'])) {
                 $variables['class'] = $options['class'];
+            }
+
+            if (isset($options['id'])) {
+                $variables['id'] = $options['id'];
             }
         }
 

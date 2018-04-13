@@ -71,10 +71,13 @@ class Fields extends Component
      * @param int $fieldId
      * @return array|null|\yii\db\ActiveRecord
      */
-    public function getFieldRecordByFieldId(int $fieldId)
+    public function getFieldRecordByFieldId(int $fieldId, int $formId)
     {
         $fieldRecord = FieldRecord::find()
-            ->where(['fieldId' => $fieldId])
+            ->where([
+                'fieldId' => $fieldId,
+                'formId' => $formId
+            ])
             ->one();
 
         return $fieldRecord;
