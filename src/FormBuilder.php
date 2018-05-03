@@ -20,6 +20,7 @@ use craft\services\UserPermissions;
 use craft\web\twig\variables\CraftVariable;
 use craft\events\RegisterComponentTypesEvent;
 use craft\events\RegisterUserPermissionsEvent;
+use craft\events\RegisterElementActionsEvent;
 use craft\events\FieldLayoutEvent;
 use craft\helpers\Json;
 
@@ -27,7 +28,7 @@ use roundhouse\formbuilder\elements\Form as FormElement;
 use roundhouse\formbuilder\elements\Entry as EntryElement;
 use roundhouse\formbuilder\elements\actions\SetStatus;
 use roundhouse\formbuilder\elements\actions\Delete;
-use roundhouse\formbuilder\variables\FormBuilderVariable;
+use roundhouse\formbuilder\web\twig\Variables;
 
 use roundhouse\formbuilder\web\twig\Extensions;
 
@@ -53,6 +54,8 @@ class FormBuilder extends Plugin
     public $schemaVersion = '1.0.0';
     public $hasCpSettings = true;
     public $hasCpSection = true;
+    public $changelogUrl = 'https://raw.githubusercontent.com/roundhouse/Form-Builder-3/master/CHANGELOG.md';
+    public $downloadUrl = 'https://github.com/roundhouse/Form-Builder-3/archive/master.zip';
 
     // Trails
     // =========================================================================
@@ -86,9 +89,9 @@ class FormBuilder extends Plugin
      *
      * @return bool
      */
-    public function isEmailBuilderPlugin()
+    public function isIntegrationsAvailable()
     {
-        return Craft::$app->plugins->isPluginInstalled('email-builder');
+        return Craft::$app->plugins->isPluginInstalled('formbuilder-integrations');
     }
 
     /**
@@ -193,7 +196,7 @@ class FormBuilder extends Plugin
     private function _registerElementActions()
     {
         Event::on(
-            Entry::class,
+            EntryElement::class,
             Element::EVENT_REGISTER_ACTIONS,
             function(RegisterElementActionsEvent $event) {
                 $event->actions[] = SetStatus::class;
@@ -304,14 +307,14 @@ class FormBuilder extends Plugin
                     ]
                 ];
 
-                $permissions['editNotifications'] = [
-                    'label' => FormBuilder::t('Edit Notifications'),
+                $permissions['editIntegrations'] = [
+                    'label' => FormBuilder::t('Edit Integrations'),
                     'nested' => [
-                        'createNotifications' => [
-                            'label' => FormBuilder::t('Create notifications')
+                        'createIntegration' => [
+                            'label' => FormBuilder::t('Create integration')
                         ],
-                        'deleteNotifications' => [
-                            'label' => FormBuilder::t('Delete notifications')
+                        'deleteIntegration' => [
+                            'label' => FormBuilder::t('Delete integration')
                         ]
                     ]
                 ];
@@ -331,7 +334,7 @@ class FormBuilder extends Plugin
             CraftVariable::EVENT_INIT,
             function (Event $event) {
                 $variable = $event->sender;
-                $variable->set('formBuilder', FormBuilderVariable::class);
+                $variable->set('fb', Variables::class);
             }
         );
     }
@@ -347,31 +350,39 @@ class FormBuilder extends Plugin
             $parent['label'] = $this->getSettings()->pluginName;
         }
 
-        $navigation = ArrayHelper::merge($parent, [
-            'subnav' => [
-                'dashboard' => [
-                    'label' => FormBuilder::t('Dashboard'),
-                    'url' => 'form-builder'
-                ],
-                'forms' => [
-                    'label' => FormBuilder::t('Forms'),
-                    'url' => 'form-builder/forms'
-                ],
-                'entries' => [
-                    'label' => FormBuilder::t('Entries'),
-                    'url' => 'form-builder/entries'
-                ],
-                'settings' => [
-                    'label' => FormBuilder::t('Settings'),
-                    'url' => 'form-builder/settings'
-                ]
-
+        $navigation = [
+            'dashboard' => [
+                'label' => FormBuilder::t('Dashboard'),
+                'url' => 'form-builder'
+            ],
+            'forms' => [
+                'label' => FormBuilder::t('Forms'),
+                'url' => 'form-builder/forms'
+            ],
+            'entries' => [
+                'label' => FormBuilder::t('Entries'),
+                'url' => 'form-builder/entries'
             ]
+        ];
+
+        // Integrations
+        if ($this->isIntegrationsAvailable()) {
+            $navigation['integrations'] = [
+                'label' => FormBuilder::t('Integrations'),
+                'url' => 'form-builder/integrations'
+            ];
+        }
+
+        // Settings
+        $navigation['settings'] = [
+            'label' => FormBuilder::t('Settings'),
+            'url' => 'form-builder/settings'
+        ];
+
+        $nav = ArrayHelper::merge($parent, [
+            'subnav' => $navigation
         ]);
 
-        return $navigation;
+        return $nav;
     }
-
-
-
 }

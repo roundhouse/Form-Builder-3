@@ -31,7 +31,7 @@
                             <a data-key="{{ source.key is defined ? source.key : key }}" {% if source.criteria.formId is defined %}data-form-id="{{ source.criteria.formId }}"{% endif %}>
                                 {{- source.label -}}
                                 {% if source.criteria.formId is defined %}
-                                    {% set entryCount = craft.formBuilder.getUnreadEntriesByFormId(source.criteria.formId) %}
+                                    {% set entryCount = craft.fb.getUnreadEntriesByFormId(source.criteria.formId) %}
                                     {% if entryCount > 0 %}
                                         <span class="entry-count">{{ entryCount }}</span>
                                     {% else %}
@@ -56,9 +56,6 @@
         {% include "_elements/indexcontainer" with {
             showSiteMenu: false
         } %}
-        {# {% include "form-builder/entries/_includes/indexcontainer" with {
-            showSiteMenu: false
-        } %} #}
     </div>
 {% endblock %}
 

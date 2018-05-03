@@ -3,7 +3,7 @@
     {% set groupOptions = groupOptions|merge([{ label: group.name, value: group.id }]) %}
 {% endfor %}
 
-{% set statuses = craft.formBuilder.getFormStatuses() %}
+{% set statuses = craft.fb.getFormStatuses() %}
 
 <div class="fb-field {{ errors is defined and form.getErrors('name') ? 'error' }}" {% if form.getErrors('name') %}data-error-message="{{ form.getErrors('name') }}"{% endif %}>
     <label for="formName" class="input-hint">{{ "NAME" |t }}</label>

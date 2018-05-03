@@ -29,7 +29,7 @@
                     <a href="{{ url('form-builder/entries') }}" class="link">See all</a>
                 </header>
                 <div class="body">
-                    {% set recentEntries = craft.formBuilder.entries({
+                    {% set recentEntries = craft.fb.entries({
                         limit: 5
                     }).all() %}
 
@@ -60,41 +60,33 @@
                 </div>
             </div>
 
-            <div class="widget">
+            <div class="widget plugin-updates">
                 <header class="pad">
-                    <h2>{{ "News"|t('form-builder') }}</h2>
+                    <h2>{{ "Updates"|t }}</h2>
                 </header>
 
                 <div class="body">
                     <div class="list">
-                        <div class="list-item has-hover pad">
+                        <div class="list-item pad">
                             <div class="item-meta">
                                 <span class="item-meta-icon"><i class="far fa-cog"></i></span>
-                                <span class="item-meta-title">{{ "Plugin Update"|t('form-builder') }}</span>
-                                <span class="item-meta-right">March 23rd</span>
+                                <span class="item-meta-title">{{ "Current Version "|t('form-builder') }} {{ plugin.getVersion() }}</span>
+                                <span class="item-meta-right"><a href="{{ plugin.changelogUrl }}" target="_blank">{{ "View Changelog"|t('form-builder') }}</a></span>
                             </div>
                             <div class="item-title">
-                                <a href="#">Version 3.0.4 Released!</a>
-                            </div>
-                        </div>
-                        <div class="list-item has-hover pad">
-                            <div class="item-meta">
-                                <span class="item-meta-icon"><i class="far fa-book"></i></span>
-                                <span class="item-meta-title">{{ "Article"|t('form-builder') }}</span>
-                                <span class="item-meta-right">Jan 13th</span>
-                            </div>
-                            <div class="item-title">
-                                <a href="#">Form Builder hits top charts.</a>
-                            </div>
-                        </div>
-                        <div class="list-item has-hover pad">
-                            <div class="item-meta">
-                                <span class="item-meta-icon"><i class="far fa-cog"></i></span>
-                                <span class="item-meta-title">{{ "Plugin Update"|t('form-builder') }}</span>
-                                <span class="item-meta-right">Jan 16th</span>
-                            </div>
-                            <div class="item-title">
-                                <a href="#">Version 3.0.3 Released!</a>
+
+
+                                {% if hasUpdate %}
+                                    <span class="plugin-warning">
+                                        <i class="far fa-exclamation-circle"></i>
+                                        Plugin needs an update!
+                                    </span>
+                                {% else %}
+                                    <span class="plugin-success">
+                                        <i class="far fa-check-circle"></i>
+                                        Plugin is up to date.
+                                    </span>
+                                {% endif %}
                             </div>
                         </div>
                     </div>

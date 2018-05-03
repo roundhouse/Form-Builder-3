@@ -11,7 +11,7 @@
     'formSpamProtection': 'https://bing.com/'
 } %}
 
-{% set groups = craft.formBuilder.getAllGroups() %}
+{% set groups = craft.fb.getAllGroups() %}
 {% if not groups %}
     {% exit 404 %}
 {% endif %}
@@ -83,43 +83,62 @@
                 return 'Hey!';
             }); #}
 
-            <section class="notifications">
+            <section class="integrations">
                 <header>
                     <h2>{{ "Integrations"|t('form-builder') }}</h2>
                     <p>{{ "Send notifications or save submission to 3rd party services."|t('form-builder') }}</p>
                 </header>
 
-                <div class="notify-options">
-                    {% if craft.app.plugins.isPluginInstalled('email-builder') %}
-                        {% set templates = craft.emailBuilder.getTemplates() %}
-                        {% if templates %}
-                            <a class="notify-item-btn btns btn-info add-email-notification" data-type="email" data-element="roundhouse\emailbuilder\elements\EmailNotification" data-context="{{ form |json_encode() }}">
-                                <i class="fas fa-plus"></i>
-                                <span>{{ "Email Notification"|t('form-builder') }}</span>
-                            </a>
-                        {% endif %}
-                    {% endif %}
-                    {% if craft.app.plugins.isPluginInstalled('formbuilder-slack-message') %}
-                        <a class="notify-item-btn btns btn-info add-slack-notification" data-type="slack" data-element="roundhouse\slacknotifier\elements\SlackNotification" data-context="{{ form |json_encode() }}">
-                            <i class="fas fa-plus"></i>
-                            <span>{{ "Slack Message"|t('form-builder') }}</span>
-                        </a>
-                    {% endif %}
-                </div>
+                <div class="integration-body">
+                    {% if craft.app.plugins.isPluginInstalled('formbuilder-integrations') %}
+                        {% set types = craft.fbi.types.getAvailableTypes() %}
+                        {# #}
+                        {# #}
+                        {# TODO: ADD BACK ELEMENT SELECT MODAL FOR INTEGRATIONS!! YO ?! #}
+                        {# #}
+                        {# #}
+                        <div class="integrate-options">
+                            {% for type in types %}
+                                <div class="list integrations-list">
+                                    {% for type in types %}
+                                        <div class="item">
+                                            <div class="item-meta">
+                                                <div class="item-meta-icon">{% include 'formbuilder-integrations/_includes/icons/integrations-' ~ type.handle ignore missing %}</div>
+                                            </div>
+                                            <div class="item-info">
+                                                <div class="item-meta-title">{{ type.title }}</div>
+                                                <a href="#" class="btns btn-small btn-info integrate-item-btn" data-element="owldesign\formbuilderintegrations\elements\{{ type.title }}" data-type="{{ type.handle }}" data-form="{{ form |json_encode() }}"><span><i class="fas fa-plus"></i></span></a>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
 
-                {% if craft.app.plugins.isPluginInstalled('email-builder') %}
-                    {% set templates = craft.emailBuilder.getTemplates() %}
-                    {% if templates %}
-                        <div id="formbuilder-notifications-container" class="elements">
-                            {% set notifications = form.notifications is defined ? form.notifications %}
-                            {% for key, notification in notifications %}
-                                {% for key, notify in notification %}
-                                    {% include 'form-builder/forms/_includes/integrations/' ~ loop.parent.key ~ '/_notification' ignore missing with { notification: notify, key: key } %}
+                                {#<a class="integrate-item-btn btns btn-info add-{{ type.handle }}-integrations" data-type="{{ type.handle }}" data-form="{{ form |json_encode() }}">#}
+                                    {#<i class="fas fa-plus"></i>#}
+                                    {#<span>{{ type.title }}</span>#}
+                                {#</a>#}
+                            {% endfor %}
+                        </div>
+
+                        <div id="formbuilder-integrations-container" class="elements">
+                            {% set integrations = form.integrations is defined ? form.integrations %}
+                            {% for typeHandle, integration in integrations %}
+                                {% set type = craft.fbi.types.getTypeByHandle(typeHandle) %}
+
+                                {% for index, element in integration %}
+                                    {% set integration = craft.fbi.integrations.getIntegrationById(element.elementId) %}
+                                    {% include 'formbuilder-integrations/integrations/' ~ type.handle ~ '/_integration' ignore missing with { integration: integration, type: type, index: index} %}
                                 {% endfor %}
                             {% endfor %}
                         </div>
+                    {% else %}
+                        {# TODO: stylize this a little nicer #}
+                        <a class="btns btn-info">
+                            <i class="fas fa-download"></i>
+                            <span>{{ "Install Integrations Plugin"|t('form-builder') }}</span>
+                        </a>
                     {% endif %}
-                {% endif %}
+                </div>
             </section>
 
         </div>

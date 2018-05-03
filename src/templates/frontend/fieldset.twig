@@ -1,6 +1,6 @@
 {%- namespace 'fields' -%}
 {% for tab in tabs %}
-    {% set fieldset = craft.formBuilder.getTabSettings(tab.id) %}
+    {% set fieldset = craft.fb.getTabSettings(tab.id) %}
     {% set tabClass = fieldset.options.class is defined ? fieldset.options.class : null %}
     {% set tabId = fieldset.options.id is defined ? fieldset.options.id : null %}
 

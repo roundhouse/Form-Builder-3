@@ -17,6 +17,8 @@ use craft\base\Element;
 use craft\web\Controller;
 use craft\helpers\DateTimeHelper;
 use craft\helpers\StringHelper;
+use roundhouse\formbuilder\records\Note;
+use yii\web\NotFoundHttpException;
 use yii\web\Response;
 
 use roundhouse\formbuilder\elements\Entry;
@@ -26,8 +28,6 @@ use roundhouse\formbuilder\events\EntryEvent;
 
 require_once __DIR__ . '/functions/array-group-by.php';
 
-// TODO: add delete action and remove all assets and notes related to entry!
-
 class EntriesController extends Controller
 {
 
@@ -35,7 +35,6 @@ class EntriesController extends Controller
     // =========================================================================
     const EVENT_BEFORE_SUBMIT_ENTRY = 'beforeSubmitEntry';
     const EVENT_AFTER_SUBMIT_ENTRY = 'afterSubmitEntry';
-    const EVENT_SEND_NOTIFICATION = 'sendNotification';
 
     // Protected Properties
     // =========================================================================
@@ -45,7 +44,7 @@ class EntriesController extends Controller
      *         The actions must be in 'kebab-case'
      * @access protected
      */
-    protected $allowAnonymous = ['actionIndex', 'actionGetUnreadEntries', 'actionSave'];
+    protected $allowAnonymous = ['actionIndex', 'actionGetUnreadEntries', 'actionSave', 'actionDelete'];
 
     // Public Properties
     // =========================================================================
@@ -217,13 +216,13 @@ class EntriesController extends Controller
         }
 
         // Fire a 'beforeSubmitEntry' event
-        if ($this->hasEventHandlers(self::EVENT_BEFORE_SUBMIT_ENTRY)) {
-            $this->trigger(self::EVENT_BEFORE_SUBMIT_ENTRY, new EntryEvent([
-                'entry' => $this->entry
-            ]));
-        }
+        $event = new EntryEvent([
+            'entry' => $this->entry,
+            'form' => $this->form
+        ]);
+        $this->trigger(self::EVENT_BEFORE_SUBMIT_ENTRY, $event);
 
-        if ($saveToDatabase) {
+        if ($saveToDatabase && $event->isValid) {
             if (Craft::$app->getElements()->saveElement($this->entry)) {
                 $saved = true;
             } else {
@@ -234,11 +233,11 @@ class EntriesController extends Controller
         }
 
         // Fire a 'afterSubmitEntry' event
-        if ($this->hasEventHandlers(self::EVENT_AFTER_SUBMIT_ENTRY)) {
-            $this->trigger(self::EVENT_AFTER_SUBMIT_ENTRY, new EntryEvent([
-                'entry' => $this->entry
-            ]));
-        }
+        $event = new EntryEvent([
+            'entry' => $this->entry,
+            'form' => $this->form
+        ]);
+        $this->trigger(self::EVENT_AFTER_SUBMIT_ENTRY, $event);
 
         // Notifications
         if ($saved) {
@@ -246,6 +245,43 @@ class EntriesController extends Controller
         } else {
             $this->_returnErrorMessage($request);
         }
+    }
+
+    public function actionDelete()
+    {
+        $this->requirePostRequest();
+
+        $entryId = Craft::$app->getRequest()->getRequiredBodyParam('entryId');
+        $entry = Craft::$app->elements->getElementById($entryId);
+
+        if (!$entry) {
+            throw new NotFoundHttpException('Entry not found');
+        }
+
+        if (!Craft::$app->getElements()->deleteElement($entry)) {
+            if (Craft::$app->getRequest()->getAcceptsJson()) {
+                return $this->asJson(['success' => false]);
+            }
+
+            Craft::$app->getSession()->setError(FormBuilder::t('Couldn’t delete entry.'));
+
+            Craft::$app->getUrlManager()->setRouteParams([
+                'entry' => $entry
+            ]);
+
+            return null;
+        }
+
+        // Delete Notes
+        Note::deleteAll(['entryId' => $entryId]);
+
+        if (Craft::$app->getRequest()->getAcceptsJson()) {
+            return $this->asJson(['success' => true]);
+        }
+
+        Craft::$app->getSession()->setNotice(FormBuilder::t( 'Entry deleted.'));
+
+        return $this->redirectToPostedUrl($entry);
     }
 
     // Private Methods

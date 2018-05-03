@@ -142,7 +142,7 @@ class Forms extends Component
         $formRecord->groupId            = $form->groupId;
         $formRecord->options            = Json::encode($form->options);
         $formRecord->spam               = Json::encode($form->spam);
-        $formRecord->notifications      = Json::encode($form->notifications);
+        $formRecord->integrations      = Json::encode($form->integrations);
         $formRecord->settings           = Json::encode($form->settings);
 
         $fieldLayout = $form->getFieldLayout();
@@ -415,14 +415,14 @@ class Forms extends Component
             'statusId',
             'options',
             'spam',
-            'notifications',
+            'integrations',
             'settings',
             'twig'
         ]));
 
         $form->options = Json::decode($form->options);
         $form->spam = Json::decode($form->spam);
-        $form->notifications = Json::decode($form->notifications);
+        $form->integrations = Json::decode($form->integrations);
         $form->settings = Json::decode($form->settings);
 
         return $form;

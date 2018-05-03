@@ -12,8 +12,9 @@ namespace roundhouse\formbuilder\controllers;
 
 use Craft;
 use craft\web\Controller;
-use craft\helpers\Json;
-use yii\web\Response;
+
+use roundhouse\formbuilder\FormBuilder;
+use roundhouse\formbuilder\web\assets\FormBuilder as FormBuilderAsset;
 
 class IntegrationsController extends Controller
 {
@@ -25,38 +26,17 @@ class IntegrationsController extends Controller
     // Public Methods
     // =========================================================================
 
-    /**
-     * Add notification template
-     *
-     * @return Response
-     * @throws \Twig_Error_Loader
-     * @throws \yii\base\Exception
-     * @throws \yii\web\BadRequestHttpException
-     */
-    public function actionAddNotification()
+    public function actionIndex()
     {
-        $this->requirePostRequest();
-        $this->requireAcceptsJson();
+        $this->requireAdmin();
 
-        $request = Craft::$app->getRequest();
+        $view = $this->getView();
+        $view->registerAssetBundle(FormBuilderAsset::class);
 
-        $index = $request->getBodyParam('index');
-        $type= $request->getBodyParam('type');
-        $elementId = $request->getBodyParam('elementId');
-        $form = $request->getBodyParam('form');
+        $plugin = FormBuilder::getInstance();
 
-        $model = Craft::$app->elements->getElementById($elementId);
-
-        $variables['index'] = $index;
-        $variables['model'] = $model;
-        $variables['type'] = $type;
-        $variables['form'] = JSON::decode($form);
-
-        $markup = Craft::$app->view->renderTemplate('form-builder/forms/_includes/integrations/'.$type.'/_notification-js', $variables);
-
-        return $this->asJson([
-            'success' => true,
-            'markup'   => $markup,
+        return $this->renderTemplate('form-builder/integrations/index', [
+            'plugin' => $plugin
         ]);
     }
 }

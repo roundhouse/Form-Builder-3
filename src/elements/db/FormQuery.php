@@ -26,7 +26,7 @@ class FormQuery extends ElementQuery
     public $statusId;
     public $options;
     public $spam;
-    public $notifications;
+    public $integrations;
     public $settings;
 
     // Public Methods
@@ -51,7 +51,7 @@ class FormQuery extends ElementQuery
             'formbuilder_forms.fieldLayoutId',
             'formbuilder_forms.options',
             'formbuilder_forms.spam',
-            'formbuilder_forms.notifications',
+            'formbuilder_forms.integrations',
             'formbuilder_forms.twig',
             'formbuilder_forms.settings'
         ]);

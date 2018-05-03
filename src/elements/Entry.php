@@ -112,7 +112,6 @@ class Entry extends Element
     public function getFieldContext(): string
     {
         return 'global';
-//        return 'formbuilder:' . $this->formId;
     }
 
     /**
@@ -242,10 +241,7 @@ class Entry extends Element
      */
     protected static function defineActions(string $source = null): array
     {
-        // $canPublishEntries = $userSessionService->checkPermission('publishEntries:'.$section->id);
-        
         $actions[] = SetStatus::class;
-        $actions[] = Delete::class;
 
         return $actions;
     }

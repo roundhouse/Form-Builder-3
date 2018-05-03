@@ -70,7 +70,7 @@ class Install extends Migration
                 'statusId' => $this->integer(),
                 'options' => $this->text(),
                 'spam' => $this->text(),
-                'notifications' => $this->text(),
+                'integrations' => $this->text(),
                 'settings' => $this->text(),
                 'twig' => $this->text(),
                 'dateCreated' => $this->dateTime()->notNull(),

@@ -1,0 +1,69 @@
+{% extends "_layouts/cp" %}
+{% import "_includes/forms" as forms %}
+
+{% set title = "Integrations"|t('form-builder') %}
+{% set bodyClass = 'formbuilder fb-integrations' %}
+{% set selectedSubnavItem = "integrations" %}
+
+{% block header %}
+    {% include 'form-builder/_includes/_header' ignore missing with { title: title } %}
+{% endblock %}
+
+{% block content %}
+    {% set types = craft.fbi.types.getAvailableTypes() %}
+
+    <section class="flex-container">
+        <div class="short-col widget">
+            <header class="pad">
+                <h2>{{ "Add Integration"|t('form-builder') }}</h2>
+            </header>
+            <div class="body">
+                <div class="list integrations-list">
+                    {% for type in types %}
+                        <div class="item has-hover pad">
+                            <div class="item-meta">
+                                <div class="item-meta-icon">{% include 'formbuilder-integrations/_includes/icons/integrations-' ~ type.handle ignore missing %}</div>
+                            </div>
+                            <div class="item-info">
+                                <div class="item-meta-title">{{ type.title }}</div>
+                                <a href="{{ url(type.newUrl, { referrer: craft.app.request.pathInfo }) }}" class="btns btn-small btn-info"><span>{{ "Create New"|t('form-builder') }}</span></a>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="wide-col widget">
+            <header class="pad">
+                <h2>{{ "Current Integration"|t('form-builder') }}</h2>
+            </header>
+            <div class="body">
+                <div class="list current-integrations-list">
+                    {# TODO: get latest integrations #}
+
+                    {% set integrations = craft.fbi.integrations.getAllIntegrations() %}
+                    {% for integration in integrations %}
+                        {% set type = craft.fbi.types.getTypeById(integration.typeId) %}
+                        <div class="item has-hover pad">
+                            <div class="item-meta">
+                                <div class="item-meta-icon">{% include 'formbuilder-integrations/_includes/icons/integrations-' ~ type.handle ignore missing %}</div>
+                            </div>
+                            <div class="item-info">
+                                <div class="item-meta-title"><a href="{{ url(integration.url, { referrer: craft.app.request.pathInfo }) }}">{{ integration.title }}</a></div>
+                                <div class="coded">{{ integration.handle }}</div>
+                            </div>
+                            <div class="item-status">
+                                {% if integration.status == 'enabled' %}
+                                    <div class="status on" title="Enabled"></div>
+                                {% else %}
+                                    <div class="status off" title="Disabled"></div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}

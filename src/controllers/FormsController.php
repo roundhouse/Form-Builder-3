@@ -224,7 +224,7 @@ class FormsController extends Controller
         $form->handle = Craft::$app->getRequest()->getBodyParam('handle');
         $form->options = Craft::$app->getRequest()->getBodyParam('options');
         $form->spam = Craft::$app->getRequest()->getBodyParam('spam');
-        $form->notifications = Craft::$app->getRequest()->getBodyParam('notifications');
+        $form->integrations = Craft::$app->getRequest()->getBodyParam('integrations');
         $form->settings = Craft::$app->getRequest()->getBodyParam('settings');
 
         return $form;

@@ -45,7 +45,7 @@ class Form extends Element
     public $statusId = 1;
     public $options;
     public $spam;
-    public $notifications;
+    public $integrations;
     public $settings;
     public $twig;
     public $totalEntries;
@@ -308,7 +308,7 @@ class Form extends Element
                 return $totalEntries;
                 break;
             case 'twig':
-                return '<span class="twig-snippet" data-handle="'. $this->handle . '" data-clipboard-text="{{ craft.formBuilder.form(\''.$this->handle.'\') }}">
+                return '<span class="twig-snippet" data-handle="'. $this->handle . '" data-clipboard-text="{{ craft.fb.form(\''.$this->handle.'\') }}">
                             <code>' . FormBuilder::t("Click to copy") . '<span class="icon"><i class="far fa-copy"></i></span></code>
                         </span>';
                 break;

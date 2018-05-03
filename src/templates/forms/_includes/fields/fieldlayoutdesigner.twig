@@ -56,6 +56,8 @@
                             <i class="far fa-calendar-alt"></i>
                         {% elseif fieldType == 'Dropdown' %}
                             <i class="far fa-caret-square-down"></i>
+                        {% else %}
+                            <i class="far fa-ban"></i>
                         {% endif %}
                     </span>
                     <span>{{ field.name|t('site') }}</span>
@@ -163,6 +165,8 @@
                                 <i class="far fa-calendar-alt"></i>
                             {% elseif fieldType == 'Dropdown' %}
                                 <i class="far fa-caret-square-down"></i>
+                            {% else %}
+                                <i class="far fa-ban"></i>
                             {% endif %}
                             </span>
                             <span>{{ field.name|t('site') }}</span>

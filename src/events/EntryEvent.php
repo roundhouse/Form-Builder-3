@@ -11,8 +11,11 @@
 namespace roundhouse\formbuilder\events;
 
 use yii\base\Event;
+use craft\events\CancelableEvent;
 
-class EntryEvent extends Event
+
+class EntryEvent extends CancelableEvent
 {
     public $entry;
+    public $form;
 }

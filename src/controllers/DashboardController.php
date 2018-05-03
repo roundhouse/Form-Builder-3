@@ -12,8 +12,11 @@ namespace roundhouse\formbuilder\controllers;
 
 use roundhouse\formbuilder\FormBuilder;
 
+use craft;
 use craft\web\Controller;
+use craft\helpers\Json;
 use yii\web\Response;
+use GuzzleHttp\Client;
 
 use roundhouse\formbuilder\web\assets\FormBuilder as FormBuilderAsset;
 use roundhouse\formbuilder\web\assets\Dashboard as DashboardAsset;
@@ -52,11 +55,13 @@ class DashboardController extends Controller
 
         $groups = FormBuilder::$plugin->groups->getAllGroups();
         $forms = FormBuilder::$plugin->forms->getAllForms();
+        $plugin = FormBuilder::getInstance();
 
         return $this->renderTemplate('form-builder/dashboard/index', [
-            'plugin' => FormBuilder::getInstance(),
+            'plugin' => $plugin,
             'groups' => $groups,
             'forms' => $forms,
+            'hasUpdate' => Craft::$app->plugins->hasPluginVersionNumberChanged($plugin)
         ]);
     }
 

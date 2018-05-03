@@ -33,6 +33,7 @@ trait Routes
                 $event->rules['form-builder/entries/<entryId:\d+>'] = 'form-builder/entries/edit';
                 $event->rules['form-builder/assets/download-files'] = 'form-builder/assets/download-files';
                 $event->rules['form-builder/settings'] = 'form-builder/settings';
+                $event->rules['form-builder/integrations'] = 'form-builder/integrations/index';
             }
         );
     }

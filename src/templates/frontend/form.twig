@@ -51,7 +51,7 @@
 
     {# Terms & Conditions #}
     {% if formOptions.terms.enabled is defined and formOptions.terms.enabled %}
-        {{ craft.formBuilder.getTermsConditionsInputs(form) |raw }}
+        {{ craft.fb.getTermsConditionsInputs(form) |raw }}
     {% endif %}
 
     {% hook 'formBuilder.afterFieldsHook' %}

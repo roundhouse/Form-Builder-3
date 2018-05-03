@@ -8,7 +8,7 @@
  * @copyright Copyright (c) 2018 Roundhouse Agency (roundhousepdx)
  */
 
-namespace roundhouse\formbuilder\variables;
+namespace roundhouse\formbuilder\web\twig;
 
 use Craft;
 use craft\web\View;
@@ -21,7 +21,7 @@ use roundhouse\formbuilder\elements\Form;
 use roundhouse\formbuilder\elements\Entry;
 use roundhouse\formbuilder\elements\db\EntryQuery;
 
-class FormBuilderVariable
+class Variables
 {
     // Public Methods
     // =========================================================================
@@ -145,7 +145,7 @@ class FormBuilderVariable
         if (isset($field->initialRows)) {
             $variables['rows'] = $field->initialRows;
         }
-        
+
         $fieldOptions = FormBuilder::$plugin->fields->getFieldRecordByFieldId($field->id, $form->id);
 
         if ($fieldOptions) {
@@ -164,7 +164,7 @@ class FormBuilderVariable
             $availableClasses = $variables['class'];
             $variables['class'] = $availableClasses . ' ' . $settings['fields']['global']['inputClass'];
         }
-        
+
         switch ($type) {
             case 'plain-text':
                 $variables['type'] = 'text';
@@ -254,20 +254,15 @@ class FormBuilderVariable
     }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    /**
+     * Check if integrations plugin is enabled
+     *
+     * @return bool
+     */
+    public function isIntegrationsAvailable()
+    {
+        return Craft::$app->plugins->isPluginInstalled('formbuilder-integrations');
+    }
 
     /**
      * Get all groups

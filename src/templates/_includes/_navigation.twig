@@ -10,6 +10,10 @@
         <a href="{{ url('form-builder') }}" {% if currentPage == null %}class="active"{% endif %}>{{ "Dashboard"|t('form-builder') }}</a>
         <a href="{{ url('form-builder/forms') }}" {% if currentPage == 'forms' %}class="active"{% endif %}>{{ "Forms"|t('form-builder') }}</a>
         <a href="{{ url('form-builder/entries') }}" {% if currentPage == 'entries' %}class="active"{% endif %}>{{ "Entries"|t('form-builder') }}</a>
+
+        {% if craft.fb.isIntegrationsAvailable() %}
+            <a href="{{ url('form-builder/integrations') }}" {% if currentPage == 'integrations' %}class="active"{% endif %}>{{ "Integrations"|t('form-builder') }}</a>
+        {% endif %}
     </div>
     
     <div class="fb-utility">
@@ -18,8 +22,8 @@
             <span class="icon"><i class="fas fa-bell"></i></span>
             <div class="utility-menu">
                 <div class="wrapper">
-                    <header>
-                        <p>{{ "Alerts"|t('form-builder') }}</p>
+                    <header class="pad">
+                        <h2>{{ "Alerts"|t('form-builder') }}</h2>
                     </header>
                     <div class="body"></div>
                     <footer></footer>
@@ -45,8 +49,8 @@
 
             <div id="unread-notifications" class="utility-menu">
                 <div class="wrapper">
-                    <header>
-                        <p>{{ "Unread Submissions"|t('form-builder') }}</p>
+                    <header class="pad">
+                        <h2>{{ "Unread Submissions"|t('form-builder') }}</h2>
                     </header>
                     <div class="body"></div>
                     <footer></footer>

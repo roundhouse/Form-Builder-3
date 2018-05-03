@@ -66,9 +66,9 @@ class Fields extends Component
 
 
     /**
-     * Get field record by field id
-     *
+     * Get field record by field and form ID
      * @param int $fieldId
+     * @param int $formId
      * @return array|null|\yii\db\ActiveRecord
      */
     public function getFieldRecordByFieldId(int $fieldId, int $formId)
@@ -94,7 +94,7 @@ class Fields extends Component
      */
     public function save(Field $field) : bool
     {
-        $fieldRecord = FormBuilder::$plugin->fields->getFieldRecordByFieldId($field->fieldId);
+        $fieldRecord = FormBuilder::$plugin->fields->getFieldRecordByFieldId($field->fieldId, $field->formId);
 
         if ($fieldRecord) {
             if (!$fieldRecord) {

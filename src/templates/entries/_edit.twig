@@ -18,8 +18,6 @@
         <input type="hidden" name="entryId" value="{{ entry.id }}">
     {% endif %}
 
-
-
     <div id="content-container">
         <div id="content">
             <div class="widget wide-col">
@@ -101,7 +99,7 @@
 
     {% set form = entry.getForm() %}
     {% set group = form.getGroup() %}
-    {% set notes = craft.formBuilder.notes(entry.id) %}
+    {% set notes = craft.fb.notes(entry.id) %}
 
     <div id="details">
         <div id="settings">
