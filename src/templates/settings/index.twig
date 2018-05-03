@@ -10,17 +10,80 @@
 {% endblock %}
 
 {% block content %}
+    <input type="hidden" name="action" value="plugins/save-plugin-settings">
+    <input type="hidden" name="pluginHandle" value="{{ plugin.handle }}">
+    {{ redirectInput('form-builder/settings') }}
+
     <section class="flex-container">
+        <div class="half-col">
+            <div class="widget">
+                <header class="pad">
+                    <h2>{{ "Plugin Settings"|t('form-builder') }}</h2>
+                </header>
+                <div class="body">
+                    <div class="list settings-list">
+                        <div class="list-item">
+                            <div class="fb-field ">
+                                <div class="input-hint">PLUGIN NAME</div>
+                                <div class="input">
+                                    <input type="text" class="options-submitButton-text" name="settings[pluginName]" value="{{ settings.pluginName }}">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-        {{ forms.textField({
-            label: 'Plugin Name',
-            instructions: 'Enter custom plugin name.',
-            id: 'pluginName',
-            name: 'pluginName',
-            value: settings['pluginName']})
-        }}
+            <button type="submit" class="btns btn-info">Update Settings</button>
+        </div>
 
-        <button type="submit" class="submit">Update Settings</button>
+        <div class="half-col">
+            <div class="widget">
+                <header class="pad">
+                    <h2>{{ "Plugin Information"|t('form-builder') }}</h2>
+                </header>
+
+                <div class="body">
+                    <div class="list">
+                        <div class="list-item pad">
+                            <div class="item-meta">
+                                <span class="item-meta-icon"><i class="far fa-cog"></i></span>
+                                <span class="item-meta-title">{{ "Current Version "|t('form-builder') }} {{ plugin.getVersion() }}</span>
+                                <span class="item-meta-right"><a href="{{ plugin.changelogUrl }}" target="_blank">{{ "View Changelog"|t('form-builder') }}</a></span>
+                            </div>
+                            <div class="item-title">
+                                {% if hasUpdate %}
+                                    <span class="plugin-warning">
+                                            <i class="far fa-exclamation-circle"></i>
+                                            Plugin needs an update!
+                                        </span>
+                                {% else %}
+                                    <span class="plugin-success">
+                                            <i class="far fa-check-circle"></i>
+                                            Plugin is up to date.
+                                        </span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="widget changelog">
+                <header class="pad">
+                    <h2>{{ "Changelog"|t('form-builder') }}</h2>
+                </header>
+
+                <div class="body">
+                    <div class="list">
+                        <div class="list-item">
+                            {{ changelog |raw }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
 
     </section>
 {% endblock %}

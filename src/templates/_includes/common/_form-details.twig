@@ -1,0 +1,12 @@
+{% set group = form.getGroup() %}
+
+<div class="form-details">
+    <div class="group-info">
+        <div class="group-icon"><i class="far fa-{{ group.settings.icon.name }}"></i></div>
+        <span class="group-name">{{ group.name }}</span>
+    </div>
+
+    <div class="form-info">
+        <div class="form-name">{{ form.name }}</div>
+    </div>
+</div>

@@ -14,6 +14,7 @@ use Craft;
 use craft\base\Element;
 use craft\base\Plugin;
 use craft\helpers\ArrayHelper;
+use craft\helpers\UrlHelper;
 use craft\services\Elements;
 use craft\services\Fields;
 use craft\services\UserPermissions;
@@ -129,10 +130,15 @@ class FormBuilder extends Plugin
         Craft::error(self::t($message), __METHOD__);
     }
 
+    public function getSettingsResponse()
+    {
+        $url = UrlHelper::cpUrl('form-builder/settings');
+
+        return Craft::$app->controller->redirect($url);
+    }
+
     // Protected Methods
     // =========================================================================
-
-
 
     /**
      * @inheritdoc
@@ -162,7 +168,6 @@ class FormBuilder extends Plugin
         FormBuilder::$plugin->forms->installDefaultStatuses();
         FormBuilder::$plugin->entries->installDefaultStatuses();
     }
-
 
     // Private Methods
     // =========================================================================
@@ -345,6 +350,8 @@ class FormBuilder extends Plugin
     public function getCpNavItem()
     {
         $parent = parent::getCpNavItem();
+
+        $parent['label'] = $this->getSettings()->pluginName;
 
         if ($this->getSettings()->pluginName) {
             $parent['label'] = $this->getSettings()->pluginName;

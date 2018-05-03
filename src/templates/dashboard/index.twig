@@ -62,7 +62,7 @@
 
             <div class="widget plugin-updates">
                 <header class="pad">
-                    <h2>{{ "Updates"|t }}</h2>
+                    <h2>{{ "Plugin Information"|t }}</h2>
                 </header>
 
                 <div class="body">
@@ -71,7 +71,7 @@
                             <div class="item-meta">
                                 <span class="item-meta-icon"><i class="far fa-cog"></i></span>
                                 <span class="item-meta-title">{{ "Current Version "|t('form-builder') }} {{ plugin.getVersion() }}</span>
-                                <span class="item-meta-right"><a href="{{ plugin.changelogUrl }}" target="_blank">{{ "View Changelog"|t('form-builder') }}</a></span>
+                                <span class="item-meta-right"><a href="{{ url('form-builder/settings') }}">{{ "View Changelog"|t('form-builder') }}</a></span>
                             </div>
                             <div class="item-title">
 

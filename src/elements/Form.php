@@ -348,8 +348,8 @@ class Form extends Element
         $attributes['name']         = ['label' => FormBuilder::t('Name')];
         $attributes['handle']       = ['label' => FormBuilder::t('Handle')];
         $attributes['group']        = ['label' => FormBuilder::t('Group')];
-        $attributes['totalEntries'] = ['label' => FormBuilder::t('Total Entries')];
-        $attributes['twig']         = ['label' => FormBuilder::t('Twig Snippet')];
+        $attributes['totalEntries'] = ['label' => FormBuilder::t('Entries')];
+        $attributes['twig']         = ['label' => FormBuilder::t('Twig')];
 
         return $attributes;
     }

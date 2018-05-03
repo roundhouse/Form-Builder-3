@@ -265,8 +265,9 @@ class Entry extends Element
         switch ($attribute) {
             case 'formId':
                 $form = $this->getForm();
-                $markup = '<span class="group">' . $form->name . '</span>';
-                return $markup;
+//                $markup = '<span class="group">' . $form->name . '</span>';
+                $template = Craft::$app->view->renderTemplate('form-builder/_includes/common/_form-details', ['form' => $form]);
+                return $template;
                 break;
             default:
                 return parent::tableAttributeHtml($attribute);
@@ -292,7 +293,7 @@ class Entry extends Element
         $attributes = [
             'formbuilder_entries.statusId'  => FormBuilder::t('Status'),
             'formbuilder_entries.formId'    => FormBuilder::t('Form'),
-            'elements.dateCreated'          => FormBuilder::t('Date Submitted')
+            'elements.dateCreated'          => FormBuilder::t('Submitted')
         ];
 
         return $attributes;
@@ -306,7 +307,7 @@ class Entry extends Element
         $attributes = [];
         $customAttributes['title']        = ['label' => FormBuilder::t('Title')];
         $customAttributes['formId']       = ['label' => FormBuilder::t('Form')];
-        $customAttributes['dateCreated']  = ['label' => FormBuilder::t('Date Submitted')];
+        $customAttributes['dateCreated']  = ['label' => FormBuilder::t('Submitted')];
 
         $formAttributes = Craft::$app->getElementIndexes()->getAvailableTableAttributes(Form::class);
         unset($formAttributes['name']);
