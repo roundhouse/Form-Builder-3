@@ -228,7 +228,7 @@ class Entry extends Element
             $key = 'form:' . $form->id;
             $sources[$key] = [
                 'key'      => $key,
-                'label'    => FormBuilder::t($form->name),
+                'label'    => $form->name,
                 'criteria' => ['formId' => $form->id]
             ];
         }

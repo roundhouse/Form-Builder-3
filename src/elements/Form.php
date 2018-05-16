@@ -220,7 +220,7 @@ class Form extends Element
 
             $sources[] = [
                 'key'      => $key,
-                'label'    => FormBuilder::t($group->name),
+                'label'    => $group->name,
                 'icon'     => $icon,
                 'data'     => ['id' => $group->id],
                 'criteria' => ['groupId' => $group->id]
@@ -308,7 +308,7 @@ class Form extends Element
                 return $totalEntries;
                 break;
             case 'twig':
-                return '<span class="twig-snippet" data-handle="'. $this->handle . '" data-clipboard-text="{{ craft.fb.form(\''.$this->handle.'\') }}">
+                return '<span class="twig-snippet" data-handle="'. $this->handle . '" data-clipboard-text="{{ craft.fb.form({formHandle:\''.$this->handle.'\'}) }}">
                             <code>' . FormBuilder::t("Click to copy") . '<span class="icon"><i class="far fa-copy"></i></span></code>
                         </span>';
                 break;
