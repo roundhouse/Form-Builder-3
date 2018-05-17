@@ -17,7 +17,7 @@ class Fontawesome extends AssetBundle
 {
     public function init()
     {
-        Craft::setAlias('@odlib', '@vendor/roundhouse/form-builder/lib/');
+        Craft::setAlias('@odlib', '@vendor/roundhouse/form-builder-3/lib/');
         $this->sourcePath = "@odlib";
 
         $this->js = [
