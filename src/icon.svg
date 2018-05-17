@@ -1,36 +1,68 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg width="276px" height="196px" viewBox="0 0 276 196" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-    <!-- Generator: Sketch 48.2 (47327) - http://www.bohemiancoding.com/sketch -->
-    <title>Slice 1</title>
-    <desc>Created with Sketch.</desc>
-    <defs>
-        <path d="M14.6,0.4 C6.9,0.4 0.6,6.6 0.6,14.4 L0.701,39.4 C0.701,47.1 6.9,53.4 14.7,53.4 L261.199,53.4 C268.9,53.4 275.2,47.2 275.2,39.4 L275.2,14.4 C275.2,6.7 269,0.4 261.199,0.4 L14.6,0.4 Z" id="path-1"></path>
-        <path d="M14.6,0.2 C6.9,0.2 0.6,6.4 0.6,14.2 L0.701,39.2 C0.701,46.9 6.9,53.2 14.7,53.2 L261.199,53.2 C268.9,53.2 275.2,46.999 275.2,39.2 L275.2,14.2 C275.2,6.5 269,0.2 261.199,0.2 L14.6,0.2 Z" id="path-3"></path>
-        <path d="M14.3,0.7 C6.6,0.7 0.3,6.9 0.3,14.7 L0.3,33.4 C0.3,41.1 6.6,47.4 14.3,47.4 L117.3,47.4 C125,47.4 131.3,41.2 131.3,33.4 L131.3,14.7 C131.3,6.999 125,0.7 117.3,0.7 L14.3,0.7 Z" id="path-5"></path>
-    </defs>
-    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g>
-            <g id="Group-3" transform="translate(0.000000, 0.300000)">
-                <mask id="mask-2" fill="white">
-                    <use xlink:href="#path-1"></use>
-                </mask>
-                <g id="Clip-2"></g>
-                <polygon id="Fill-1" fill="#E6ECF0" mask="url(#mask-2)" points="-15 69 290.9 69 290.9 -15.3 -15 -15.3"></polygon>
-            </g>
-            <g id="Group-6" transform="translate(0.000000, 72.300000)">
-                <mask id="mask-4" fill="white">
-                    <use xlink:href="#path-3"></use>
-                </mask>
-                <g id="Clip-5"></g>
-                <polygon id="Fill-4" fill="#E6ECF0" mask="url(#mask-4)" points="-15 68.8 290.9 68.8 290.9 -15.5 -15 -15.5"></polygon>
-            </g>
-            <g id="Group-9" transform="translate(2.000000, 147.300000)">
-                <mask id="mask-6" fill="white">
-                    <use xlink:href="#path-5"></use>
-                </mask>
-                <g id="Clip-8"></g>
-                <polygon id="Fill-7" fill="#A6E50F" mask="url(#mask-6)" points="-15.3 63 147 63 147 -15 -15.3 -15"></polygon>
-            </g>
-        </g>
-    </g>
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 22.1.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 276 196" style="enable-background:new 0 0 276 196;" xml:space="preserve">
+<style type="text/css">
+	.st0{filter:url(#Adobe_OpacityMaskFilter);}
+	.st1{fill:#FFFFFF;}
+	.st2{mask:url(#mask-2_1_);fill:#4BB8D4;}
+	.st3{filter:url(#Adobe_OpacityMaskFilter_1_);}
+	.st4{mask:url(#mask-4_1_);fill:#4BB8D4;}
+	.st5{filter:url(#Adobe_OpacityMaskFilter_2_);}
+	.st6{mask:url(#mask-6_1_);fill:#231F20;}
+</style>
+<title>Slice 1</title>
+<desc>Created with Sketch.</desc>
+<g id="Page-1">
+	<g>
+		<g id="Group-3" transform="translate(0.000000, 0.300000)">
+			<g id="Clip-2">
+			</g>
+			<defs>
+				<filter id="Adobe_OpacityMaskFilter" filterUnits="userSpaceOnUse" x="-15" y="-15.3" width="305.9" height="84.3">
+					<feColorMatrix  type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 1 0"/>
+				</filter>
+			</defs>
+			<mask maskUnits="userSpaceOnUse" x="-15" y="-15.3" width="305.9" height="84.3" id="mask-2_1_">
+				<g class="st0">
+					<path id="path-1_1_" class="st1" d="M14.6,0.4c-7.7,0-14,6.2-14,14l0.1,25c0,7.7,6.2,14,14,14h246.5c7.7,0,14-6.2,14-14v-25
+						c0-7.7-6.2-14-14-14H14.6z"/>
+				</g>
+			</mask>
+			<polygon id="Fill-1" class="st2" points="-15,69 290.9,69 290.9,-15.3 -15,-15.3 			"/>
+		</g>
+		<g id="Group-6" transform="translate(0.000000, 72.300000)">
+			<g id="Clip-5">
+			</g>
+			<defs>
+				<filter id="Adobe_OpacityMaskFilter_1_" filterUnits="userSpaceOnUse" x="-15" y="-15.5" width="305.9" height="84.3">
+					<feColorMatrix  type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 1 0"/>
+				</filter>
+			</defs>
+			<mask maskUnits="userSpaceOnUse" x="-15" y="-15.5" width="305.9" height="84.3" id="mask-4_1_">
+				<g class="st3">
+					<path id="path-3_1_" class="st1" d="M14.6,0.2c-7.7,0-14,6.2-14,14l0.1,25c0,7.7,6.2,14,14,14h246.5c7.7,0,14-6.2,14-14v-25
+						c0-7.7-6.2-14-14-14H14.6z"/>
+				</g>
+			</mask>
+			<polygon id="Fill-4" class="st4" points="-15,68.8 290.9,68.8 290.9,-15.5 -15,-15.5 			"/>
+		</g>
+		<g id="Group-9" transform="translate(2.000000, 147.300000)">
+			<g id="Clip-8">
+			</g>
+			<defs>
+				<filter id="Adobe_OpacityMaskFilter_2_" filterUnits="userSpaceOnUse" x="-15.3" y="-15" width="162.3" height="78">
+					<feColorMatrix  type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 1 0"/>
+				</filter>
+			</defs>
+			<mask maskUnits="userSpaceOnUse" x="-15.3" y="-15" width="162.3" height="78" id="mask-6_1_">
+				<g class="st5">
+					<path id="path-5_1_" class="st1" d="M14.3,0.7c-7.7,0-14,6.2-14,14v18.7c0,7.7,6.3,14,14,14h103c7.7,0,14-6.2,14-14V14.7
+						c0-7.7-6.3-14-14-14H14.3z"/>
+				</g>
+			</mask>
+			<polygon id="Fill-7" class="st6" points="-15.3,63 147,63 147,-15 -15.3,-15 			"/>
+		</g>
+	</g>
+</g>
 </svg>
