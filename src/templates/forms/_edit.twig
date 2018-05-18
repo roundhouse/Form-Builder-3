@@ -92,11 +92,6 @@
                 <div class="integration-body">
                     {% if craft.app.plugins.isPluginInstalled('formbuilder-integrations') %}
                         {% set types = craft.fbi.types.getAvailableTypes() %}
-                        {# #}
-                        {# #}
-                        {# TODO: ADD BACK ELEMENT SELECT MODAL FOR INTEGRATIONS!! YO ?! #}
-                        {# #}
-                        {# #}
                         <div class="integrate-options">
                             {% for type in types %}
                                 <div class="list integrations-list">
@@ -107,16 +102,11 @@
                                             </div>
                                             <div class="item-info">
                                                 <div class="item-meta-title">{{ type.title }}</div>
-                                                <a href="#" class="btns btn-small btn-info integrate-item-btn" data-element="owldesign\formbuilderintegrations\elements\{{ type.title }}" data-type="{{ type.handle }}" data-form="{{ form |json_encode() }}"><span><i class="fas fa-plus"></i></span></a>
+                                                <a href="#" class="btns btn-small btn-info integrate-item-btn" data-element="roundhouse\formbuilderintegrations\elements\{{ type.title }}" data-type="{{ type.handle }}" data-form="{{ form |json_encode() }}"><span><i class="fas fa-plus"></i></span></a>
                                             </div>
                                         </div>
                                     {% endfor %}
                                 </div>
-
-                                {#<a class="integrate-item-btn btns btn-info add-{{ type.handle }}-integrations" data-type="{{ type.handle }}" data-form="{{ form |json_encode() }}">#}
-                                    {#<i class="fas fa-plus"></i>#}
-                                    {#<span>{{ type.title }}</span>#}
-                                {#</a>#}
                             {% endfor %}
                         </div>
 
@@ -127,7 +117,9 @@
 
                                 {% for index, element in integration %}
                                     {% set integration = craft.fbi.integrations.getIntegrationById(element.elementId) %}
-                                    {% include 'formbuilder-integrations/integrations/' ~ type.handle ~ '/_integration' ignore missing with { integration: integration, type: type, index: index} %}
+                                    {% if integration %}
+                                        {% include 'formbuilder-integrations/integrations/' ~ type.handle ~ '/_integration' ignore missing with { integration: integration, type: type, index: index} %}
+                                    {% endif %}
                                 {% endfor %}
                             {% endfor %}
                         </div>
