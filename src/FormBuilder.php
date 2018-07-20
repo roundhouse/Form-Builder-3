@@ -177,7 +177,7 @@ class FormBuilder extends Plugin
      */
     private function _addTwigExtensions()
     {
-        Craft::$app->view->twig->addExtension(new Extensions);
+        Craft::$app->view->registerTwigExtension(new Extensions);
     }
 
     /**
