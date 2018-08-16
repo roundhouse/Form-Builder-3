@@ -4,3 +4,8 @@
 
 ### Added
 - Initial release
+
+## 3.0.1 - 2018-08-16 [CRITICAL]
+
+### Added
+- {note} Fixed security vulnerabilities

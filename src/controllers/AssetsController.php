@@ -20,7 +20,7 @@ use ZipArchive;
 
 class AssetsController extends Controller
 {
-    protected $allowAnonymous = true;
+    protected $allowAnonymous = false;
 
     /**
      * Download all entry assets
@@ -79,6 +79,7 @@ class AssetsController extends Controller
      */
     public function actionDownloadFile(): Response
     {
+        $this->requireAdmin();
         $filePath = Craft::$app->getRequest()->getRequiredQueryParam('filename');
 
         return Craft::$app->getResponse()->sendFile($filePath);

@@ -44,7 +44,7 @@ class EntriesController extends Controller
      *         The actions must be in 'kebab-case'
      * @access protected
      */
-    protected $allowAnonymous = ['actionIndex', 'actionGetUnreadEntries', 'actionSave', 'actionDelete'];
+    protected $allowAnonymous = ['actionIndex', 'actionGetUnreadEntries', 'actionSave'];
 
     // Public Properties
     // =========================================================================
@@ -53,7 +53,7 @@ class EntriesController extends Controller
     public $entry;
     public $post;
     public $files;
-    
+
     // Public Methods
     // =========================================================================
 
@@ -94,7 +94,7 @@ class EntriesController extends Controller
         if ($entryId) {
             $variables['entry'] = Entry::find()->id($entryId)->one();
             $variables['title'] = $variables['entry']->title;
-            
+
             Craft::$app->getDb()->createCommand()
                 ->update('{{%formbuilder_entries}}', ['statusId' => 2], ['id' => $variables['entry']->id])
                 ->execute();
@@ -249,6 +249,7 @@ class EntriesController extends Controller
 
     public function actionDelete()
     {
+        // $this->requireAdmin();
         $this->requirePostRequest();
 
         $entryId = Craft::$app->getRequest()->getRequiredBodyParam('entryId');
@@ -357,7 +358,7 @@ class EntriesController extends Controller
      * @return Response
      */
     private function _returnErrorMessage($request)
-    {   
+    {
         if (Craft::$app->getRequest()->getIsAjax()) {
             return $this->asJson([
                 'success' => false,
@@ -385,6 +386,6 @@ class EntriesController extends Controller
         } else {
             Craft::$app->getSession()->setFlash('success', isset($this->form['options']['messages']['success']) ? $this->form['options']['messages']['success'] : FormBuilder::t('Form submission successful.'));
         }
-        
+
     }
 }
