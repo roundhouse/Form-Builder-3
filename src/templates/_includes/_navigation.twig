@@ -7,12 +7,16 @@
     </div>
 
     <div class="fb-nav">
+        {% if currentUser.can('accessPlugin-form-builder') %}
         <a href="{{ url('form-builder') }}" {% if currentPage == null %}class="active"{% endif %}>{{ "Dashboard"|t('form-builder') }}</a>
-        <a href="{{ url('form-builder/forms') }}" {% if currentPage == 'forms' %}class="active"{% endif %}>{{ "Forms"|t('form-builder') }}</a>
-        <a href="{{ url('form-builder/entries') }}" {% if currentPage == 'entries' %}class="active"{% endif %}>{{ "Entries"|t('form-builder') }}</a>
+        {% endif %}
 
-        {% if craft.fb.isIntegrationsAvailable() %}
-            <a href="{{ url('form-builder/integrations') }}" {% if currentPage == 'integrations' %}class="active"{% endif %}>{{ "Integrations"|t('form-builder') }}</a>
+        {% if currentUser.can('fb:accessForms') %}
+        <a href="{{ url('form-builder/forms') }}" {% if currentPage == 'forms' %}class="active"{% endif %}>{{ "Forms"|t('form-builder') }}</a>
+        {% endif %}
+
+        {% if currentUser.can('fb:accessEntries') %}
+        <a href="{{ url('form-builder/entries') }}" {% if currentPage == 'entries' %}class="active"{% endif %}>{{ "Entries"|t('form-builder') }}</a>
         {% endif %}
     </div>
     

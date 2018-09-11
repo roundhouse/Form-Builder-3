@@ -57,4 +57,5 @@ return [
     'Group added.' => 'Group added.',
     'Are you sure you want to delete?' => 'Are you sure you want to delete?',
     'Submission deleted' => 'Submission deleted',
+    'You are not allowed to delete this element type.' => 'You are not allowed to delete this element type.',
 ];

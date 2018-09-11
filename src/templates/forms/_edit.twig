@@ -83,6 +83,7 @@
                 return 'Hey!';
             }); #}
 
+            {% if currentUser.can('fb:accessIntegrations') %}
             <section class="integrations">
                 <header>
                     <h2>{{ "Integrations"|t('form-builder') }}</h2>
@@ -132,7 +133,7 @@
                     {% endif %}
                 </div>
             </section>
-
+            {% endif %}
         </div>
     </div>
 
@@ -187,10 +188,12 @@
                 <button type="submit" href="#" class="btns btn-info save-form">{{ "Save Form" |t('form-builder') }}<span class="btn-hint">&#8984; + S</span></button>
             </div>
 
-            {% if formId is defined %}
-                <div class="pane meta delete-form-meta last">
-                    <a href="#" class="btns btn-danger delete-form" data-id="{{ form.id }}">{{ "Delete Form" |t('form-builder') }}</a>
-                </div>
+            {% if currentUser.can('fb:deleteForms') %}
+                {% if formId is defined %}
+                    <div class="pane meta delete-form-meta last">
+                        <a href="#" class="btns btn-danger delete-form" data-id="{{ form.id }}">{{ "Delete Form" |t('form-builder') }}</a>
+                    </div>
+                {% endif %}
             {% endif %}
         </div>
     </div>

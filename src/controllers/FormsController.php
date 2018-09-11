@@ -45,7 +45,7 @@ class FormsController extends Controller
      */
     public function actionIndex()
     {
-        $this->requireAdmin();
+        $this->requirePermission('fb:accessForms');
 
         $view = $this->getView();
         $view->registerAssetBundle(FormBuilderAsset::class);
@@ -67,9 +67,13 @@ class FormsController extends Controller
      * @return Response
      * @throws NotFoundHttpException
      * @throws \yii\base\InvalidConfigException
+     * @throws \yii\web\ForbiddenHttpException
      */
     public function actionEdit(int $formId = null): Response
     {
+        $this->requirePermission('fb:editForms');
+        $this->requirePermission('fb:createForms');
+
         $variables['formId'] = $formId;
         $this->_prepEditFormVariables($variables);
 
@@ -113,12 +117,14 @@ class FormsController extends Controller
      * @return null|Response
      * @throws BadRequestHttpException
      * @throws NotFoundHttpException
+     * @throws \craft\errors\MissingComponentException
      * @throws \yii\web\ForbiddenHttpException
      */
     public function actionSave()
     {
+        $this->requirePermission('fb:editForms');
+        $this->requirePermission('fb:createForms');
         $this->requirePostRequest();
-        $this->requireAdmin();
 
         $form = $this->_getFormModel();
 
@@ -150,9 +156,10 @@ class FormsController extends Controller
      */
     public function actionDelete(): Response
     {
+        $this->requirePermission('fb:editForms');
+        $this->requirePermission('fb:deleteForms');
         $this->requirePostRequest();
         $this->requireAcceptsJson();
-        $this->requireAdmin();
 
         $formId = Craft::$app->getRequest()->getRequiredBodyParam('id');
 

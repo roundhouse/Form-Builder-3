@@ -47,8 +47,6 @@ class DashboardController extends Controller
      */
     public function actionIndex()
     {
-        $this->requireAdmin();
-
         $view = $this->getView();
         $view->registerAssetBundle(FormBuilderAsset::class);
         $view->registerAssetBundle(DashboardAsset::class);

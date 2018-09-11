@@ -92,7 +92,12 @@ class FormBuilder extends Plugin
      */
     public function isIntegrationsAvailable()
     {
-        return Craft::$app->plugins->isPluginInstalled('formbuilder-integrations');
+        $integrationsInstalled = Craft::$app->plugins->isPluginInstalled('formbuilder-integrations');
+        $integrationsEnabled = Craft::$app->plugins->isPluginEnabled('formbuilder-integrations');
+
+        $active = $integrationsInstalled === $integrationsEnabled;
+
+        return $active;
     }
 
     /**
@@ -276,50 +281,41 @@ class FormBuilder extends Plugin
             function(RegisterUserPermissionsEvent $event) {
                 $permissions = [];
 
-                $permissions['accessForms'] = [
+                $permissions['fb:accessForms'] = [
                     'label' => FormBuilder::t('Access Forms'),
                 ];
 
-                $permissions['accessEntries'] = [
-                    'label' => FormBuilder::t('Access Submissions'),
+                $permissions['fb:accessEntries'] = [
+                    'label' => FormBuilder::t('Access Entries'),
                 ];
 
-                $permissions['accessNotifications'] = [
-                    'label' => FormBuilder::t('Access Notifications'),
+                $permissions['fb:accessIntegrations'] = [
+                    'label' => FormBuilder::t('Access Integrations'),
                 ];
 
-                $permissions['editForms'] = [
+                $permissions['fb:editForms'] = [
                     'label' => FormBuilder::t('Edit Forms'),
                     'nested' => [
-                        'createForms' => [
+                        'fb:createForms' => [
                             'label' => FormBuilder::t('Create forms')
                         ],
-                        'deleteForms' => [
+                        'fb:deleteForms' => [
                             'label' => FormBuilder::t('Delete forms')
                         ]
                     ]
                 ];
 
-                $permissions['editEntries'] = [
-                    'label' => FormBuilder::t('Edit Submissions'),
+                $permissions['fb:editEntries'] = [
+                    'label' => FormBuilder::t('Edit Entries'),
                     'nested' => [
-                        'setStatusEntry' => [
-                            'label' => FormBuilder::t('Set status')
+                        'fb:deleteEntry' => [
+                            'label' => FormBuilder::t('Delete entry')
                         ],
-                        'deleteEntry' => [
-                            'label' => FormBuilder::t('Delete submission')
-                        ]
-                    ]
-                ];
-
-                $permissions['editIntegrations'] = [
-                    'label' => FormBuilder::t('Edit Integrations'),
-                    'nested' => [
-                        'createIntegration' => [
-                            'label' => FormBuilder::t('Create integration')
+                        'fb:downloadFiles' => [
+                            'label' => FormBuilder::t('Download files')
                         ],
-                        'deleteIntegration' => [
-                            'label' => FormBuilder::t('Delete integration')
+                        'fb:leaveNotes' => [
+                            'label' => FormBuilder::t('Leave notes')
                         ]
                     ]
                 ];
@@ -357,34 +353,38 @@ class FormBuilder extends Plugin
             $parent['label'] = $this->getSettings()->pluginName;
         }
 
-        $navigation = [
-            'dashboard' => [
+        // Permission to access dashboard
+        if (Craft::$app->user->checkPermission('accessPlugin-form-builder')) {
+            $navigation['dashboard'] = [
                 'label' => FormBuilder::t('Dashboard'),
                 'url' => 'form-builder'
-            ],
-            'forms' => [
+            ];
+        }
+
+        // Permission to access forms
+        if (Craft::$app->user->checkPermission('fb:accessForms')) {
+            $navigation['forms'] = [
                 'label' => FormBuilder::t('Forms'),
                 'url' => 'form-builder/forms'
-            ],
-            'entries' => [
+            ];
+        }
+
+        // Permission to access entries
+        if (Craft::$app->user->checkPermission('fb:accessEntries')) {
+            $navigation['entries'] = [
                 'label' => FormBuilder::t('Entries'),
                 'url' => 'form-builder/entries'
-            ]
-        ];
+            ];
+        }
 
-        // Integrations
-        if ($this->isIntegrationsAvailable()) {
+
+        // Permission to access integrations
+        if (Craft::$app->user->checkPermission('fb:accessIntegrations') && $this->isIntegrationsAvailable()) {
             $navigation['integrations'] = [
                 'label' => FormBuilder::t('Integrations'),
                 'url' => 'form-builder/integrations'
             ];
         }
-
-        // Settings
-        $navigation['settings'] = [
-            'label' => FormBuilder::t('Settings'),
-            'url' => 'form-builder/settings'
-        ];
 
         $nav = ArrayHelper::merge($parent, [
             'subnav' => $navigation

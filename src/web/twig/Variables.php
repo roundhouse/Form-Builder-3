@@ -14,6 +14,7 @@ use Craft;
 use craft\web\View;
 use craft\helpers\Template;
 use craft\helpers\StringHelper;
+use craft\helpers\ArrayHelper;
 use craft\helpers\Json;
 
 use roundhouse\formbuilder\FormBuilder;

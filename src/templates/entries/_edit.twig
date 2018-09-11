@@ -54,8 +54,10 @@
                                                     <div class="asset-description pad">
                                                         <span class="item-title asset-title">{{ asset.title }}</span>
                                                         <span class="item-title">{{ asset.size|formatBytes }}</span>
+                                                        {% if currentUser.can('fb:downloadFiles') %}
                                                         <span class="item-title download-asset"><a href="{{ asset.url }}" target="_blank"><i class="far fa-download"></i></a></span>
                                                         <div class="asset-select" data-asset-id="{{ asset.id }}"><i class="far fa-check-circle"></i></div>
+                                                        {% endif %}
                                                     </div>
                                                 </div>
                                                 {% endfor %}
@@ -143,8 +145,10 @@
                             </div>
                         </div>
                         <div class="list-item element-actions">
+                            {% if currentUser.can('fb:deleteEntry') %}
                             <button id="delete-entry" class="btns btn-danger" data-entry-id="{{ entry.id }}"><span>Delete Entry</span></button>
-
+                            {% endif %}
+                            {% if currentUser.can('fb:downloadFiles') %}
                             <form id="download-all-assets" method="post" accept-charset="UTF-8">
                                 <input type="hidden" name="action" value="form-builder/assets/download-all-files">
                                 <input type="hidden" name="entryId" value="{{ entry.id }}">
@@ -153,11 +157,13 @@
                                 <button type="submit" class="btns btn-info hidden"><span>Download Assets</span><span class="asset-count">0</span></button>
                                 <div class="download-status"></div>
                             </form>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
             </div>
 
+            {% if currentUser.can('fb:leaveNotes') %}
             <div class="widget notes-widget" data-entry-id="{{ entry.id }}">
                 <header class="pad">
                     <h2>{{ "Notes"|t('form-builder') }}</h2>
@@ -188,6 +194,7 @@
                     </div>
                 </div>
             </div>
+            {% endif %}
         </div>
     </div>
 {% endblock %}

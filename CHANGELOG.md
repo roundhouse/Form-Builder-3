@@ -8,4 +8,10 @@
 ## 3.0.1 - 2018-08-16 [CRITICAL]
 
 ### Added
-- {note} Fixed security vulnerabilities
+- Fixed security vulnerabilities
+
+## 3.0.2 - 2018-09-11 [CRITICAL]
+
+### Added
+- Fixed security vulnerabilities, part 2
+- Updated user group permissions across the plugin

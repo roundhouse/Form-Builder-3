@@ -19,6 +19,7 @@ use craft\helpers\DateTimeHelper;
 use craft\helpers\StringHelper;
 use roundhouse\formbuilder\records\Note;
 use yii\web\NotFoundHttpException;
+use yii\web\ForbiddenHttpException;
 use yii\web\Response;
 
 use roundhouse\formbuilder\elements\Entry;
@@ -66,7 +67,7 @@ class EntriesController extends Controller
      */
     public function actionIndex()
     {
-        $this->requireAdmin();
+        $this->requirePermission('fb:accessEntries');
 
         $view = $this->getView();
         $view->registerAssetBundle(FormBuilderAsset::class);
@@ -76,15 +77,18 @@ class EntriesController extends Controller
     }
 
     /**
-     * Entry single page
+     * Edit entry
      *
      * @param int|null $entryId
      * @return Response
      * @throws \yii\base\InvalidConfigException
      * @throws \yii\db\Exception
+     * @throws \yii\web\ForbiddenHttpException
      */
     public function actionEdit(int $entryId = null): Response
     {
+        $this->requirePermission('fb:editEntries');
+
         $view = $this->getView();
         $view->registerAssetBundle(FormBuilderAsset::class);
         $view->registerAssetBundle(EntryAsset::class);
@@ -247,13 +251,29 @@ class EntriesController extends Controller
         }
     }
 
+    /**
+     * Delete entry
+     *
+     * @return null|Response
+     * @throws NotFoundHttpException
+     * @throws \Throwable
+     * @throws \craft\errors\MissingComponentException
+     * @throws \yii\web\BadRequestHttpException
+     */
     public function actionDelete()
     {
-        // $this->requireAdmin();
+        $this->requirePermission('fb:deleteEntry');
         $this->requirePostRequest();
 
         $entryId = Craft::$app->getRequest()->getRequiredBodyParam('entryId');
         $entry = Craft::$app->elements->getElementById($entryId);
+
+        // Ensure this is a form builder entry element only
+        $validElementType = $entry->refHandle() === 'formbuilderEntry';
+
+        if (!$validElementType) {
+            throw new ForbiddenHttpException(FormBuilder::t('You are not allowed to delete this element type.'));
+        }
 
         if (!$entry) {
             throw new NotFoundHttpException('Entry not found');
@@ -375,6 +395,7 @@ class EntriesController extends Controller
      * Return success message
      *
      * @return Response
+     * @throws \craft\errors\MissingComponentException
      */
     private function _returnSuccessMessage()
     {

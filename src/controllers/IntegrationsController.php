@@ -28,7 +28,7 @@ class IntegrationsController extends Controller
 
     public function actionIndex()
     {
-        $this->requireAdmin();
+        $this->requirePermission('fb:accessIntegrations');
 
         $view = $this->getView();
         $view->registerAssetBundle(FormBuilderAsset::class);

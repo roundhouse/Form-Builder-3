@@ -239,16 +239,6 @@ class Entry extends Element
     /**
      * @inheritdoc
      */
-    protected static function defineActions(string $source = null): array
-    {
-        $actions[] = SetStatus::class;
-
-        return $actions;
-    }
-
-    /**
-     * @inheritdoc
-     */
     public function getCpEditUrl(): string
     {
         return UrlHelper::cpUrl('form-builder/entries/'.$this->id);
