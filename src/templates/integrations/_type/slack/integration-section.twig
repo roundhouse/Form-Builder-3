@@ -1,0 +1,37 @@
+{% import "form-builder/_includes/_components" as components %}
+
+{% set templatePath = 'form-builder/integrations/_type/slack/fields/' %}
+
+<section class="cmp-tout-alt" id="integration-{{ type }}-{{ index }}" data-type="{{ type }}">
+
+    <input type="hidden" name="integrations[{{ type }}][{{ index }}][id]" value="{{ integration.id }}">
+
+    <header>
+        <div class="titlebar">
+            <span class="tout-title">
+                {% include 'form-builder/_includes/icons/integrations-' ~ type ignore missing %}
+                <span class="type-title">{{ type }}</span>
+                <a href="#" class="delete-btn" data-target="integration-{{ type }}-{{ index }}">Remove</a>
+            </span>
+            <div class="integration-info">
+                <span class="integration-title">{{ integration.name }}</span>
+                <div class="status-container">
+                    {% if integration.status == 'enabled' %}
+                        <div class="status on" title="Enabled"></div>
+                    {% else %}
+                        <div class="status off" title="Disabled"></div>
+                    {% endif %}
+                    <div class="status-title">{{ integration.status |pascal }}</div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="body">
+        <div class="fields">
+            {% include templatePath ~ 'submission' ignore missing %}
+            {% include templatePath ~ 'text' ignore missing %}
+        </div>
+    </div>
+
+</section>

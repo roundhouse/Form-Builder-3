@@ -1,0 +1,63 @@
+{% import "form-builder/_includes/_components" as components %}
+
+{% set availableFields = form.fieldLayoutId is defined and form.fieldLayoutId ? craft.app.getFields.getLayoutById(form.fieldLayoutId).getFields() : null %}
+{% set fieldsOption = [] %}
+{% set fieldsOption = [{'label': 'Select Email Field', 'value': ''}] %}
+{% for field in availableFields %}
+    {% if field|getClass(field) == 'Email' %}
+        {% set fieldsOption = fieldsOption|merge([{ 'label': field.name, 'value': field.handle }]) %}
+    {% endif %}
+{% endfor %}
+
+{% set nameSelected = 'integrations[email]['~ index ~'][replyTo][selected]' %}
+{% set nameEmail = 'integrations[email]['~ index ~'][replyTo][email]' %}
+{% set nameField = 'integrations[email]['~ index ~'][replyTo][field]' %}
+
+{% set container = {
+    title: 'Reply-To' |t,
+    info: null,
+    icon: null,
+    class: null,
+    id: null
+} %}
+
+{% set inputs = {
+    0: {
+        type: 'email',
+        name: nameEmail,
+        value: attribute(form.integrations.email, index).replyTo.email is defined and attribute(form.integrations.email, index).replyTo.email != '' ? attribute(form.integrations.email, index).replyTo.email : '',
+        class: 'hidden',
+        id: null,
+        hint: 'EMAIL'
+    },
+    1: {
+        type: 'select',
+        name: nameField,
+        value: attribute(form.integrations.email, index).replyTo.field is defined and attribute(form.integrations.email, index).replyTo.field != '' ? attribute(form.integrations.email, index).replyTo.field : '',
+        options: fieldsOption |json_encode(),
+        class: 'hidden',
+        id: null,
+        hint: 'FIELD'
+    },
+    2: {
+        type: 'text',
+        name: nameSelected,
+        value: attribute(form.integrations.email, index).replyTo.selected is defined and attribute(form.integrations.email, index).replyTo.selected != '' ? attribute(form.integrations.email, index).replyTo.selected : '',
+        class: 'hidden',
+        id: null,
+        toggler: true
+    }
+} %}
+
+{% set modal = {
+    title: 'Reply-To' |t,
+    instructions: 'The Reply-To email address. You must toggle the label to turn it on.' |t,
+    successMessage: 'Reply-To Email Updated' |t,
+    inputs: inputs
+} %}
+
+{{ components.optionItem(
+    container,
+    modal,
+    inputs
+) }}

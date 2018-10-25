@@ -1,0 +1,47 @@
+{% import "form-builder/_includes/_components" as components %}
+
+{% set name = 'integrations[email]['~ index ~'][bcc]' %}
+{% set values = attribute(form.integrations.email, index).bcc is defined ? attribute(form.integrations.email, index).bcc %}
+
+{% set container = {
+    title: 'BCC' |t,
+    info: null,
+    icon: null,
+    class: 'tags',
+    id: null
+} %}
+
+{% set inputs = {
+    0: {
+        type: 'text',
+        name: name,
+        value: attribute(form.integrations.email, index).bcc.key is defined and attribute(form.integrations.email, index).bcc.key != '' ? attribute(form.integrations.email, index).bcc.key : '',
+        class: 'hidden',
+        id: null,
+        hint: 'NAME',
+        required: true
+    },
+    1: {
+        type: 'email',
+        name: name,
+        value: attribute(form.integrations.email, index).bcc.value is defined and attribute(form.integrations.email, index).bcc.value != '' ? attribute(form.integrations.email, index).bcc.value : '',
+        class: 'hidden',
+        id: null,
+        hint: 'EMAIL',
+        required: true
+    }
+} %}
+
+{% set modal = {
+    title: 'BCC' |t,
+    instructions: 'The recipients that should be BCC’d on the email. Each element of this array should be a nested array containing the keys "name" and "email".' |t,
+    successMessage: 'BCC Email Added' |t,
+    inputs: inputs
+} %}
+
+{{ components.repeaterItem(
+    container,
+    modal,
+    inputs,
+    values
+) }}

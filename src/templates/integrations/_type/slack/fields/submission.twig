@@ -1,0 +1,32 @@
+{% import "form-builder/_includes/_components" as components %}
+
+{% set enabledName = 'integrations[slack]['~ index ~'][includeSubmission]' %}
+{% set enabled = attribute(form.integrations.slack, index).includeSubmission is defined and attribute(form.integrations.slack, index).includeSubmission ? true : false %}
+
+{% set container = {
+    title: 'Include Submission' |t('form-builder'),
+    info: 'Should we include submission data in slack message?'|t('form-builder'),
+    icon: null,
+    toggle: true,
+    class: null,
+    id: null
+} %}
+
+{% set inputs = {
+    0: {
+        type: 'checkbox',
+        name: enabledName,
+        value: '1',
+        checked: enabled,
+        class: 'hidden',
+        id: null
+    }
+} %}
+
+{% set modal = null %}
+
+{{ components.optionItem(
+    container,
+    modal,
+    inputs
+) }}

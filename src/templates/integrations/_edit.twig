@@ -1,0 +1,96 @@
+{% extends "_layouts/cp" %}
+
+{% set bodyClass = 'formbuilder fb-edit-integration' %}
+{% set pluginCpUrl = url('form-builder') %}
+{% set selectedSubnavItem = "integrations" %}
+
+{% set docLinks = {
+    'formSettings': 'https://google.com/',
+    'formDatabase': 'https://yahoo.com/',
+    'formOptions': 'https://bing.com/',
+    'formSpamProtection': 'https://bing.com/'
+} %}
+
+{% set details = true %}
+
+{% block header %}
+    {% include 'form-builder/_includes/_header' ignore missing with { title: title } %}
+{% endblock %}
+
+{% block main %}
+    <div id="content-container">
+
+        <input type="hidden" name="action" value="form-builder/integrations/save-entry">
+        {{ redirectInput('form-builder/integrations') }}
+
+        {% if entry.id %}
+            <input type="hidden" name="id" value="{{ entry.id }}">
+            <input type="hidden" name="type" value="{{ entry.type }}">
+        {% endif %}
+
+
+        <div id="content">
+            <section class="flex-container">
+
+                <div class="widget full-col">
+                    <header class="pad">
+                        <h2>{{ "Options"|t('form-builder') }}</h2>
+                    </header>
+                    <div class="body">
+                        {% include 'form-builder/integrations/_type/'~ entry.type ~'/_edit' ignore missing with { entry: entry } %}
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <div id="details">
+        <div id="settings">
+            <section class="form-settings-tout cmp-tout theme-white">
+                <header>
+                    <span class="tout-title">{{ "Settings" |t('form-builder') }}</span>
+                </header>
+                <div class="body">
+                    <div class="fb-field ">
+                        <label for="name" class="input-hint">{{ 'NAME'|t('form-builder') }}</label>
+                        <input type="text" id="name" class="text input-control" name="name" value="{{ entry.name }}" autocomplete="off">
+                    </div>
+
+                    <div class="fb-field ">
+                        <label for="handle" class="input-hint">{{ 'HANDLE'|t('form-builder') }}</label>
+                        <input type="text" id="handle" class="text input-control" name="handle" value="{{ entry.handle }}" autocomplete="off">
+                    </div>
+                </div>
+
+                <div class="fb-field">
+                    <label for="statusId" class="input-hint">{{ "STATUS" |t('form-builder') }}</label>
+                    <div class="select">
+                        <select id="status" name="status">
+                            <option value="enabled" {% if entry.status == 'enabled' %}selected{% endif %}>{{ 'Enabled'|t('form-builder') }}</option>
+                            <option value="disabled" {% if entry.status == 'disabled' %}selected{% endif %}>{{ 'Disabled'|t('form-builder') }}</option>
+                        </select>
+                    </div>
+                </div>
+
+            </section>
+
+            <div class="pane meta save-form-meta last">
+                <button type="submit" class="btns btn-info save-form">{{ "Save Integration" |t('form-builder') }}<span class="btn-hint">&#8984; + S</span></button>
+            </div>
+
+            {# TODO: add delete button #}
+            {#{% if currentUser.can('fb:deleteIntegrations') %}#}
+                {#{% if entry.id is defined %}#}
+                    {#<div class="pane meta delete-form-meta last">#}
+                        {#<a href="#" class="btns btn-danger delete-form" data-id="{{ entry.id }}">{{ "Delete Integration" |t('form-builder') }}</a>#}
+                    {#</div>#}
+                {#{% endif %}#}
+            {#{% endif %}#}
+        </div>
+    </div>
+
+{% endblock %}
+
+{% js %}
+    {% if entry and not entry.handle %}new Craft.HandleGenerator('#name', '#handle');{% endif %}
+{% endjs %}

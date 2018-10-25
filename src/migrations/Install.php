@@ -175,6 +175,19 @@ class Install extends Migration
                 'uid' => $this->uid()
             ]
         );
+
+        $this->createTable('{{%formbuilder_integrations}}', [
+            'id' => $this->primaryKey(),
+            'name' => $this->string()->notNull(),
+            'handle' => $this->string()->notNull(),
+            'type' => $this->string()->notNull(),
+            'status' => $this->string()->notNull()->defaultValue('enabled'),
+            'content' => $this->text(),
+            'settings' => $this->text(),
+            'dateCreated' => $this->dateTime()->notNull(),
+            'dateUpdated' => $this->dateTime()->notNull(),
+            'uid' => $this->uid(),
+        ]);
     }
 
     /**
@@ -235,5 +248,8 @@ class Install extends Migration
         $this->dropTableIfExists('{{%formbuilder_forms}}');
         $this->dropTableIfExists('{{%formbuilder_formgroup}}');
         $this->dropTableIfExists('{{%formbuilder_formstatus}}');
+
+        $this->dropTableIfExists('{{%formbuilder_integrations}}');
+
     }
 }

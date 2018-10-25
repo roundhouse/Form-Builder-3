@@ -21,10 +21,10 @@ class Fontawesome extends AssetBundle
         $this->sourcePath = "@odlib";
 
         $this->js = [
-            'fontawesome/fa-light.min.js',
-            'fontawesome/fa-regular.min.js',
-            'fontawesome/fa-solid.min.js',
-            'fontawesome/fontawesome.js'
+            'fontawesome/light.min.js',
+            'fontawesome/regular.min.js',
+            'fontawesome/solid.min.js',
+            'fontawesome/fontawesome.min.js'
         ];
 
         parent::init();

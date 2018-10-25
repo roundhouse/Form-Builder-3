@@ -1,0 +1,57 @@
+{# TODO: Add email templates/notificaitons #}
+
+{% import "form-builder/_includes/_components" as components %}
+
+{% set templates = craft.fbi.emails.getNotifications() %}
+
+{% set templateOption = [{label: 'Select Template', value: ''}] %}
+{% for template in templates %}
+    {% set templateOption = templateOption|merge([{ label: template.title, value: template.handle }]) %}
+{% endfor %}
+
+{% set name = 'integrations[email]['~ index ~'][template][handle]' %}
+{% set enabledName = 'integrations[email]['~ index ~'][template][enabled]' %}
+{% set enabled = attribute(form.integrations.email, index).template.enabled is defined and attribute(form.integrations.email, index).template.enabled ? true : false %}
+
+{% set container = {
+    title: 'Email Template' |t,
+    info: null,
+    icon: null,
+    toggle: true,
+    class: null,
+    id: null
+} %}
+
+{% set inputs = {
+    0: {
+        type: 'select',
+        name: name,
+        value: attribute(form.integrations.email, index).template.handle is defined and attribute(form.integrations.email, index).template.handle != '' ? attribute(form.integrations.email, index).template.handle : '',
+        options: templateOption |json_encode(),
+        class: 'hidden',
+        id: null,
+        hint: 'TEMPLATE',
+        required: true
+    },
+    1: {
+        type: 'checkbox',
+        name: enabledName,
+        value: '1',
+        checked: enabled,
+        class: 'hidden',
+        id: null
+    },
+} %}
+
+{% set modal = {
+    title: 'Email Template' |t,
+    instructions: 'Select email template to use for notification.' |t,
+    successMessage: 'Email Template Updated' |t,
+    inputs: inputs
+} %}
+
+{{ components.optionItem(
+    container,
+    modal,
+    inputs
+) }}

@@ -1,0 +1,36 @@
+{% import "form-builder/_includes/_components" as components %}
+
+{% set text = 'integrations[slack]['~ index ~'][text]' %}
+
+{% set container = {
+    title: 'Text' |t,
+    info: null,
+    icon: null,
+    toggle: false,
+    class: null,
+    id: null
+} %}
+
+{% set inputs = {
+    0: {
+        type: 'text',
+        name: text,
+        value: attribute(form.integrations.slack, index).text is defined and attribute(form.integrations.slack, index).text != '' ? attribute(form.integrations.slack, index).text : '',
+        class: 'hidden',
+        id: null,
+        hint: 'TEXT'
+    },
+} %}
+
+{% set modal = {
+    title: 'Text' |t,
+    instructions: 'Enter slack message.' |t,
+    successMessage: 'Text Updated' |t,
+    inputs: inputs
+} %}
+
+{{ components.optionItem(
+    container,
+    modal,
+    inputs
+) }}

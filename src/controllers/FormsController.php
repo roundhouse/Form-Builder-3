@@ -10,6 +10,7 @@
 
 namespace roundhouse\formbuilder\controllers;
 
+use craft\helpers\ArrayHelper;
 use roundhouse\formbuilder\FormBuilder;
 
 use Craft;
@@ -265,5 +266,8 @@ class FormsController extends Controller
             $variables['form']->groupId = 1;
             $variables['form']->statusId = 1;
         }
+
+        // Integrations
+//        $variables['integrations'] = FormBuilder::$plugin->integrations->getAllIntegrations();
     }
 }

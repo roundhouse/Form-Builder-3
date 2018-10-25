@@ -204,7 +204,6 @@ class EntriesController extends Controller
         $this->entry = $this->_getEntryModel($request);
         $this->_populateEntryModel($this->entry, $request);
 
-
         // Spam Protection
         $this->_spamProtection($this->entry, $request);
 
@@ -224,6 +223,7 @@ class EntriesController extends Controller
             'entry' => $this->entry,
             'form' => $this->form
         ]);
+
         $this->trigger(self::EVENT_BEFORE_SUBMIT_ENTRY, $event);
 
         if ($saveToDatabase && $event->isValid) {
@@ -235,12 +235,18 @@ class EntriesController extends Controller
         } else {
             $saved = true;
         }
+        
+        // Perform Integrations
+        if ($this->form->integrations) {
+            FormBuilder::$plugin->integrations->performIntegrations($this->entry, $this->form);
+        }
 
         // Fire a 'afterSubmitEntry' event
         $event = new EntryEvent([
             'entry' => $this->entry,
             'form' => $this->form
         ]);
+
         $this->trigger(self::EVENT_AFTER_SUBMIT_ENTRY, $event);
 
         // Notifications
@@ -325,6 +331,7 @@ class EntriesController extends Controller
      *
      * @param Entry $entry
      * @param $request
+     * @throws \Throwable
      * @throws \yii\base\Exception
      */
     private function _populateEntryModel(Entry $entry, $request)

@@ -5,8 +5,8 @@
 {% set selectedSubnavItem = "forms" %}
 
 {% set docLinks = {
-    'formSettings': 'https://google.com/', 
-    'formDatabase': 'https://yahoo.com/', 
+    'formSettings': 'https://google.com/',
+    'formDatabase': 'https://yahoo.com/',
     'formOptions': 'https://bing.com/',
     'formSpamProtection': 'https://bing.com/'
 } %}
@@ -17,7 +17,7 @@
 {% endif %}
 
 {% set groupId = craft.app.request.getQueryParam('groupId') %}
-{% set statusId = form.statusId is defined ? form.statusId  %}
+{% set statusId = form.statusId is defined ? form.statusId %}
 
 {% if not groupId %}
     {% if form.id %}
@@ -50,9 +50,9 @@
         {% set fieldsOption = [{label: 'Select Field', value: ''}] %}
         {% for field in availableFields %}
             {% set type = field |getClass(field) %}
-             {% if type == 'PlainText' or type == 'Email' %}
+            {% if type == 'PlainText' or type == 'Email' %}
                 {% set fieldsOption = fieldsOption|merge([{ label: field.name, value: field.handle }]) %}
-             {% endif %}
+            {% endif %}
         {% endfor %}
 
         {% set errors = form.getErrors() %}
@@ -72,67 +72,39 @@
             }
         ] %}
 
-
         <div id="content">
             {% include 'form-builder/forms/_includes/fields/fields' ignore missing %}
 
-            {#{% hook 'formBuilderNotificationsHtml' %}#}
-
-            {# Craft::$app->view->hook('formBuilderNotificationsHtml', function(&$context) {
-                $context['foo'] = 'bar';
-                return 'Hey!';
-            }); #}
-
+            {# INTEGRATIONS #}
             {% if currentUser.can('fb:accessIntegrations') %}
-            <section class="integrations">
-                <header>
-                    <h2>{{ "Integrations"|t('form-builder') }}</h2>
-                    <p>{{ "Send notifications or save submission to 3rd party services."|t('form-builder') }}</p>
-                </header>
+                {% set availableIntegrations = craft.fb.isIntegrations() %}
+                {% set integrations = form.getIntegrations() %}
 
-                <div class="integration-body">
-                    {% if craft.app.plugins.isPluginInstalled('formbuilder-integrations') %}
-                        {% set types = craft.fbi.types.getAvailableTypes() %}
-                        <div class="integrate-options">
-                            {% for type in types %}
-                                <div class="list integrations-list">
-                                    {% for type in types %}
-                                        <div class="item">
-                                            <div class="item-meta">
-                                                <div class="item-meta-icon">{% include 'formbuilder-integrations/_includes/icons/integrations-' ~ type.handle ignore missing %}</div>
-                                            </div>
-                                            <div class="item-info">
-                                                <div class="item-meta-title">{{ type.title }}</div>
-                                                <a href="#" class="btns btn-small btn-info integrate-item-btn" data-element="roundhouse\formbuilderintegrations\elements\{{ type.title }}" data-type="{{ type.handle }}" data-form="{{ form |json_encode() }}"><span><i class="fas fa-plus"></i></span></a>
-                                            </div>
-                                        </div>
-                                    {% endfor %}
-                                </div>
-                            {% endfor %}
-                        </div>
+                <section class="integrations">
+                    <header>
+                        <h2>{{ "Integrations"|t('form-builder') }}</h2>
+                        {#<p>{{ "Send notifications or save submission to 3rd party services."|t('form-builder') }}</p>#}
+                    </header>
 
-                        <div id="formbuilder-integrations-container" class="elements">
-                            {% set integrations = form.integrations is defined ? form.integrations %}
-                            {% for typeHandle, integration in integrations %}
-                                {% set type = craft.fbi.types.getTypeByHandle(typeHandle) %}
+                    {% if availableIntegrations %}
+                        <a href="#" class="btns btn-small btn-info add-integrations-item"><span><i class="fas fa-plus"></i> {{ 'Add Integration'|t('form-builder') }}</span></a>
+                    {% endif %}
 
-                                {% for index, element in integration %}
-                                    {% set integration = craft.fbi.integrations.getIntegrationById(element.elementId) %}
-                                    {% if integration %}
-                                        {% include 'formbuilder-integrations/integrations/' ~ type.handle ~ '/_integration' ignore missing with { integration: integration, type: type, index: index} %}
+                    <div class="integration-body">
+
+                        <div id="formbuilder-integrations-container">
+
+                            {% for type, elements in integrations %}
+                                {% for index, element in elements %}
+                                    {% if element.integration %}
+                                        {% include 'form-builder/integrations/_type/' ~ type ~ '/integration-section' ignore missing with { integration: element.integration, type: type, index: index} %}
                                     {% endif %}
                                 {% endfor %}
                             {% endfor %}
+
                         </div>
-                    {% else %}
-                        {# TODO: stylize this a little nicer #}
-                        <a class="btns btn-info">
-                            <i class="fas fa-download"></i>
-                            <span>{{ "Install Integrations Plugin"|t('form-builder') }}</span>
-                        </a>
-                    {% endif %}
-                </div>
-            </section>
+                    </div>
+                </section>
             {% endif %}
         </div>
     </div>
@@ -142,7 +114,8 @@
             <section class="form-settings-tout cmp-tout theme-white">
                 <header>
                     <span class="tout-title">{{ "Settings" |t('form-builder') }}</span>
-                    <a href="{{ docLinks['formSettings'] }}" class="docs-link" target="_blank"><i class="fas fa-info"></i></a>
+                    <a href="{{ docLinks['formSettings'] }}" class="docs-link" target="_blank"><i
+                                class="fas fa-info"></i></a>
                 </header>
                 <div class="body">
                     {% include 'form-builder/forms/_includes/settings/basic-settings' ignore missing %}
@@ -152,7 +125,8 @@
             <section class="form-options-tout cmp-tout theme-white">
                 <header>
                     <span class="tout-title">{{ "Database" |t('form-builder') }}</span>
-                    <a href="{{ docLinks['formDatabase'] }}" class="docs-link" target="_blank"><i class="fas fa-info"></i></a>
+                    <a href="{{ docLinks['formDatabase'] }}" class="docs-link" target="_blank"><i
+                                class="fas fa-info"></i></a>
                 </header>
                 <div class="body">
                     {% include 'form-builder/forms/_includes/settings/save-entries' ignore missing %}
@@ -162,7 +136,8 @@
             <section class="form-options-tout cmp-tout theme-white">
                 <header>
                     <span class="tout-title">{{ "Options" |t('form-builder') }}</span>
-                    <a href="{{ docLinks['formOptions'] }}" class="docs-link" target="_blank"><i class="fas fa-info"></i></a>
+                    <a href="{{ docLinks['formOptions'] }}" class="docs-link" target="_blank"><i
+                                class="fas fa-info"></i></a>
                 </header>
                 <div class="body">
                     {% include 'form-builder/forms/_includes/options/submit-button' ignore missing %}
@@ -176,7 +151,8 @@
             <section class="spam-protection-tout cmp-tout theme-white">
                 <header>
                     <span class="tout-title">{{ "Spam Protection" |t('form-builder') }}</span>
-                    <a href="{{ docLinks['formSpamProtection'] }}" class="docs-link" target="_blank"><i class="fas fa-info"></i></a>
+                    <a href="{{ docLinks['formSpamProtection'] }}" class="docs-link" target="_blank"><i
+                                class="fas fa-info"></i></a>
                 </header>
                 <div class="body">
                     {% include 'form-builder/forms/_includes/spam/honeypot' ignore missing %}
@@ -185,13 +161,15 @@
             </section>
 
             <div class="pane meta save-form-meta last">
-                <button type="submit" href="#" class="btns btn-info save-form">{{ "Save Form" |t('form-builder') }}<span class="btn-hint">&#8984; + S</span></button>
+                <button type="submit" class="btns btn-info save-form">{{ "Save Form" |t('form-builder') }}<span
+                            class="btn-hint">&#8984; + S</span></button>
             </div>
 
             {% if currentUser.can('fb:deleteForms') %}
                 {% if formId is defined %}
                     <div class="pane meta delete-form-meta last">
-                        <a href="#" class="btns btn-danger delete-form" data-id="{{ form.id }}">{{ "Delete Form" |t('form-builder') }}</a>
+                        <a href="#" class="btns btn-danger delete-form"
+                           data-id="{{ form.id }}">{{ "Delete Form" |t('form-builder') }}</a>
                     </div>
                 {% endif %}
             {% endif %}

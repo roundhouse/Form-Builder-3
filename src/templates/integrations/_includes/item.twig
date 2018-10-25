@@ -1,0 +1,19 @@
+<div class="item has-hover pad">
+    <div class="item-meta">
+        <div class="item-meta-icon">{% include 'form-builder/_includes/icons/integrations-' ~ type ignore missing %}</div>
+    </div>
+    <div class="item-info">
+        <div class="item-meta-title"><a href="{{ url('form-builder/integrations/' ~ id) }}">{{ name }}</a></div>
+        <div class="coded">{{ handle }}</div>
+    </div>
+    <div class="item-status">
+        {% if status == 'enabled' %}
+            <div class="status on" title="Enabled"></div>
+        {% else %}
+            <div class="status off" title="Disabled"></div>
+        {% endif %}
+    </div>
+    <div class="item-remove" data-id="{{ id }}">
+        <i class="fa fa-times"></i>
+    </div>
+</div>

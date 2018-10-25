@@ -1,5 +1,14 @@
 # Form Builder Changelog
 
+## 3.0.4 - 2018-10-24
+
+### Fixed
+- Entries index page
+
+### Added
+- Slack notification integration
+- Email notification integration
+
 ## 3.0.3 - 2018-09-11
 
 ### Fixed

@@ -1,0 +1,36 @@
+{% import "form-builder/_includes/_components" as components %}
+
+{% set nameText = 'integrations[email]['~ index ~'][subject]' %}
+
+{% set container = {
+    title: 'Subject' |t,
+    info: null,
+    icon: null,
+    toggle: false,
+    class: null,
+    id: null
+} %}
+
+{% set inputs = {
+    0: {
+        type: 'text',
+        name: nameText,
+        value: attribute(form.integrations.email, index).subject is defined and attribute(form.integrations.email, index).subject != '' ? attribute(form.integrations.email, index).subject : '',
+        class: 'hidden',
+        id: null,
+        hint: 'TEXT'
+    }
+} %}
+
+{% set modal = {
+    title: 'Custom Subject' |t,
+    instructions: 'Enter custom subject line or select a field that will be used for the custom subject line.' |t,
+    successMessage: 'Custom Subject Updated' |t,
+    inputs: inputs
+} %}
+
+{{ components.optionItem(
+    container,
+    modal,
+    inputs
+) }}

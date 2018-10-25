@@ -12,6 +12,7 @@ namespace roundhouse\formbuilder\elements;
 
 use Craft;
 use craft\base\Element;
+use craft\helpers\ArrayHelper;
 use craft\helpers\Json;
 use craft\helpers\UrlHelper;
 use craft\db\Query;
@@ -266,6 +267,44 @@ class Form extends Element
         $behavior = $this->getBehavior('fieldLayout');
 
         return $behavior->getFieldLayout();
+    }
+
+    /**
+     * Get Form Integrations
+     *
+     * @return array
+     */
+    public function getIntegrations()
+    {
+        $isArray = ArrayHelper::isTraversable($this->integrations);
+
+        if ($isArray) {
+            $integrations = $this->integrations;
+        } else {
+            $integrations = Json::decode($this->integrations);
+        }
+
+
+        if ($integrations) {
+            $newArray = [];
+
+            foreach ($integrations as $key => $items) {
+
+                $type = $key;
+
+                foreach ($items as $index => $item) {
+                    $integration = FormBuilder::$plugin->integrations->getIntegrationById($item['id']);
+
+                    $item['integration'] = $integration;
+
+                    $items[$index] = $item;
+                }
+
+                $newArray[$type] = $items;
+            }
+
+            return $newArray;
+        }
     }
 
     // Indexes, etc.

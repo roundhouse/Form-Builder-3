@@ -1,0 +1,27 @@
+<?php
+/**
+ * Form Builder plugin for Craft CMS 3.x
+ *
+ * Craft CMS plugin that lets you create and manage forms for your front-end.
+ *
+ * @link      https://roundhouseagency.com
+ * @copyright Copyright (c) 2018 Roundhouse Agency (roundhousepdx)
+ */
+
+namespace roundhouse\formbuilder\web\assets;
+
+use craft\web\AssetBundle;
+
+class Integrations extends AssetBundle
+{
+    public function init()
+    {
+        $this->sourcePath = "@roundhouse/formbuilder/web/assets";
+
+        $this->js = [
+            'js/integrations.js',
+        ];
+
+        parent::init();
+    }
+}

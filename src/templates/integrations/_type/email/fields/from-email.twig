@@ -1,0 +1,36 @@
+{% import "form-builder/_includes/_components" as components %}
+
+{% set name = 'integrations[email]['~ index ~'][fromEmail]' %}
+
+{% set container = {
+    title: 'From Email' |t,
+    info: null,
+    icon: null,
+    class: null,
+    id: null
+} %}
+
+{% set inputs = {
+    0: {
+        type: 'email',
+        name: name,
+        value: attribute(form.integrations.email, index).fromEmail is defined and attribute(form.integrations.email, index).fromEmail != '' ? attribute(form.integrations.email, index).fromEmail : '',
+        class: 'hidden',
+        id: null,
+        hint: 'EMAIL',
+        required: true
+    }
+} %}
+
+{% set modal = {
+    title: 'From Email' |t,
+    instructions: 'The sender’s email address. Defaults to the System Email Address defined in Settings → Email.' |t,
+    successMessage: 'From Email Updated' |t,
+    inputs: inputs
+} %}
+
+{{ components.optionItem(
+    container,
+    modal,
+    inputs
+) }}

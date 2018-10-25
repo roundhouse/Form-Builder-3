@@ -344,4 +344,28 @@ class Variables
         return FormBuilder::$plugin->tabs->getTabSettings($tabId);
     }
 
+    /** Get allowed text fields
+     *
+     * @return array
+     */
+    public function getAllowedTextFields()
+    {
+        $fields = [
+            'PlainText' => ['class' => 'PlainText'],
+            'Email' => ['class' => 'Email'],
+            'Url' => ['class' => 'Url'],
+            'Number' => ['class' => 'Number'],
+            'Dropdown' => ['class' => 'Dropdown'],
+            'Checkboxes' => ['class' => 'Checkboxes'],
+            'RadioButtons' => ['class' => 'RadioButtons']
+        ];
+
+        return $fields;
+    }
+
+    public function isIntegrations()
+    {
+        return FormBuilder::$plugin->integrations->isIntegrations();
+    }
+
 }
