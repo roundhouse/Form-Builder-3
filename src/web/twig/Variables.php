@@ -30,17 +30,37 @@ class Variables
     /**
      * Render form on the frontend
      *
+     * * Basic usage:
+     *
+     * {{ craft.fb.form('formHandle') }}
+     *
+     *
+     * Advanced usage:
+     *
+     * {{ craft.fb.form('formHandle', {
+     *     options: {
+     *         display: 'displayForProductReviews'
+     *     }
+     * }) }}
+     * ```
+     *
      * @param $variables
      * @return bool|\Twig_Markup
      * @throws \Twig_Error_Loader
      * @throws \yii\base\Exception
      */
-    public function form($variables)
+    public function form($formHandle, $variables = null)
     {
-        $form = FormBuilder::$plugin->forms->getFormByHandle($variables['formHandle']);
+
+        if ($formHandle) {
+            $form = FormBuilder::$plugin->forms->getFormByHandle($formHandle);
+        } else {
+            $form = FormBuilder::$plugin->forms->getFormByHandle($variables['formHandle']);
+        }
+        
         $options = isset($variables['options']) ? $variables['options'] : null;
         $submission = isset($variables['submission']) ? $variables['submission'] : null;
-
+        
         if (!$form) {
             echo 'Invalid Form Handle!';
             return false;
@@ -165,6 +185,9 @@ class Variables
             $availableClasses = $variables['class'];
             $variables['class'] = $availableClasses . ' ' . $settings['fields']['global']['inputClass'];
         }
+
+        // TODO: Add functionality for custom templates
+        // Just look at this overall
 
         switch ($type) {
             case 'plain-text':

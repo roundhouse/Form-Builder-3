@@ -1,5 +1,10 @@
 # Form Builder Changelog
 
+## 3.0.5 - 2018-10-31
+
+### Changed :ghost:
+- You can now just pass form handle into your frontend snippet code
+
 ## 3.0.4 - 2018-10-24
 
 ### Fixed
