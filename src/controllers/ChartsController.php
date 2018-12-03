@@ -60,7 +60,9 @@ class ChartsController extends ElementIndexesController
                 ->search(null);
         }
 
-        $dataTable = ChartHelper::getRunChartDataFromQuery($query, $startDate, $endDate, 'formbuilder_entries.dateCreated', 'count', '[[formbuilder_entries.dateCreated]]', [
+
+
+        $dataTable = ChartHelper::getRunChartDataFromQuery($query, $startDate, $endDate, 'formbuilder_entries.postedOn', 'count', '[[formbuilder_entries.postedOn]]', [
             'intervalUnit' => $intervalUnit,
             'valueLabel' => FormBuilder::t('Entries'),
             'valueType' => 'number',

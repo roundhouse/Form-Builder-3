@@ -341,7 +341,7 @@ class Form extends Element
                 $totalEntries = (new Query())
                     ->select('COUNT(*) as [[value]]')
                     ->from(['{{%formbuilder_entries}}'])
-                    ->where(['formbuilder_entries.formId' => $this->id])
+                    ->where(['{{%formbuilder_entries}}.formId' => $this->id])
                     ->scalar();
 
                 return $totalEntries;
@@ -405,16 +405,4 @@ class Form extends Element
 
     // Events
     // -------------------------------------------------------------------------
-
-    /**
-     * @inheritdoc
-     */
-    public function beforeDelete(): bool
-    {
-        if ($this->fieldLayoutId !== null) {
-            Craft::$app->getFields()->deleteLayoutById($this->fieldLayoutId);
-        }
-
-        return parent::beforeDelete();
-    }
 }

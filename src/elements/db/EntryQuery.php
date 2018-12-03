@@ -26,6 +26,7 @@ class EntryQuery extends ElementQuery
     public $formId;
     public $statusId;
     public $options;
+    public $postedOn;
     public $ipAddress;
     public $userAgent;
 
@@ -73,6 +74,7 @@ class EntryQuery extends ElementQuery
             'formbuilder_entries.title',
             'formbuilder_entries.formId',
             'formbuilder_entries.statusId',
+            'formbuilder_entries.postedOn',
             'formbuilder_entries.ipAddress',
             'formbuilder_entries.userAgent',
             'formbuilder_entries.dateCreated',
@@ -89,6 +91,10 @@ class EntryQuery extends ElementQuery
 
         if ($this->statusId) {
             $this->subQuery->andWhere(Db::parseParam('formbuilder_entries.statusId', $this->statusId));
+        }
+
+        if ($this->postedOn) {
+            $this->subQuery->andWhere(Db::parseParam('formbuilder_entries.postedOn', $this->postedOn));
         }
 
         if ($this->options) {

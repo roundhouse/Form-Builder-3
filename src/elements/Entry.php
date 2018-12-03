@@ -35,6 +35,7 @@ class Entry extends Element
     public $options;
     public $settings;
     public $statusId = 1;
+    public $postedOn;
     public $ipAddress;
     public $userAgent;
 
@@ -363,6 +364,7 @@ class Entry extends Element
         $entryRecord->formId            = $this->formId;
         $entryRecord->statusId          = $this->statusId;
         $entryRecord->title             = $this->title;
+        $entryRecord->postedOn          = $this->postedOn;
         $entryRecord->ipAddress         = $this->ipAddress;
         $entryRecord->userAgent         = $this->userAgent;
         $entryRecord->save(false);

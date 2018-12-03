@@ -1,5 +1,17 @@
 # Form Builder Changelog
 
+## 3.0.6 - 2018-12-03
+
+### Added
+- You can now migration your old FormBuilder 2 Forms and Entries
+- Added column to entries table for postedOn date
+
+#### Fixed
+- Some bug fixes and 
+
+#### Improved
+- Code cleanup
+
 ## 3.0.5 - 2018-10-31
 
 ### Changed :ghost:

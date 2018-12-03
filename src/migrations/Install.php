@@ -114,6 +114,7 @@ class Install extends Migration
                 'settings' => $this->text(),
                 'formId' => $this->integer()->notNull(),
                 'statusId' => $this->integer()->notNull(),
+                'postedOn' => $this->dateTime()->notNull(),
                 'ipAddress' => $this->string()->notNull(),
                 'userAgent' => $this->text(),
                 'dateCreated' => $this->dateTime()->notNull(),

@@ -338,6 +338,7 @@ class EntriesController extends Controller
     {
         $entry->formId          = $this->form->id;
         $entry->statusId        = $request->getRequiredBodyParam('statusId');
+        $entry->postedOn        = DateTimeHelper::currentTimeStamp();
         $entry->ipAddress       = $request->getUserIP();
         $entry->userAgent       = $request->getHeaders()->get('user-agent');
 

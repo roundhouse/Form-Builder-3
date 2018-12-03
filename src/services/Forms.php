@@ -149,62 +149,12 @@ class Forms extends Component
         $form->oldHandle = $formRecord->getOldHandle();
         $form->oldFieldLayoutId = $formRecord->getOldFieldLayoutId();
 
-//        $oldContentTable = $this->getContentTableName($form, true);
-//        $newContentTable = $this->getContentTableName($form);
-
-//        if ($form->oldFieldLayoutId) {
-//            $oldFields = ArrayHelper::map(Craft::$app->fields->getFieldsByLayoutId($form->oldFieldLayoutId), 'handle', function ($field) {
-//               return [
-//                   'id' => $field->id,
-//                   'handle' => $field->handle,
-//                   'columnType' => $field->getContentColumnType(),
-//               ];
-//            });
-//        }
-
-//        $newFields = ArrayHelper::map($fieldLayout->getFields(), 'id', function ($field) {
-//            return [
-//                'id' => $field->id,
-//                'handle' => $field->handle,
-//                'columnType' => $field->getContentColumnType(),
-//            ];
-//        });
-
         $transaction = Craft::$app->getDb()->beginTransaction();
 
         try {
-//            Craft::$app->content->fieldContext = $form->getFieldContext();
-//            Craft::$app->content->contentTable = $form->getContentTable();
-
             Craft::$app->getFields()->saveLayout($fieldLayout);
             $form->fieldLayoutId = $fieldLayout->id;
             $formRecord->fieldLayoutId = $fieldLayout->id;
-
-//            if (!Craft::$app->db->tableExists($newContentTable)) {
-//                if ($oldContentTable && Craft::$app->db->tableExists($oldContentTable)) {
-//                    MigrationHelper::renameTable($oldContentTable, $newContentTable);
-//                } else {
-//                    $this->_createContentTable($newContentTable);
-//                }
-//            }
-
-//            foreach ($newFields as $handle => $field) {
-//                $columnType = $field['columnType'];
-//                $columnName = 'field_'.$field['handle'];
-//
-//                Craft::$app->getDb()->schema->refresh();
-//
-//                if (Craft::$app->getDb()->columnExists($newContentTable, $columnName)) {
-//
-//                    Craft::$app->getDb()->createCommand()
-//                        ->alterColumn($newContentTable, $columnName, $columnType)
-//                        ->execute();
-//                } else {
-//                    Craft::$app->getDb()->createCommand()
-//                        ->addColumn($newContentTable, $columnName, $columnType)
-//                        ->execute();
-//                }
-//            }
 
             if (!Craft::$app->getElements()->saveElement($form, false)) {
                 throw new Exception('Couldn’t save the form.');
@@ -246,34 +196,38 @@ class Forms extends Component
         if (!$form) {
             return false;
         }
-
+        
         $transaction = Craft::$app->getDb()->beginTransaction();
 
         try {
-            $fieldLayoutId = (new Query())
-                ->select(['fieldLayoutId'])
-                ->from(['{{%formbuilder_forms}}'])
-                ->where(['id' => $formId])
-                ->scalar();
+            // Delete field layout
+            Craft::$app->getFields()->deleteFieldById($form->fieldLayoutId);
 
-            if ($fieldLayoutId) {
-                Craft::$app->getFields()->deleteLayoutById($fieldLayoutId);
-            }
-
+            // Delete all associated entries
             $entries = Entry::find()
                 ->status(null)
                 ->enabledForSite(false)
-                ->formId($formId)
+                ->formId($form->id)
                 ->all();
 
             foreach ($entries as $entry) {
                 Craft::$app->getElements()->deleteElement($entry);
             }
 
+            // Delete element
+            $success = Craft::$app->elements->deleteElementById($form->id);
+
+            if (!$success) {
+                $transaction->rollback();
+
+                return false;
+            }
+
+            // Delete form record
             Craft::$app->getDb()->createCommand()
                 ->delete(
                     '{{%formbuilder_forms}}',
-                    ['id' => $formId])
+                    ['id' => $form->id])
                 ->execute();
 
             $transaction->commit();

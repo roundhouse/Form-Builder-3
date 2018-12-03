@@ -37,7 +37,23 @@
             <button type="submit" class="btns btn-info">Update Settings</button>
         </div>
 
+        {% set isMigrationsAvailable = craft.fbMigration.isMigrationsAvailable() %}
+
         <div class="half-col">
+            {% if isMigrationsAvailable %}
+                <div class="widget available-migrations">
+                    <header class="pad">
+                        <h2>{{ "Migrations"|t('form-builder') }}</h2>
+                    </header>
+                    <div class="body ">
+                        <div class="list pad">
+                            <p>{{ 'Migrations available!'|t('form-builder') }}</p>
+                            <a href="{{ url('form-builder/settings/migration') }}" class="btns btn-info" style="display: inline-block;">{{ 'View Migrations'|t('form-builder') }}</a>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+
             <div class="widget">
                 <header class="pad">
                     <h2>{{ "Plugin Information"|t('form-builder') }}</h2>

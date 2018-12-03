@@ -1,0 +1,282 @@
+{% extends "_layouts/cp" %}
+{% import "_includes/forms" as forms %}
+
+{% set title = "Migration"|t('form-builder') %}
+{% set bodyClass = 'formbuilder fb-migrations' %}
+{% set selectedSubnavItem = "settings" %}
+
+{% block header %}
+    {% include 'form-builder/_includes/_header' ignore missing with { title: title } %}
+{% endblock %}
+
+{% block content %}
+
+    <section class="flex-container">
+        <div class="full-col widget">
+            <div class="body">
+
+                <div class="list current-migrations-list" id="current-integrations-list">
+                    {% for form in oldForms %}
+                        {% set isMigrated = craft.fbMigration.isMigrated(form.handle) %}
+
+                        <form method="post" accept-charset="UTF-8">
+                            {{- csrfInput() }}
+                            <input type="hidden" name="action" value="form-builder/tools/migrate-form">
+                            <input type="hidden" name="oldFormId" value="{{ form.id }}">
+                            {{ redirectInput('form-builder/settings/migration') }}
+
+                            <div class="item has-hover pad">
+                                <div class="item-info-wrapper"
+                                     data-tippy="{% if isMigrated %}{{ 'Migrated'|t('form-builder') }}{% else %}{{ 'Not Migrated'|t('form-builder') }}{% endif %}"
+                                     data-tippy-arrow="true"
+                                     data-tippy-placement="top">
+                                    <div class="item-info">
+                                        <div class="item-meta-title">{{ form.name }}</div>
+                                        <div class="coded">{{ form.handle }}</div>
+                                    </div>
+
+                                    <div class="item-status">
+                                        {% if isMigrated %}
+                                            <div class="status on" title="Enabled"></div>
+                                        {% else %}
+                                            <div class="status off" title="Disabled"></div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                                {% if not isMigrated %}
+                                    <div class="item-section-wrapper">
+                                        <div class="item-body item-section">
+                                            <div class="item-body-header" data-target="fieldLayouts-{{ form.handle }}">
+                                                <p>{{ 'Fields'|t('form-builder') }}</p>
+                                                <a class="toggle-section"><i class="far fa-chevron-down"></i></a>
+                                            </div>
+                                            {% set layout = craft.app.fields.getLayoutById(form.fieldLayoutId) %}
+                                            {% set tabs = layout.getTabs() %}
+
+                                            <div class="item-body-content" id="fieldLayouts-{{ form.handle }}">
+                                                <div class="item-tabs">
+                                                    {% for tab in tabs %}
+                                                        <div class="item-tab">
+                                                            <div class="tab-header">
+                                                                <strong>{{ tab.name }}</strong>
+                                                            </div>
+                                                            {% set fields = tab.getFields() %}
+
+                                                            {% for field in fields %}
+
+                                                                {% set fieldClass = field|getClass %}
+                                                                <div class="item-field"
+                                                                     {% if fieldClass == 'MissingField' %}data-tippy="{{ field.errorMessage }}"
+                                                                     data-tippy-arrow="true"{% endif %}>
+
+                                                                    <p>
+                                                                        {% if fieldClass == 'MissingField' %}<i
+                                                                                class="far fa-exclamation-circle"></i>{% endif %}
+                                                                        <strong>{{ field.name }}</strong>
+                                                                    </p>
+                                                                    <p class="muted field-handle">{{ field.handle }}</p>
+                                                                </div>
+                                                            {% endfor %}
+                                                        </div>
+                                                    {% else %}
+                                                        <p>{{ 'No fields available'|t('form-builder') }}</p>
+                                                    {% endfor %}
+                                                </div>
+                                                <p class="note">Fields with <i class="far fa-exclamation-circle"></i> icon
+                                                    will not be
+                                                    able to migrate.</p>
+                                            </div>
+                                        </div>
+
+                                        <div class="item-body item-section">
+                                            <div class="item-body-header" data-target="form-settings-{{ form.handle }}">
+                                                <p>{{ 'Settings & Options'|t('form-builder') }}</p>
+                                                <a class="toggle-section"><i class="far fa-chevron-down"></i></a>
+                                            </div>
+
+                                            <div class="item-body-content" id="form-settings-{{ form.handle }}">
+
+                                                <div class="item-field item-form-fields">
+                                                    {# SETTINGS #}
+                                                    <input type="hidden" name="fieldLayoutId"
+                                                           value="{{ form.fieldLayoutId }}">
+                                                    <input type="hidden" name="name" value="{{ form.name }}">
+                                                    <input type="hidden" name="handle" value="{{ form.handle }}">
+                                                    <input type="hidden" name="groupId" value="1">
+                                                    <input type="hidden" name="statusId" value="1">
+
+                                                    {# DATABASE #}
+                                                    <input type="hidden" name="settings[database][enabled]" value="1">
+                                                    <input type="hidden" name="settings[database][titleFormat]"
+                                                           value="{{ form.name }}">
+
+                                                    {# Submit Button #}
+                                                    {% if form.formSettings['submitButtonText'] != '' %}
+                                                        <h4>{{ 'Submit Button'|t('form-builder') }}</h4>
+                                                        <div class="fb-field">
+                                                            <label class="input-hint">SUBMIT BUTTON TEXT</label>
+                                                            <input type="hidden" name="options[submitButton][enabled]"
+                                                                   value="1">
+                                                            <input type="text" name="options[submitButton][text]"
+                                                                   class="text input-control"
+                                                                   value="{{ form.formSettings['submitButtonText'] }}">
+                                                        </div>
+                                                    {% endif %}
+
+                                                    {# Custom Redirect #}
+                                                    {% if form.formSettings['formRedirect']['customRedirectUrl'] != '' %}
+                                                        <h4>{{ 'Custom Redirect'|t('form-builder') }}</h4>
+                                                        <div class="fb-field">
+                                                            <label class="input-hint">CUSTOM REDIRECT</label>
+                                                            <input type="hidden" name="options[redirect][enabled]"
+                                                                   value="1">
+                                                            <input type="text" name="options[redirect][url]"
+                                                                   class="text input-control"
+                                                                   value="{{ form.formSettings['formRedirect']['customRedirectUrl'] }}">
+                                                        </div>
+                                                    {% endif %}
+
+                                                    {# Messages #}
+
+                                                    {% if form.messageSettings['successMessage'] != '' or form.messageSettings['errorMessage'] != '' %}
+                                                        <input type="hidden" name="options[messages][enabled]" value="1">
+                                                        <h4>{{ 'Messages'|t('form-builder') }}</h4>
+                                                        {% if form.messageSettings['successMessage'] != '' %}
+                                                            <div class="fb-field">
+                                                                <label class="input-hint">SUCCESS MESSAGE</label>
+                                                                <input type="text" name="options[messages][success]"
+                                                                       class="text input-control"
+                                                                       value="{{ form.messageSettings['successMessage'] }}">
+                                                            </div>
+                                                        {% endif %}
+                                                        {% if form.messageSettings['errorMessage'] != '' %}
+                                                            <div class="fb-field">
+                                                                <label class="input-hint">ERROR MESSAGE</label>
+                                                                <input type="text" name="options[messages][error]"
+                                                                       class="text input-control"
+                                                                       value="{{ form.messageSettings['errorMessage'] }}">
+                                                            </div>
+                                                        {% endif %}
+                                                    {% endif %}
+
+                                                    {% if form.spamProtectionSettings['spamHoneypotMethodMessage'] != '' or form.spamProtectionSettings['spamTimeMethodTime'] != '' %}
+                                                        <h4>{{ 'Spam Protection'|t('form-builder') }}</h4>
+
+                                                    {% endif %}
+
+                                                    {# Honeypot #}
+                                                    {% if form.spamProtectionSettings['spamHoneypotMethodMessage'] != '' %}
+                                                        <input type="hidden" name="spam[honeypot][enabled]" value="1">
+                                                        <div class="fb-field">
+                                                            <label class="input-hint">HONEYPOT</label>
+                                                            <input type="text" name="spam[honeypot][message]"
+                                                                   class="text input-control"
+                                                                   value="{{ form.spamProtectionSettings['spamHoneypotMethodMessage'] }}">
+                                                        </div>
+
+                                                    {% endif %}
+
+                                                    {# Timed #}
+                                                    {% if form.spamProtectionSettings['spamTimeMethodTime'] != '' %}
+                                                        <input type="hidden" name="spam[timed][enabled]" value="1">
+                                                        <div class="fb-field">
+                                                            <label class="input-hint">TIMED</label>
+                                                            <input type="text" name="spam[timed][number]"
+                                                                   class="text input-control"
+                                                                   value="{{ form.spamProtectionSettings['spamTimeMethodTime'] }}">
+                                                        </div>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="item-extra">
+                                        <label>
+                                            <input type="checkbox" name="includeEntries">
+                                            {{ 'Also migrate all the entries'|t('form-builder') }}
+                                        </label>
+                                    </div>
+
+                                    <div class="item-actions">
+                                        <button type="submit"
+                                                class="btns btn-info">{{ 'Migrate'|t('form-builder') }} {{ form.name }}</button>
+                                    </div>
+                                {% endif %}
+
+                                <div class="item-remove" data-id="{{ form.id }}">
+                                    <i class="fa fa-times"></i>
+                                </div>
+                            </div>
+                        </form>
+                    {% else %}
+                        <p class="empty pad">{{ 'No old forms available'|t('form-builde') }}</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        {#<div class="half-col">#}
+        {#<div class="widget">#}
+        {#<header class="pad">#}
+        {#<h2>{{ "Plugin Settings"|t('form-builder') }}</h2>#}
+        {#</header>#}
+        {#<div class="body">#}
+        {#<div class="list settings-list">#}
+        {#<div class="list-item">#}
+        {#<div class="fb-field ">#}
+        {#<div class="input-hint">PLUGIN NAME</div>#}
+        {#<div class="input">#}
+        {#<input type="text" class="options-submitButton-text" name="settings[pluginName]" value="{{ settings.pluginName }}">#}
+        {#</div>#}
+        {#</div>#}
+        {#</div>#}
+        {#</div>#}
+        {#</div>#}
+        {#</div>#}
+
+        {#<button type="submit" class="btns btn-info">Update Settings</button>#}
+        {#</div>#}
+
+        {#<div class="wide-col">#}
+        {#<div class="widget">#}
+        {#<header class="pad">#}
+        {#<h2>{{ "Plugin Information"|t('form-builder') }}</h2>#}
+        {#</header>#}
+
+        {#{% if oldPlugin %}#}
+        {#<div class="body">#}
+        {#<div class="list">#}
+        {#{% for form in oldForms %}#}
+        {#<div class="list-item pad">#}
+        {#<div class="item-title">#}
+        {#{{ form.name }}#}
+
+        {#{{ d(form) }}#}
+        {#</div>#}
+        {#</div>#}
+        {#{% endfor %}#}
+        {#</div>#}
+        {#</div>#}
+        {#{% endif %}#}
+        {#</div>#}
+
+        {#<div class="widget changelog">#}
+        {#<header class="pad">#}
+        {#<h2>{{ "Changelog"|t('form-builder') }}</h2>#}
+        {#</header>#}
+
+        {#<div class="body">#}
+        {#<div class="list">#}
+        {#<div class="list-item">#}
+        {#{{ changelog |raw }}#}
+        {#</div>#}
+        {#</div>#}
+        {#</div>#}
+        {#</div>#}
+
+        </div>
+
+    </section>
+{% endblock %}

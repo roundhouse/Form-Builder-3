@@ -29,6 +29,7 @@ use roundhouse\formbuilder\elements\Form as FormElement;
 use roundhouse\formbuilder\elements\Entry as EntryElement;
 use roundhouse\formbuilder\elements\actions\SetStatus;
 use roundhouse\formbuilder\elements\actions\Delete;
+use roundhouse\formbuilder\services\Migrations;
 use roundhouse\formbuilder\web\twig\Variables;
 
 use roundhouse\formbuilder\web\twig\Extensions;
@@ -52,7 +53,7 @@ class FormBuilder extends Plugin
     // Public Properties
     // =========================================================================
 
-    public $schemaVersion = '1.0.1';
+    public $schemaVersion = '1.0.2';
     public $hasCpSettings = true;
     public $hasCpSection = true;
     public $changelogUrl = 'https://raw.githubusercontent.com/roundhouse/Form-Builder-3/master/CHANGELOG.md';
@@ -293,6 +294,10 @@ class FormBuilder extends Plugin
                     'label' => FormBuilder::t('Access Integrations'),
                 ];
 
+                $permissions['fb:accessSettings'] = [
+                    'label' => FormBuilder::t('Access Settings'),
+                ];
+
                 $permissions['fb:editForms'] = [
                     'label' => FormBuilder::t('Edit Forms'),
                     'nested' => [
@@ -336,6 +341,7 @@ class FormBuilder extends Plugin
             function (Event $event) {
                 $variable = $event->sender;
                 $variable->set('fb', Variables::class);
+                $variable->set('fbMigration', Migrations::class);
             }
         );
     }
@@ -383,6 +389,14 @@ class FormBuilder extends Plugin
             $navigation['integrations'] = [
                 'label' => FormBuilder::t('Integrations'),
                 'url' => 'form-builder/integrations'
+            ];
+        }
+
+        // Permission to access settings
+        if (Craft::$app->user->checkPermission('fb:accessSettings')) {
+            $navigation['settings'] = [
+                'label' => FormBuilder::t('Settings'),
+                'url' => 'form-builder/settings'
             ];
         }
 

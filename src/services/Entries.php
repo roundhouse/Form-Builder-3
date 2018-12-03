@@ -14,6 +14,7 @@ use Craft;
 use craft\base\Component;
 use craft\helpers\ArrayHelper;
 
+use roundhouse\formbuilder\elements\Entry;
 use roundhouse\formbuilder\models\EntryStatus as EntryStatusModel;
 use roundhouse\formbuilder\records\EntryStatus as EntryStatusRecord;
 use roundhouse\formbuilder\records\Entry as EntryRecord;
