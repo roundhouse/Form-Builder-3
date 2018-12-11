@@ -82,6 +82,7 @@ class IntegrationsController extends Controller
         $variables = [];
         $variables['type'] = Craft::$app->getRequest()->getBodyParam('type');
 
+
         $template = Craft::$app->view->renderTemplate('form-builder/integrations/_type/'. $variables['type'] .'/form', $variables);
 
         return $this->asJson([
