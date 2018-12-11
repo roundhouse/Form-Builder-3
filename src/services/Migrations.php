@@ -27,36 +27,41 @@ class Migrations extends Component
 {
     public function getOldForms()
     {
-        $forms = (new Query())
-            ->select([
-                'id',
-                'name',
-                'handle',
-                'fieldLayoutId',
-                'formSettings',
-                'spamProtectionSettings',
-                'messageSettings',
-                'notificationSettings',
-                'extra',
-            ])
-            ->from(['{{%formbuilder2_forms}}']);
+        if (Craft::$app->db->columnExists('{{%formbuilder2_forms}}', 'id')) {
+            $forms = (new Query())
+                ->select([
+                    'id',
+                    'name',
+                    'handle',
+                    'fieldLayoutId',
+                    'formSettings',
+                    'spamProtectionSettings',
+                    'messageSettings',
+                    'notificationSettings',
+                    'extra',
+                ])
+                ->from(['{{%formbuilder2_forms}}']);
 
-        $clean = [];
 
-        foreach ($forms->all() as $form) {
-            $form = [
-                'id' => $form['id'],
-                'name' => $form['name'],
-                'handle' => $form['handle'],
-                'fieldLayoutId' => $form['fieldLayoutId'],
-                'formSettings' => Json::decode($form['formSettings']),
-                'spamProtectionSettings' => Json::decode($form['spamProtectionSettings']),
-                'messageSettings' => Json::decode($form['messageSettings']),
-                'notificationSettings' => Json::decode($form['notificationSettings']),
-                'extra' => Json::decode($form['extra']),
-            ];
+            $clean = [];
 
-            $clean[] = $form;
+            foreach ($forms->all() as $form) {
+                $form = [
+                    'id' => $form['id'],
+                    'name' => $form['name'],
+                    'handle' => $form['handle'],
+                    'fieldLayoutId' => $form['fieldLayoutId'],
+                    'formSettings' => Json::decode($form['formSettings']),
+                    'spamProtectionSettings' => Json::decode($form['spamProtectionSettings']),
+                    'messageSettings' => Json::decode($form['messageSettings']),
+                    'notificationSettings' => Json::decode($form['notificationSettings']),
+                    'extra' => Json::decode($form['extra']),
+                ];
+
+                $clean[] = $form;
+            }
+        } else {
+            $clean = null;
         }
 
         return $clean;
@@ -222,12 +227,14 @@ class Migrations extends Component
     {
         $forms = $this->getOldForms();
         $migrationAvailable = false;
-        
-        foreach ($forms as $form) {
-            $migrated = $this->isMigrated($form['handle']);
 
-            if (!$migrated) {
-                $migrationAvailable = true;
+        if ($forms) {
+            foreach ($forms as $form) {
+                $migrated = $this->isMigrated($form['handle']);
+
+                if (!$migrated) {
+                    $migrationAvailable = true;
+                }
             }
         }
 

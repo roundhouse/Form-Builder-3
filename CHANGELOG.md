@@ -1,5 +1,10 @@
 # Form Builder Changelog
 
+## 3.0.7 - 2018-12-11
+
+### Fixed
+- Database migration bugs
+
 ## 3.0.6 - 2018-12-03
 
 ### Added
