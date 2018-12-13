@@ -243,9 +243,11 @@ class Variables
                 break;
         }
 
-        // Converge Integration
-        if ($form->getIntegrationsByKey('converge')) {
+        // Frontend Integration
+        Craft::dd($form->getIntegrations());
 
+        if ($form->getIntegrationsByKey('converge')) {
+            Craft::dd($form->getIntegrationsByKey('converge'));
         }
 
 

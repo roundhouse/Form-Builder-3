@@ -181,8 +181,11 @@ class Install extends Migration
             'id' => $this->primaryKey(),
             'name' => $this->string()->notNull(),
             'handle' => $this->string()->notNull(),
+            'category' => $this->string(),
             'type' => $this->string()->notNull(),
             'status' => $this->string()->notNull()->defaultValue('enabled'),
+            'token' => $this->string(),
+            'frontend' => $this->boolean(),
             'content' => $this->text(),
             'settings' => $this->text(),
             'dateCreated' => $this->dateTime()->notNull(),
@@ -241,6 +244,12 @@ class Install extends Migration
      */
     protected function removeTables()
     {
+        $hasIntegrationsPlugin = Craft::$app->plugins->isPluginInstalled('form-builder-integrations');
+
+        if ($hasIntegrationsPlugin) {
+            Craft::$app->plugins->uninstallPlugin('form-builder-integrations');
+        }
+
         $this->dropTableIfExists('{{%formbuilder_entries_notes}}');
         $this->dropTableIfExists('{{%formbuilder_entries}}');
         $this->dropTableIfExists('{{%formbuilder_entrystatus}}');
@@ -251,6 +260,5 @@ class Install extends Migration
         $this->dropTableIfExists('{{%formbuilder_formstatus}}');
 
         $this->dropTableIfExists('{{%formbuilder_integrations}}');
-
     }
 }

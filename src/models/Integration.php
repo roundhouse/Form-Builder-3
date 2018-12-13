@@ -21,6 +21,9 @@ class Integration extends Model
     public $name;
     public $handle;
     public $type;
+    public $category;
+    public $token;
+    public $frontend;
     public $status = 'enabled';
     public $content;
     public $settings;

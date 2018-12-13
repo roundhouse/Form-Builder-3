@@ -1,5 +1,10 @@
 # Form Builder Changelog
 
+## 3.0.8 - 2018-12-12
+
+### Added
+- Updated integration db columns
+
 ## 3.0.7 - 2018-12-11
 
 ### Fixed

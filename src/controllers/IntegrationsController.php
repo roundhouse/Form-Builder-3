@@ -194,11 +194,15 @@ class IntegrationsController extends Controller
         $type = Craft::$app->getRequest()->getBodyParam('type');
         $name = Craft::$app->getRequest()->getBodyParam('name');
         $handle = Craft::$app->getRequest()->getBodyParam('handle');
+        $category = Craft::$app->getRequest()->getBodyParam('category');
+        $frontend = Craft::$app->getRequest()->getBodyParam('frontend');
 
         $model              = new Integration();
         $model->name        = $name;
         $model->handle      = $handle;
         $model->type        = $type;
+        $model->category    = $category;
+        $model->frontend    = $frontend;
         $model->content     = Craft::$app->getRequest()->getBodyParam('content');
         $model->settings    = Craft::$app->getRequest()->getBodyParam('settings');
 

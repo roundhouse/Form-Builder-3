@@ -105,6 +105,11 @@ class Integrations extends Component
         return $this->_integrationsById[$integrationId] = $result ? new Integration($result) : null;
     }
 
+    public function getFrontendIntegrations()
+    {
+
+    }
+
     /**
      * Save Integration to database
      *
@@ -252,7 +257,10 @@ class Integrations extends Component
                 'integration.name',
                 'integration.handle',
                 'integration.type',
+                'integration.category',
                 'integration.status',
+                'integration.frontend',
+                'integration.token',
                 'integration.content',
                 'integration.settings',
             ])
