@@ -1,6 +1,10 @@
 <div class="item has-hover pad">
     <div class="item-meta">
-        <div class="item-meta-icon">{% include 'form-builder/_includes/icons/integrations-' ~ type ignore missing %}</div>
+        {% if craft.app.view.doesTemplateExist('form-builder/_includes/icons/integrations-' ~ type) %}
+            <div class="item-meta-icon">{% include 'form-builder/_includes/icons/integrations-' ~ type ignore missing %}</div>
+        {% else %}
+            <div class="item-meta-icon">{% include 'form-builder-integrations/icons/integrations-' ~ type ignore missing %}</div>
+        {% endif %}
     </div>
     <div class="item-info">
         <div class="item-meta-title"><a href="{{ url('form-builder/integrations/' ~ id) }}">{{ name }}</a></div>

@@ -188,7 +188,6 @@ class Variables
 
         // TODO: Add functionality for custom templates
         // Just look at this overall
-
         switch ($type) {
             case 'plain-text':
                 $variables['type'] = 'text';
@@ -244,6 +243,12 @@ class Variables
                 break;
         }
 
+        // Converge Integration
+        if ($form->getIntegrationsByKey('converge')) {
+
+        }
+
+
         Craft::$app->view->setTemplateMode($oldPath);
 
         if (isset($input)) {
@@ -252,8 +257,6 @@ class Variables
             return '';
         }
     }
-
-
 
     public function entries($criteria = null): EntryQuery
     {

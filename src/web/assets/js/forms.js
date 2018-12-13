@@ -223,7 +223,7 @@ Garnish.$doc.ready(function () {
             text: function text(trigger) {
                 var handle, snippet;
                 handle = $(trigger).data('handle');
-                snippet = '{{ craft.fb.form("' + handle + '") }}';
+                snippet = '{{ craft.fb.form({formHandle:"' + handle + '"}) }}';
                 Craft.cp.displayNotice(snippet + Craft.t('form-builder', ' copied'));
                 return snippet;
             }

@@ -82,8 +82,30 @@ class IntegrationsController extends Controller
         $variables = [];
         $variables['type'] = Craft::$app->getRequest()->getBodyParam('type');
 
+        $isTemplate = Craft::$app->view->doesTemplateExist('form-builder/integrations/_type/'. $variables['type'] .'/form');
 
-        $template = Craft::$app->view->renderTemplate('form-builder/integrations/_type/'. $variables['type'] .'/form', $variables);
+        if ($isTemplate) {
+            $template = Craft::$app->view->renderTemplate('form-builder/integrations/_type/'. $variables['type'] .'/form', $variables);
+        } else {
+            $isIntegrationPlugin = Craft::$app->plugins->isPluginInstalled('form-builder-integrations');
+            if ($isIntegrationPlugin) {
+                $isIntegrationTemplate = Craft::$app->view->doesTemplateExist('form-builder-integrations/types/'. $variables['type'] .'/form');
+
+                if ($isIntegrationTemplate) {
+                    $template = Craft::$app->view->renderTemplate('form-builder-integrations/types/'. $variables['type'] .'/form', $variables);
+                } else {
+                    return $this->asJson([
+                        'success' => false,
+                        'error'   => FormBuilder::t('Template not found')
+                    ]);
+                }
+            } else {
+                return $this->asJson([
+                    'success' => false,
+                    'error'   => FormBuilder::t('Template not found')
+                ]);
+            }
+        }
 
         return $this->asJson([
             'success' => true,
@@ -123,8 +145,31 @@ class IntegrationsController extends Controller
         $variables['type'] = $type;
         $variables['index'] = StringHelper::randomString(4);
 
+        $isTemplate = Craft::$app->view->doesTemplateExist('form-builder/integrations/_type/'. $type .'/form');
 
-        $template = Craft::$app->view->renderTemplate('form-builder/integrations/_type/'.$type.'/integration-section', $variables);
+        if ($isTemplate) {
+            $template = Craft::$app->view->renderTemplate('form-builder/integrations/_type/'. $type .'/integration-section', $variables);
+        } else {
+            $isIntegrationPlugin = Craft::$app->plugins->isPluginInstalled('form-builder-integrations');
+            if ($isIntegrationPlugin) {
+                $isIntegrationTemplate = Craft::$app->view->doesTemplateExist('form-builder-integrations/types/'. $type .'/form');
+
+                if ($isIntegrationTemplate) {
+                    $template = Craft::$app->view->renderTemplate('form-builder-integrations/types/'. $type .'/integration-section', $variables);
+                } else {
+                    return $this->asJson([
+                        'success' => false,
+                        'error'   => FormBuilder::t('Template not found')
+                    ]);
+                }
+            } else {
+                return $this->asJson([
+                    'success' => false,
+                    'error'   => FormBuilder::t('Template not found')
+                ]);
+            }
+        }
+
 
         return $this->asJson([
             'success' => true,

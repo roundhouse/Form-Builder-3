@@ -7,16 +7,21 @@
 <div class="hud-body">
     {% for integration in integrations %}
         <a href="{{ url('form-builder/integrations/' ~ integration.id) }}" class="fb-field integration-add-link"
-            data-id="{{ integration.id }}"
-            data-name="{{ integration.name }}"
-            data-handle="{{ integration.handle }}"
-            data-type="{{ integration.type }}"
-            data-status="{{ integration.status }}">
+           data-id="{{ integration.id }}"
+           data-name="{{ integration.name }}"
+           data-handle="{{ integration.handle }}"
+           data-type="{{ integration.type }}"
+           data-status="{{ integration.status }}">
 
-             <span class="tout-title">
-                {% include 'form-builder/_includes/icons/integrations-' ~ integration.type ignore missing %}
-                 <span class="type-title">{{ integration.type }}</span>
-            </span>
+            <div class="tout-title">
+                {% if craft.app.view.doesTemplateExist('form-builder/_includes/icons/integrations-' ~ integration.type) %}
+                    <div class="item-meta-icon">{% include 'form-builder/_includes/icons/integrations-' ~ integration.type ignore missing %}</div>
+                {% else %}
+                    <div class="item-meta-icon">{% include 'form-builder-integrations/icons/integrations-' ~ integration.type ignore missing %}</div>
+                {% endif %}
+
+                <span class="type-title">{{ integration.type }}</span>
+            </div>
             <span class="integration-title">{{ integration.name }}</span>
             <div class="status-container">
                 {% if integration.status == 'enabled' %}

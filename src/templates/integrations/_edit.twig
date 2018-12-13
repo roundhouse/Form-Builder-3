@@ -13,6 +13,8 @@
 
 {% set details = true %}
 
+{% set isLocalIntegration = craft.app.view.doesTemplateExist('form-builder/_includes/icons/integrations-' ~ entry.type) %}
+
 {% block header %}
     {% include 'form-builder/_includes/_header' ignore missing with { title: title } %}
 {% endblock %}
@@ -31,15 +33,18 @@
 
         <div id="content">
             <section class="flex-container">
-
-                <div class="widget full-col">
-                    <header class="pad">
-                        <h2>{{ "Options"|t('form-builder') }}</h2>
-                    </header>
-                    <div class="body">
-                        {% include 'form-builder/integrations/_type/'~ entry.type ~'/_edit' ignore missing with { entry: entry } %}
+                {% if isLocalIntegration %}
+                    <div class="widget full-col">
+                        <header class="pad">
+                            <h2>{{ "Options"|t('form-builder') }}</h2>
+                        </header>
+                        <div class="body">
+                            {% include 'form-builder/integrations/_type/'~ entry.type ~'/_edit' ignore missing with { entry: entry } %}
+                        </div>
                     </div>
-                </div>
+                {% else %}
+                    {% include 'form-builder-integrations/types/'~ entry.type ~'/_edit' ignore missing with { entry: entry } %}
+                {% endif %}
             </section>
         </div>
     </div>

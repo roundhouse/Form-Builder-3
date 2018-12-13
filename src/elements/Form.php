@@ -307,6 +307,28 @@ class Form extends Element
         }
     }
 
+    /**
+     * Get integrations by key
+     *
+     * @param $handle
+     * @return array
+     */
+    public function getIntegrationsByKey($handle)
+    {
+        $integrations = $this->getIntegrations();
+        $selectIntegrations = [];
+
+        foreach ($integrations as $key => $collection) {
+            if ($key === $handle) {
+                foreach ($collection as $item) {
+                    $selectIntegrations[] = $item;
+                }
+            }
+        }
+
+        return $selectIntegrations;
+    }
+
     // Indexes, etc.
     // -------------------------------------------------------------------------
 
