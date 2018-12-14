@@ -1,0 +1,43 @@
+<form method="post" accept-charset="utf-8" enctype="multipart/form-data">
+    {{ csrfInput() }}
+
+    <input type="hidden" name="action" value="form-builder/entries/save">
+    <input type="hidden" name="formId" value="{{ form.id }}">
+    <input type="hidden" name="statusId" value="1">
+
+    {%- namespace 'fields' -%}
+        {% set tabs = form.getFieldLayout.getTabs() %}
+
+        {% for tab in tabs %}
+            {%- set fields = tab.getFields() %}
+
+            <fieldset>
+                <legend>{{ tab.name }}:</legend>
+
+                {% for field in fields -%}
+                    {%- if field -%}
+                        {% if element is not defined %}{% set element = null %}{% endif %}
+                        {% include "_includes/field" with {
+                            field:    field,
+                            required: field.required,
+                            element:  element,
+                            static:   (static is defined ? static : null)
+                        } only %}
+                    {%- endif %}
+                {% endfor %}
+            </fieldset>
+        {% endfor %}
+    {%- endnamespace -%}
+
+    {% if errors %}
+        <ul class="formbuilder-errors">
+            {% for error in errors %}
+                <li class="fb-error-item">{{ error[0] }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    <button type="submit">
+        {{ "Submit Message" |t('form-builder') }}
+    </button>
+</form>

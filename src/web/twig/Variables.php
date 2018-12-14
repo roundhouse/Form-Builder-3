@@ -51,61 +51,83 @@ class Variables
      */
     public function form($formHandle, $variables = null)
     {
-
         if ($formHandle) {
             $form = FormBuilder::$plugin->forms->getFormByHandle($formHandle);
         } else {
             $form = FormBuilder::$plugin->forms->getFormByHandle($variables['formHandle']);
         }
         
-        $options = isset($variables['options']) ? $variables['options'] : null;
-        $submission = isset($variables['submission']) ? $variables['submission'] : null;
         
-        if (!$form) {
-            echo 'Invalid Form Handle!';
-            return false;
-        }
+//        $options = isset($variables['options']) ? $variables['options'] : null;
+//        $submission = isset($variables['submission']) ? $variables['submission'] : null;
+//        
+//        if (!$form) {
+//            echo 'Invalid Form Handle!';
+//            return false;
+//        }
 
         if ($form->statusId == 2) {
             return false;
         }
+//        Craft::dd(Craft::$app->getUrlManager()->getRouteParams('submission'));
+//        if ($submission) {
+//            $entry = $submission;
+//        } else {
+//            $entry = new Entry();
+//            $entry->form = $form;
+//        }
 
-        if ($submission) {
-            $entry = $submission;
-        } else {
-            $entry = new Entry();
-            $entry->form = $form;
-        }
-
+        // START REWRITE
         if ($form) {
-            $tabs = $form->fieldLayout->getTabs();
-
             $oldPath = Craft::$app->view->getTemplateMode();
             Craft::$app->view->setTemplateMode(View::TEMPLATE_MODE_CP);
 
-            $fieldsets = Craft::$app->view->renderTemplate('form-builder/frontend/fieldset', [
-                'tabs'          => $tabs,
-                'form'          => $form,
-                'submission'    => $submission,
-                'entry'         => $entry,
-                'options'       => $options
-            ]);
-
-            $formHtml = Craft::$app->view->renderTemplate('form-builder/frontend/form', [
-                'form'      => $form,
-                'fieldset'  => $fieldsets,
-                'entry'     => $entry,
-                'options'   => $options
+            $html = Craft::$app->view->renderTemplate('form-builder/frontend/render/form', [
+                'form' => $form,
+                'errors' => isset($variables['errors']) ? $variables['errors'] : null
             ]);
 
             Craft::$app->view->setTemplateMode($oldPath);
 
-            return Template::raw($formHtml);
-        } else {
-            $notice = '<code>'.FormBuilder::t('There is no form with handle: '. $variables['formHandle']).'</code>';
-
-            echo $notice;
+            return Template::raw($html);
         }
+
+        return '<code>'.FormBuilder::t('There is no form with handle: '. $variables['formHandle']).'</code>';;
+
+
+
+
+
+
+//        if ($form) {
+//            $tabs = $form->fieldLayout->getTabs();
+//
+//            $oldPath = Craft::$app->view->getTemplateMode();
+//            Craft::$app->view->setTemplateMode(View::TEMPLATE_MODE_CP);
+//
+//            $fieldsets = Craft::$app->view->renderTemplate('form-builder/frontend/fieldset', [
+//                'tabs'          => $tabs,
+//                'form'          => $form,
+//                'submission'    => $submission,
+//                'entry'         => $entry,
+//                'options'       => $options
+//            ]);
+//
+//            $formHtml = Craft::$app->view->renderTemplate('form-builder/frontend/form', [
+//                'form'      => $form,
+//                'fieldset'  => $fieldsets,
+//                'entry'     => $entry,
+//                'options'   => $options
+//            ]);
+//
+//            Craft::$app->view->setTemplateMode($oldPath);
+//
+//            return Template::raw($formHtml);
+//        } else {
+//            $notice = '<code>'.FormBuilder::t('There is no form with handle: '. $variables['formHandle']).'</code>';
+//
+//            echo $notice;
+//        }
     }
 
     /**
@@ -242,14 +264,6 @@ class Variables
             default:
                 break;
         }
-
-        // Frontend Integration
-        Craft::dd($form->getIntegrations());
-
-        if ($form->getIntegrationsByKey('converge')) {
-            Craft::dd($form->getIntegrationsByKey('converge'));
-        }
-
 
         Craft::$app->view->setTemplateMode($oldPath);
 

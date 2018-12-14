@@ -24,6 +24,7 @@ class Integration extends Model
     public $category;
     public $token;
     public $frontend;
+    public $allowMultiple;
     public $status = 'enabled';
     public $content;
     public $settings;

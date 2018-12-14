@@ -277,33 +277,38 @@ class Form extends Element
     public function getIntegrations()
     {
         $isArray = ArrayHelper::isTraversable($this->integrations);
-
+        
         if ($isArray) {
             $integrations = $this->integrations;
         } else {
             $integrations = Json::decode($this->integrations);
         }
-
-
+        
         if ($integrations) {
-            $newArray = [];
+            $allIntegrations = [];
 
             foreach ($integrations as $key => $items) {
+                $type       = $key;
+                $isMultiple = $this->is_multi($items);
 
-                $type = $key;
+                if ($isMultiple) {
+                    foreach ($items as $index => $item) {
+                        $integration = FormBuilder::$plugin->integrations->getIntegrationById($item['integrationId']);
+                        if ($integration->frontend) {
+                            $item['frontend'] = true;
+                        }
+                        $item['integration'] = $integration;
+                        $items[$index] = $item;
+                    }
 
-                foreach ($items as $index => $item) {
-                    $integration = FormBuilder::$plugin->integrations->getIntegrationById($item['id']);
-
-                    $item['integration'] = $integration;
-
-                    $items[$index] = $item;
+                    $allIntegrations[$type] = $items;
+                } else {
+                    $items['integration'] = FormBuilder::$plugin->integrations->getIntegrationById($items['integrationId']);
+                    $allIntegrations[$type] = $items;
                 }
-
-                $newArray[$type] = $items;
             }
 
-            return $newArray;
+            return $allIntegrations;
         }
     }
 
@@ -423,6 +428,19 @@ class Form extends Element
         $attributes = ['name', 'handle', 'group', 'totalEntries', 'twig'];
 
         return $attributes;
+    }
+
+    /**
+     * Check if multi dimensional array
+     *
+     * @param $array
+     * @return bool
+     */
+    protected function is_multi($array)
+    {
+        $rv = array_filter($array,'is_array');
+        if(count($rv)>0) return true;
+        return false;
     }
 
     // Events

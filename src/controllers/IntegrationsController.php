@@ -141,8 +141,9 @@ class IntegrationsController extends Controller
         $id = Craft::$app->getRequest()->getBodyParam('id');
         $type = Craft::$app->getRequest()->getBodyParam('type');
 
-        $variables['integration'] = $integrations = FormBuilder::$plugin->integrations->getIntegrationById($id);
+        $variables['integration'] = FormBuilder::$plugin->integrations->getIntegrationById($id);
         $variables['type'] = $type;
+        $variables['allowMultiple'] = $variables['integration']->allowMultiple;
         $variables['index'] = StringHelper::randomString(4);
 
         $isTemplate = Craft::$app->view->doesTemplateExist('form-builder/integrations/_type/'. $type .'/form');
@@ -194,6 +195,7 @@ class IntegrationsController extends Controller
         $type = Craft::$app->getRequest()->getBodyParam('type');
         $name = Craft::$app->getRequest()->getBodyParam('name');
         $handle = Craft::$app->getRequest()->getBodyParam('handle');
+        $token = Craft::$app->getRequest()->getBodyParam('token');
         $category = Craft::$app->getRequest()->getBodyParam('category');
         $frontend = Craft::$app->getRequest()->getBodyParam('frontend');
 
@@ -201,6 +203,7 @@ class IntegrationsController extends Controller
         $model->name        = $name;
         $model->handle      = $handle;
         $model->type        = $type;
+        $model->token       = $token;
         $model->category    = $category;
         $model->frontend    = $frontend;
         $model->content     = Craft::$app->getRequest()->getBodyParam('content');

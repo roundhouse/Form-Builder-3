@@ -18,6 +18,7 @@ class m181213_053147_UpdateIntegrationColumns extends Migration
         $this->addColumn('{{%formbuilder_integrations}}', 'category', $this->string()->after('handle'));
         $this->addColumn('{{%formbuilder_integrations}}', 'token', $this->string()->after('status'));
         $this->addColumn('{{%formbuilder_integrations}}', 'frontend', $this->boolean()->after('status'));
+        $this->addColumn('{{%formbuilder_integrations}}', 'allowMultiple', $this->boolean()->after('status')->defaultValue(0));
     }
 
     /**

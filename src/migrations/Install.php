@@ -186,6 +186,7 @@ class Install extends Migration
             'status' => $this->string()->notNull()->defaultValue('enabled'),
             'token' => $this->string(),
             'frontend' => $this->boolean(),
+            'allowMultiple' => $this->boolean()->defaultValue(0),
             'content' => $this->text(),
             'settings' => $this->text(),
             'dateCreated' => $this->dateTime()->notNull(),

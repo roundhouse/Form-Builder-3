@@ -34,6 +34,7 @@ class Extensions extends \Twig_Extension
             new \Twig_SimpleFilter('timeAgo', [$this, 'getTimeAgo']),
             new \Twig_SimpleFilter('browser', [$this, 'browser']),
             new \Twig_SimpleFilter('formatBytes', [$this, 'formatBytes']),
+            new \Twig_SimpleFilter('isMulti', [$this, 'isMulti']),
         ];
     }
 
@@ -130,5 +131,18 @@ class Extensions extends \Twig_Extension
         $bytes /= pow(1024, $pow);
 
         return round($bytes, $precision) . ' ' . $units[$pow];
+    }
+
+    /**
+     * Check if multi dimensional array
+     *
+     * @param $array
+     * @return bool
+     */
+    public function isMulti($array)
+    {
+        $rv = array_filter($array,'is_array');
+        if(count($rv)>0) return true;
+        return false;
     }
 }

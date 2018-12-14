@@ -14,6 +14,7 @@ use craft;
 use craft\base\Element;
 use craft\helpers\UrlHelper;
 use craft\helpers\ArrayHelper;
+use craft\helpers\DateTimeHelper;
 use craft\elements\db\ElementQueryInterface;
 use craft\behaviors\FieldLayoutBehavior;
 
@@ -364,7 +365,7 @@ class Entry extends Element
         $entryRecord->formId            = $this->formId;
         $entryRecord->statusId          = $this->statusId;
         $entryRecord->title             = $this->title;
-        $entryRecord->postedOn          = $this->postedOn;
+        $entryRecord->postedOn          = DateTimeHelper::toDateTime($this->postedOn)->format('Y-m-d');
         $entryRecord->ipAddress         = $this->ipAddress;
         $entryRecord->userAgent         = $this->userAgent;
         $entryRecord->save(false);

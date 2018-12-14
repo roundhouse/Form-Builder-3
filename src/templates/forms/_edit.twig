@@ -90,21 +90,29 @@
                     {% endif %}
 
                     <div class="integration-body">
-
                         <div id="formbuilder-integrations-container">
-
                             {% for type, elements in integrations %}
-                                {% for index, element in elements %}
-                                    {% if element.integration %}
-                                        {% if craft.app.view.doesTemplateExist('form-builder/integrations/_type/' ~ type ~ '/integration-section') %}
-                                            {% include 'form-builder/integrations/_type/' ~ type ~ '/integration-section' ignore missing with { integration: element.integration, type: type, index: index} %}
-                                        {% else %}
-                                            {% include 'form-builder-integrations/types/' ~ type ~ '/integration-section' ignore missing with { integration: element.integration, type: type, index: index} %}
-                                        {% endif %}
-                                    {% endif %}
-                                {% endfor %}
-                            {% endfor %}
+                                {% set isMultiple = elements|isMulti %}
 
+                                {% if isMultiple %}
+                                    {% for index, element in elements %}
+                                        {% if element.integration %}
+                                            {% if craft.app.view.doesTemplateExist('form-builder/integrations/_type/' ~ type ~ '/integration-section') %}
+                                                {% include 'form-builder/integrations/_type/' ~ type ~ '/integration-section' ignore missing with { integration: element.integration, type: type, index: index} %}
+                                            {% else %}
+                                                {% include 'form-builder-integrations/types/' ~ type ~ '/integration-section' ignore missing with { integration: element.integration, type: type, index: index} %}
+                                            {% endif %}
+                                        {% endif %}
+                                    {% endfor %}
+                                {% else %}
+                                    {% if craft.app.view.doesTemplateExist('form-builder/integrations/_type/' ~ type ~ '/integration-section') %}
+                                        {% include 'form-builder/integrations/_type/' ~ type ~ '/integration-section' ignore missing with { integration: elements.integration, type: elements.integration.type, index: loop.index} %}
+                                    {% else %}
+                                        {% include 'form-builder-integrations/types/' ~ type ~ '/integration-section' ignore missing with { integration: elements.integration, type: elements.integration.type, index: loop.index} %}
+                                    {% endif %}
+                                {% endif %}
+
+                            {% endfor %}
                         </div>
                     </div>
                 </section>

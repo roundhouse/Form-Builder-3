@@ -24,6 +24,9 @@ use roundhouse\formbuilder\records\Integration as IntegrationRecord;
 use roundhouse\formbuilder\services\integrations\Email;
 use roundhouse\formbuilder\services\integrations\Slack;
 
+// Integrations plugin
+use roundhouse\formbuilderintegrations\Integrations\Payment\Converge;
+
 /**
  * Class Integrations
  * @package roundhouse\formbuilder\services
@@ -143,6 +146,9 @@ class Integrations extends Component
         $record->name       = $model->name;
         $record->handle     = $model->handle;
         $record->status     = $model->status;
+        $record->token      = $model->token;
+        $record->category   = $model->category;
+        $record->frontend   = $model->frontend;
         $record->content    = $model->content;
         $record->settings   = $model->settings;
 
@@ -218,14 +224,15 @@ class Integrations extends Component
         $integrations = $form->getIntegrations();
 
         foreach ($integrations as $type => $integration) {
-
-
             switch ($type) {
                 case 'email':
                     Email::instance()->prepare($integration, $entry);
                     break;
                 case 'slack':
                     Slack::instance()->prepare($integration, $entry);
+                    break;
+                case 'converge':
+                    Converge::instance()->prepare($integration, $entry);
                     break;
             }
         }
@@ -260,6 +267,7 @@ class Integrations extends Component
                 'integration.category',
                 'integration.status',
                 'integration.frontend',
+                'integration.allowMultiple',
                 'integration.token',
                 'integration.content',
                 'integration.settings',

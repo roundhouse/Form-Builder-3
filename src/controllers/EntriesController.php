@@ -208,11 +208,12 @@ class EntriesController extends Controller
         $this->_spamProtection($this->entry, $request);
 
         $this->entry->setScenario(Element::SCENARIO_LIVE);
-
+        $this->entry->validate();
+        
         // Check form errors
         if ($this->entry->hasErrors()) {
             Craft::$app->getUrlManager()->setRouteParams([
-                'submission' => $this->entry
+                'errors' => $this->entry->getErrors()
             ]);
 
             return null;
@@ -225,7 +226,7 @@ class EntriesController extends Controller
         ]);
 
         $this->trigger(self::EVENT_BEFORE_SUBMIT_ENTRY, $event);
-
+        
         if ($saveToDatabase && $event->isValid) {
             if (Craft::$app->getElements()->saveElement($this->entry)) {
                 $saved = true;
