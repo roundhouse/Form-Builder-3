@@ -231,9 +231,6 @@ class Integrations extends Component
                 case 'slack':
                     Slack::instance()->prepare($integration, $entry);
                     break;
-                case 'converge':
-                    Converge::instance()->prepare($integration, $entry);
-                    break;
             }
         }
     }

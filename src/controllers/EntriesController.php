@@ -209,15 +209,6 @@ class EntriesController extends Controller
 
         $this->entry->setScenario(Element::SCENARIO_LIVE);
         $this->entry->validate();
-        
-        // Check form errors
-        if ($this->entry->hasErrors()) {
-            Craft::$app->getUrlManager()->setRouteParams([
-                'errors' => $this->entry->getErrors()
-            ]);
-
-            return null;
-        }
 
         // Fire a 'beforeSubmitEntry' event
         $event = new EntryEvent([
@@ -226,7 +217,16 @@ class EntriesController extends Controller
         ]);
 
         $this->trigger(self::EVENT_BEFORE_SUBMIT_ENTRY, $event);
-        
+
+        // Check form errors
+        if ($this->entry->hasErrors()) {
+            Craft::$app->getUrlManager()->setRouteParams([
+                'submission' => $this->entry
+            ]);
+
+            return null;
+        }
+
         if ($saveToDatabase && $event->isValid) {
             if (Craft::$app->getElements()->saveElement($this->entry)) {
                 $saved = true;

@@ -8,6 +8,7 @@
     {% for integration in integrations %}
         <a href="{{ url('form-builder/integrations/' ~ integration.id) }}" class="fb-field integration-add-link"
            data-id="{{ integration.id }}"
+           data-allow-multiple="{{ integration.allowMultiple }}"
            data-name="{{ integration.name }}"
            data-handle="{{ integration.handle }}"
            data-type="{{ integration.type }}"

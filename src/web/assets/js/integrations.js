@@ -205,8 +205,21 @@ Garnish.$doc.ready(function () {
         var integrationSelection = new IntegrationSelectionHud($(this));
 
         integrationSelection.on('response', function (e) {
+            var type = e.data.type;
+            var allowMultiple = e.data.allowMultiple;
+
             e.target.hud.hide();
-            new IntegrationItem(e.data);
+
+            if (allowMultiple === '1') {
+                new IntegrationItem(e.data);
+            } else {
+                var niddle = $('#integration-' + type + '-1');
+                if (niddle.length > 0) {
+                    Craft.cp.displayError(Craft.t('form-builder', 'Only 1 integration is allowed for this type'));
+                } else {
+                    new IntegrationItem(e.data);
+                }
+            }
         });
     });
 
