@@ -76,28 +76,6 @@ class Variables
             $entry->form = $form;
         }
 
-        // START REWRITE
-//        if ($form) {
-//            $oldPath = Craft::$app->view->getTemplateMode();
-//            Craft::$app->view->setTemplateMode(View::TEMPLATE_MODE_CP);
-//
-//            $html = Craft::$app->view->renderTemplate('form-builder/frontend/render/form', [
-//                'form' => $form,
-//                'errors' => isset($variables['errors']) ? $variables['errors'] : null
-//            ]);
-//
-//            Craft::$app->view->setTemplateMode($oldPath);
-//
-//            return Template::raw($html);
-//        }
-//
-//        return '<code>'.FormBuilder::t('There is no form with handle: '. $variables['formHandle']).'</code>';;
-
-
-
-
-
-
         if ($form) {
             $tabs = $form->fieldLayout->getTabs();
 

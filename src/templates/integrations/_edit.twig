@@ -65,15 +65,15 @@
                         <label for="handle" class="input-hint">{{ 'HANDLE'|t('form-builder') }}</label>
                         <input type="text" id="handle" class="text input-control" name="handle" value="{{ entry.handle }}" autocomplete="off">
                     </div>
-                </div>
 
-                <div class="fb-field">
-                    <label for="statusId" class="input-hint">{{ "STATUS" |t('form-builder') }}</label>
-                    <div class="select">
-                        <select id="status" name="status">
-                            <option value="enabled" {% if entry.status == 'enabled' %}selected{% endif %}>{{ 'Enabled'|t('form-builder') }}</option>
-                            <option value="disabled" {% if entry.status == 'disabled' %}selected{% endif %}>{{ 'Disabled'|t('form-builder') }}</option>
-                        </select>
+                    <div class="fb-field">
+                        <label for="statusId" class="input-hint">{{ "STATUS" |t('form-builder') }}</label>
+                        <div class="select">
+                            <select id="status" name="status">
+                                <option value="enabled" {% if entry.status == 'enabled' %}selected{% endif %}>{{ 'Enabled'|t('form-builder') }}</option>
+                                <option value="disabled" {% if entry.status == 'disabled' %}selected{% endif %}>{{ 'Disabled'|t('form-builder') }}</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
 
