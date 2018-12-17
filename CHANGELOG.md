@@ -1,9 +1,10 @@
 # Form Builder Changelog
 
-## 3.0.8 - 2018-12-12
+## 3.0.8 - 2018-12-17
 
 ### Added
-- Updated integration db columns
+- Updated integrations database columns
+- Added [Integrations plugin](https://github.com/roundhouse/Form-Builder-Integrations)
 
 ## 3.0.7 - 2018-12-11
 
