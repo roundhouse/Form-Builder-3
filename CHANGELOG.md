@@ -1,5 +1,10 @@
 # Form Builder Changelog
 
+## 3.0.9 - 2018-12-19
+
+### Fixed
+- Integrations sometimes broke forms if it missed `integrationId`
+
 ## 3.0.8 - 2018-12-17
 
 ### Added

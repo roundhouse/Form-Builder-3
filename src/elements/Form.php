@@ -293,12 +293,16 @@ class Form extends Element
 
                 if ($isMultiple) {
                     foreach ($items as $index => $item) {
-                        $integration = FormBuilder::$plugin->integrations->getIntegrationById($item['integrationId']);
-                        if ($integration->frontend) {
-                            $item['frontend'] = true;
+                        $isNumber = is_integer($item['integrationId']);
+
+                        if ($isNumber) {
+                            $integration = FormBuilder::$plugin->integrations->getIntegrationById($item['integrationId']);
+                            if ($integration->frontend) {
+                                $item['frontend'] = true;
+                            }
+                            $item['integration'] = $integration;
+                            $items[$index] = $item;
                         }
-                        $item['integration'] = $integration;
-                        $items[$index] = $item;
                     }
 
                     $allIntegrations[$type] = $items;
