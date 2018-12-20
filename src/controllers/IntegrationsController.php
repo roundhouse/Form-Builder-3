@@ -17,6 +17,7 @@ use craft\helpers\StringHelper;
 use craft\web\Controller;
 use craft\web\View;
 
+use roundhouse\formbuilder\elements\Form;
 use yii\web\BadRequestHttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
@@ -140,11 +141,14 @@ class IntegrationsController extends Controller
         $this->requirePostRequest();
         $id = Craft::$app->getRequest()->getBodyParam('id');
         $type = Craft::$app->getRequest()->getBodyParam('type');
+        $formId = Craft::$app->getRequest()->getBodyParam('formId');
+
 
         $variables['integration'] = FormBuilder::$plugin->integrations->getIntegrationById($id);
         $variables['type'] = $type;
         $variables['allowMultiple'] = $variables['integration']->allowMultiple;
         $variables['index'] = StringHelper::randomString(4);
+        $variables['form'] = Form::findOne($formId);
 
         $isTemplate = Craft::$app->view->doesTemplateExist('form-builder/integrations/_type/'. $type .'/form');
 

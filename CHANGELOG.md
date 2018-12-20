@@ -1,5 +1,11 @@
 # Form Builder Changelog
 
+## 3.0.10 - 2018-12-20
+
+### Fixed
+- Converge integration now accepts Dropdown values for expiration date
+- Made fields available to integrations right away as long as they are saved on the form
+
 ## 3.0.9 - 2018-12-19
 
 ### Fixed

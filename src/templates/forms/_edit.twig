@@ -86,7 +86,7 @@
                     </header>
 
                     {% if availableIntegrations %}
-                        <a href="#" class="btns btn-small btn-info add-integrations-item"><span><i class="fas fa-plus"></i> {{ 'Add Integration'|t('form-builder') }}</span></a>
+                        <a href="#" class="btns btn-small btn-info add-integrations-item" {% if form.id is defined %}data-form-id="{{ form.id }}"{% endif %}><span><i class="fas fa-plus"></i> {{ 'Add Integration'|t('form-builder') }}</span></a>
                     {% endif %}
 
                     <div class="integration-body">

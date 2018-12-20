@@ -139,6 +139,7 @@ var IntegrationSelectionHud = Garnish.Base.extend({
 
 var IntegrationItem = Garnish.Base.extend({
     $container: null,
+    formId: null,
 
     id: null,
     name: null,
@@ -151,6 +152,7 @@ var IntegrationItem = Garnish.Base.extend({
         this.$container = $('#formbuilder-integrations-container');
 
         var payload = {
+            formId: data.formId,
             id: data.id,
             name: data.name,
             handle: data.handle,
@@ -201,20 +203,21 @@ Garnish.$doc.ready(function () {
 
     $('.add-integrations-item').on('click', function (e) {
         e.preventDefault();
+        var formId = $(this).data('form-id');
 
         var integrationSelection = new IntegrationSelectionHud($(this));
 
         integrationSelection.on('response', function (e) {
             var type = e.data.type;
             var allowMultiple = e.data.allowMultiple;
-
+            e.data.formId = formId;
             e.target.hud.hide();
 
             if (allowMultiple === '1') {
                 new IntegrationItem(e.data);
             } else {
-                var niddle = $('#integration-' + type + '-1');
-                if (niddle.length > 0) {
+                var needle = $('#integration-' + type + '-1');
+                if (needle.length > 0) {
                     Craft.cp.displayError(Craft.t('form-builder', 'Only 1 integration is allowed for this type'));
                 } else {
                     new IntegrationItem(e.data);
