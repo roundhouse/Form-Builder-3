@@ -1,5 +1,10 @@
 # Form Builder Changelog
 
+## 3.0.11 - 2019-01-11
+
+### Fixed
+- Fixed custom redirects
+
 ## 3.0.10 - 2018-12-20
 
 ### Fixed

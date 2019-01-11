@@ -414,7 +414,22 @@ class EntriesController extends Controller
                 'message' => isset($this->form['options']['messages']['success']) ? $this->form['options']['messages']['success'] : FormBuilder::t('Form submission successful.')
             ]);
         } else {
-            Craft::$app->getSession()->setFlash('success', isset($this->form['options']['messages']['success']) ? $this->form['options']['messages']['success'] : FormBuilder::t('Form submission successful.'));
+            $options = $this->form->options;
+            $customRedirect = isset($options['redirect']['enabled']) && $options['redirect']['enabled'] === '1' ? true : false;
+            
+            if ($customRedirect) {
+                $currentRoute = Craft::$app->request->url;
+                $url =  isset($options['redirect']['url']) && $options['redirect']['url'] != '' ? $options['redirect']['url'] : $currentRoute;
+
+                if ($currentRoute === $url) {
+                    Craft::$app->getSession()->setFlash('success', isset($this->form['options']['messages']['success']) ? $this->form['options']['messages']['success'] : FormBuilder::t('Form submission successful.'));
+                } else {
+                    $this->redirect($url);
+                }
+            } else {
+                Craft::$app->getSession()->setFlash('success', isset($this->form['options']['messages']['success']) ? $this->form['options']['messages']['success'] : FormBuilder::t('Form submission successful.'));
+            }
+
         }
 
     }
