@@ -10,6 +10,8 @@
 
 namespace roundhouse\formbuilder\web\twig;
 
+use Craft;
+
 class Extensions extends \Twig_Extension
 {
     // Public Methods
@@ -139,7 +141,7 @@ class Extensions extends \Twig_Extension
      * @param $array
      * @return bool
      */
-    public function isMulti($array)
+    public function isMulti(array $array)
     {
         $rv = array_filter($array,'is_array');
         if(count($rv)>0) return true;

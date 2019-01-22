@@ -1,0 +1,31 @@
+{% import "form-builder/_includes/_components" as components %}
+
+{% set text = 'integrations[salesforce]['~ index ~'][organizationId]' %}
+
+{% set container = {
+    title: 'Organization ID' |t('form-builder'),
+    info: 'Please enter your Salesforce oganization ID?'|t('form-builder'),
+    icon: null,
+    toggle: false,
+    class: null,
+    id: null
+} %}
+
+{% set inputs = {
+    0: {
+        type: 'text',
+        name: text,
+        value: attribute(form.integrations.salesforce, index).organizationId is defined and attribute(form.integrations.salesforce, index).organizationId != '' ? attribute(form.integrations.salesforce, index).organizationId : '',
+        class: 'hidden',
+        id: null,
+        hint: 'ID'
+    },
+} %}
+
+{% set modal = null %}
+
+{{ components.optionItem(
+    container,
+    modal,
+    inputs
+) }}

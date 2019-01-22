@@ -23,7 +23,7 @@
                             <div class="item-meta-icon">{% include 'form-builder/_includes/icons/integrations-email' ignore missing %}</div>
                         </a>
                         <div class="item-info">
-                            <div class="item-meta-title">Email</div>
+                            <div class="item-meta-title">{{ 'Email'|t('form-builder') }}</div>
                         </div>
                     </div>
                     <div class="item has-hover pad">
@@ -31,7 +31,15 @@
                             <div class="item-meta-icon">{% include 'form-builder/_includes/icons/integrations-slack' ignore missing %}</div>
                         </a>
                         <div class="item-info">
-                            <div class="item-meta-title">Slack</div>
+                            <div class="item-meta-title">{{ 'Slack'|t('form-builder') }}</div>
+                        </div>
+                    </div>
+                    <div class="item has-hover pad">
+                        <a href="#" class="item-meta add-integration" data-type="salesforce">
+                            <div class="item-meta-icon">{% include 'form-builder/_includes/icons/integrations-salesforce' ignore missing %}</div>
+                        </a>
+                        <div class="item-info">
+                            <div class="item-meta-title">{{ 'Salesforce'|t('form-builder') }}</div>
                         </div>
                     </div>
                     {% hook 'formbuilder-integrations-types' %}

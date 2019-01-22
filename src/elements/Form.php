@@ -277,13 +277,13 @@ class Form extends Element
     public function getIntegrations()
     {
         $isArray = ArrayHelper::isTraversable($this->integrations);
-        
+
         if ($isArray) {
             $integrations = $this->integrations;
         } else {
             $integrations = Json::decode($this->integrations);
         }
-        
+
         if ($integrations) {
             $allIntegrations = [];
 
@@ -296,7 +296,13 @@ class Form extends Element
                         $isNumber = is_integer($item['integrationId']);
 
                         if ($isNumber) {
-                            $integration = FormBuilder::$plugin->integrations->getIntegrationById($item['integrationId']);
+                            $integrationId = $item['integrationId'];
+                        } else {
+                            $integrationId = (int)$item['integrationId'];
+                        }
+
+                        if ($integrationId) {
+                            $integration = FormBuilder::$plugin->integrations->getIntegrationById($integrationId);
                             if ($integration->frontend) {
                                 $item['frontend'] = true;
                             }

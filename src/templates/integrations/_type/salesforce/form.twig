@@ -1,0 +1,42 @@
+<input type="hidden" name="type" value="{{ type }}">
+
+
+<header class="hud-header">
+    <h2>{{ type|capitalize }} {{ 'Integration'|t('form-builder') }}</h2>
+</header>
+
+<div class="hud-body">
+
+    <div class="fb-field" id="field-name">
+        <div class="input-hint">NAME</div>
+        <div class="input">
+            <input type="text" class="data-required" data-hint="NAME" name="name" id="integration-name">
+        </div>
+    </div>
+
+    <div class="fb-field" id="field-handle">
+        <div class="input-hint">HANDLE</div>
+        <div class="input">
+            <input type="text" class="data-required" data-hint="HANDLE" name="handle" id="integration-handle">
+        </div>
+    </div>
+
+    <div class="hud-section">
+        <h3>{{ 'Settings'|t('form-builder') }}</h3>
+    </div>
+
+    <div class="fb-field">
+        <div class="input-hint">ORGANIZATION ID</div>
+        <div class="input">
+            <input type="text" class="data-required" data-hint="ORGANIZATION ID" name="settings[organizationId]">
+        </div>
+    </div>
+
+</div>
+
+<footer class="hud-footer">
+    <div class="buttons">
+        <input type="button" class="btns btn-modal cancel" value="{{ 'Cancel'|t('form-builder') }}">
+        <input type="submit" class="btns btn-modal submit" value="{{ 'Save'|t('form-builder') }}"/>
+    </div>
+</footer>

@@ -96,7 +96,7 @@
 
                                 {% if isMultiple %}
                                     {% for index, element in elements %}
-                                        {% if element.integration %}
+                                        {% if element.integration is defined and element.integration %}
                                             {% if craft.app.view.doesTemplateExist('form-builder/integrations/_type/' ~ type ~ '/integration-section') %}
                                                 {% include 'form-builder/integrations/_type/' ~ type ~ '/integration-section' ignore missing with { integration: element.integration, type: type, index: index} %}
                                             {% else %}

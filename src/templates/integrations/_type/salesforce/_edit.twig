@@ -1,0 +1,6 @@
+{% for key, setting in entry.settings %}
+    <div class="fb-field ">
+        <label for="field-{{ key }}" class="input-hint">{{ key|t('form-builder')|upper }}</label>
+        <input type="text" id="field-{{ key }}" class="text input-control" name="settings[{{ key }}]" value="{{ setting }}" autocomplete="off">
+    </div>
+{% endfor %}

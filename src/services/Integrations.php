@@ -16,6 +16,7 @@ use craft\db\Query;
 use craft\helpers\Json;
 use craft\mail\Message;
 
+use roundhouse\formbuilder\services\integrations\Salesforce;
 use yii\base\Exception;
 
 use roundhouse\formbuilder\FormBuilder;
@@ -230,6 +231,9 @@ class Integrations extends Component
                     break;
                 case 'slack':
                     Slack::instance()->prepare($integration, $entry);
+                    break;
+                case 'salesforce':
+                    Salesforce::instance()->prepare($integration, $entry);
                     break;
             }
         }
