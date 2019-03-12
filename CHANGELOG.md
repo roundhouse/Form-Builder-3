@@ -1,5 +1,10 @@
 # Form Builder Changelog
 
+## 3.0.12 - 2019-03-12
+
+### Improved
+- Updated the way input templates get rendered behind the scenes
+
 ## 3.0.11 - 2019-01-11
 
 ### Fixed

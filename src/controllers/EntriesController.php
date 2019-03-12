@@ -197,6 +197,7 @@ class EntriesController extends Controller
         $this->form     = FormBuilder::$plugin->forms->getFormRecordById($formId);
         $this->post     = $request->post();
         $this->files    = $_FILES;
+        
 
         $saveToDatabase = isset($this->form->settings['database']['enabled']) && $this->form->settings['database']['enabled'] == '1' ? true : false;
 
@@ -236,7 +237,7 @@ class EntriesController extends Controller
         } else {
             $saved = true;
         }
-        
+
         // Perform Integrations
         if ($this->form->integrations) {
             FormBuilder::$plugin->integrations->performIntegrations($this->entry, $this->form);

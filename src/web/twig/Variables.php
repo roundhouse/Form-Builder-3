@@ -122,20 +122,28 @@ class Variables
         $oldPath = Craft::$app->view->getTemplateMode();
         Craft::$app->view->setTemplateMode(View::TEMPLATE_MODE_CP);
 
-        $type = StringHelper::toKebabCase(StringHelper::toLowerCase($field->displayName()));
-        $settings = $form->settings;
+        // Deprecate on next release
+        // $type = StringHelper::toKebabCase(StringHelper::toLowerCase($field->displayName()));
 
-        if (isset($settings['fields']['global']['inputTemplate']) && $settings['fields']['global']['inputTemplate'] != '') {
+        // Get field type
+        $fieldType = $this->getFieldTypeByClass(get_class($field));
+        $settings = $form->settings;
+        
+        if (isset($settings['fields']['global']['inputTemplate']) && $settings['fields']['global']['inputTemplate'] !== '') {
             $customPath = $settings['fields']['global']['inputTemplate'];
             Craft::$app->view->setTemplatesPath(Craft::$app->getPath()->getSiteTemplatesPath() . '/' . $customPath);
+            FormBuilder::log('Using custom input fields');
         } else {
             Craft::$app->view->setTemplatesPath(Craft::$app->getPath()->getVendorPath().'/roundhouse/form-builder/src/templates/_includes/forms/');
+            FormBuilder::log('Using default input fields');
         }
 
-        $fileExist = file_exists(Craft::$app->view->getTemplatesPath().'/'.$type.'/input.twig');
+        $fileExist = file_exists(Craft::$app->view->getTemplatesPath().'/'.$fieldType.'/input.twig');
 
         if (!$fileExist) {
             Craft::$app->view->setTemplatesPath(Craft::$app->getPath()->getVendorPath().'/roundhouse/form-builder/src/templates/_includes/forms/');
+        } else {
+            return FormBuilder::t(':: File type does not exist at the path: ' . $fieldType);
         }
 
         $variables = [
@@ -184,72 +192,26 @@ class Variables
             $variables['class'] = $availableClasses . ' ' . $settings['fields']['global']['inputClass'];
         }
 
-        // TODO: Add functionality for custom templates
-        // Just look at this overall
-        switch ($type) {
-            case 'plain-text':
-                $variables['type'] = 'text';
-
-                if ($field->multiline) {
-                    $input = Craft::$app->view->renderTemplate('form-builder/_includes/forms/textarea', $variables);
-                } else {
-                    $input = Craft::$app->view->renderTemplate('form-builder/_includes/forms/text', $variables);
-                }
-                break;
-            case 'email':
-                $variables['type'] = 'email';
-                $input = Craft::$app->view->renderTemplate('form-builder/_includes/forms/text', $variables);
-                break;
-            case 'url':
-                $variables['type'] = 'url';
-                $input = Craft::$app->view->renderTemplate('form-builder/_includes/forms/text', $variables);
-                break;
-            case 'number':
-                $variables['type'] = 'number';
-                $input = Craft::$app->view->renderTemplate('form-builder/_includes/forms/text', $variables);
-                break;
-            case 'color':
-                $variables['type'] = 'color';
-                $input = Craft::$app->view->renderTemplate('form-builder/_includes/forms/color', $variables);
-                break;
-            case 'date-time':
-                $variables['type'] = 'date';
-                $input = Craft::$app->view->renderTemplate('form-builder/_includes/forms/date', $variables);
-                break;
-            case 'checkboxes':
-                $variables['type'] = 'checkbox';
-                $variables['options'] = $field->options;
-                $input = Craft::$app->view->renderTemplate('form-builder/_includes/forms/checkboxGroup', $variables);
-                break;
-            case 'dropdown':
-                $variables['type'] = 'select';
-                $variables['options'] = $field->options;
-                $input = Craft::$app->view->renderTemplate('form-builder/_includes/forms/select', $variables);
-                break;
-            case 'multi-select':
-                $variables['options'] = $field->options;
-                $input = Craft::$app->view->renderTemplate('form-builder/_includes/forms/multiselect', $variables);
-                break;
-            case 'radio-buttons':
-                $variables['options'] = $field->options;
-                $input = Craft::$app->view->renderTemplate('form-builder/_includes/forms/radioGroup', $variables);
-                break;
-            case 'assets':
-                $input = Craft::$app->view->renderTemplate('form-builder/_includes/forms/file', $variables);
-                break;
-            default:
-                break;
-        }
-
+        // Get input html
+        $input = $this->getInput($fieldType, $field, $variables);
+        
         Craft::$app->view->setTemplateMode($oldPath);
 
-        if (isset($input)) {
+        if (isset($input) && $input !== '') {
             return Template::raw($input);
         } else {
-            return '';
+            FormBuilder::log('Input field is not available, $input does not exist or returns empty');
+
+            return Formbuilder::t('Input field is not available');
         }
     }
 
+    /**
+     * Get entries
+     *
+     * @param null $criteria
+     * @return EntryQuery
+     */
     public function entries($criteria = null): EntryQuery
     {
         $query = Entry::find();
@@ -384,6 +346,129 @@ class Variables
     public function isIntegrations()
     {
         return FormBuilder::$plugin->integrations->isIntegrations();
+    }
+
+    /**
+     * Get clean field name by class
+     *
+     * @param $class
+     * @return string
+     */
+    public function getFieldTypeByClass($class)
+    {
+        $type = 'Field type is not available';
+
+        switch ($class) {
+            case 'craft\\fields\\PlainText':
+                $type = 'plain-text';
+                break;
+            case 'craft\\fields\\Email':
+                $type = 'email';
+                break;
+            case 'craft\\fields\\Url':
+                $type = 'url';
+                break;
+            case 'craft\\fields\\Number':
+                $type = 'number';
+                break;
+            case 'craft\\fields\\Color':
+                $type = 'color';
+                break;
+            case 'craft\\fields\\Date':
+                $type = 'date-time';
+                break;
+            case 'craft\\fields\\Checkboxes':
+                $type = 'checkboxes';
+                break;
+            case 'craft\\fields\\Dropdown':
+                $type = 'dropdown';
+                break;
+            case 'craft\\fields\\MultiSelect':
+                $type = 'multi-select';
+                break;
+            case 'craft\\fields\\RadioButtons':
+                $type = 'radio-buttons';
+                break;
+            case 'craft\\fields\\Assets':
+                $type = 'assets';
+                break;
+            default:
+                break;
+        }
+
+        return $type;
+    }
+
+    /**
+     * Get input markup
+     *
+     * @param $type
+     * @param $field
+     * @param $variables
+     * @return string
+     * @throws \Twig_Error_Loader
+     * @throws \yii\base\Exception
+     */
+    public function getInput($type, $field, $variables)
+    {
+        $input = '';
+
+        switch ($type) {
+            case 'plain-text':
+                $variables['type'] = 'text';
+
+                if ($field->multiline) {
+                    $input = Craft::$app->view->renderTemplate('form-builder/_includes/forms/textarea', $variables);
+                } else {
+                    $input = Craft::$app->view->renderTemplate('form-builder/_includes/forms/text', $variables);
+                }
+                break;
+            case 'email':
+                $variables['type'] = 'email';
+                $input = Craft::$app->view->renderTemplate('form-builder/_includes/forms/text', $variables);
+                break;
+            case 'url':
+                $variables['type'] = 'url';
+                $input = Craft::$app->view->renderTemplate('form-builder/_includes/forms/text', $variables);
+                break;
+            case 'number':
+                $variables['type'] = 'number';
+                $input = Craft::$app->view->renderTemplate('form-builder/_includes/forms/text', $variables);
+                break;
+            case 'color':
+                $variables['type'] = 'color';
+                $input = Craft::$app->view->renderTemplate('form-builder/_includes/forms/color', $variables);
+                break;
+            case 'date-time':
+                $variables['type'] = 'date';
+                $input = Craft::$app->view->renderTemplate('form-builder/_includes/forms/date', $variables);
+                break;
+            case 'checkboxes':
+                $variables['type'] = 'checkbox';
+                $variables['options'] = $field->options;
+                $input = Craft::$app->view->renderTemplate('form-builder/_includes/forms/checkboxGroup', $variables);
+                break;
+            case 'dropdown':
+                $variables['type'] = 'select';
+                $variables['options'] = $field->options;
+                $input = Craft::$app->view->renderTemplate('form-builder/_includes/forms/select', $variables);
+                break;
+            case 'multi-select':
+                $variables['options'] = $field->options;
+                $input = Craft::$app->view->renderTemplate('form-builder/_includes/forms/multiselect', $variables);
+                break;
+            case 'radio-buttons':
+                $variables['options'] = $field->options;
+                $input = Craft::$app->view->renderTemplate('form-builder/_includes/forms/radioGroup', $variables);
+                break;
+            case 'assets':
+                $input = Craft::$app->view->renderTemplate('form-builder/_includes/forms/file', $variables);
+                break;
+            default:
+                break;
+        }
+
+        return $input;
     }
 
 }
