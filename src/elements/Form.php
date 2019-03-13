@@ -290,10 +290,9 @@ class Form extends Element
             foreach ($integrations as $key => $items) {
                 $type       = $key;
                 $isMultiple = $this->is_multi($items);
-
                 if ($isMultiple) {
                     foreach ($items as $index => $item) {
-                        $isNumber = is_integer($item['integrationId']);
+                        $isNumber = (int) $item['integrationId'];
 
                         if ($isNumber) {
                             $integration = FormBuilder::$plugin->integrations->getIntegrationById($item['integrationId']);

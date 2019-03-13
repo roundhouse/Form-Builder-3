@@ -1,5 +1,10 @@
 # Form Builder Changelog
 
+## 3.0.13 - 2019-03-13
+
+### Fixed
+- Fixed integrations breaking forms edit page
+
 ## 3.0.12 - 2019-03-12
 
 ### Improved
