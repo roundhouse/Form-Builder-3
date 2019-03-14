@@ -105,7 +105,21 @@
                         {% if settings.includeSubmission %}
                             {% for field in fields %}
                                 <p style="margin: 0 0 10px 0; padding: 10px; border:1px dashed #E9EFF4; border-radius: 5px; background: rgba(233, 239, 244, 0.2);">
-                                    <strong>{{ field.name }}:</strong> {{ attribute(entry, field.handle) }}
+
+                                    {% if attribute(entry, field.handle).iteratorClass is defined %}
+                                        <strong>{{ field.name }}:</strong>
+                                        {% spaceless %}
+                                        {% for option in attribute(entry, field.handle) %}
+                                            {% if loop.first %}
+                                                {{ option.label }},
+                                            {% else %}
+                                                {{ option.label }}
+                                            {% endif %}
+                                        {% endfor %}
+                                        {% endspaceless %}
+                                    {% else %}
+                                        <strong>{{ field.name }}:</strong> {{ attribute(entry, field.handle) }}
+                                    {% endif %}
                                 </p>
                             {% endfor %}
                         {% endif %}

@@ -77,7 +77,7 @@ class Email extends Component
         Craft::$app->view->setTemplateMode(View::TEMPLATE_MODE_CP);
         $template = Craft::$app->view->renderTemplate('form-builder/integrations/_type/email/email-template', $variables);
         Craft::$app->view->setTemplateMode($oldPath);
-
+        
         $this->_sendEmail($variables['settings'], $template);
     }
 

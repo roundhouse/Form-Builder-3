@@ -1,5 +1,10 @@
 # Form Builder Changelog
 
+## 3.0.14 - 2019-03-14
+
+### Fixed
+- Fixed issue with email notification template breaking submissions
+
 ## 3.0.13 - 2019-03-13
 
 ### Fixed
