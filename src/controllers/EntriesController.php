@@ -197,7 +197,7 @@ class EntriesController extends Controller
         $this->form     = FormBuilder::$plugin->forms->getFormRecordById($formId);
         $this->post     = $request->post();
         $this->files    = $_FILES;
-        
+
 
         $saveToDatabase = isset($this->form->settings['database']['enabled']) && $this->form->settings['database']['enabled'] == '1' ? true : false;
 
@@ -253,9 +253,9 @@ class EntriesController extends Controller
 
         // Notifications
         if ($saved) {
-            $this->_returnSuccessMessage();
+            return $this->_returnSuccessMessage();
         } else {
-            $this->_returnErrorMessage($request);
+            return $this->_returnErrorMessage($request);
         }
     }
 
@@ -417,7 +417,7 @@ class EntriesController extends Controller
         } else {
             $options = $this->form->options;
             $customRedirect = isset($options['redirect']['enabled']) && $options['redirect']['enabled'] === '1' ? true : false;
-            
+
             if ($customRedirect) {
                 $currentRoute = Craft::$app->request->url;
                 $url =  isset($options['redirect']['url']) && $options['redirect']['url'] != '' ? $options['redirect']['url'] : $currentRoute;
