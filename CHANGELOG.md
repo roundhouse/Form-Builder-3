@@ -1,8 +1,13 @@
 # Form Builder Changelog
 
+## 3.0.16 - 2019-08-06
+
+### Fixed
+- Updates allowAnonymous support
+
 ## 3.0.15 - 2019-06-14
 
-### Impoved
+### Improved
 - Add return for success and error messages when entry is saved [PR](https://github.com/roundhouse/Form-Builder-3/pull/3)
 
 ## 3.0.14 - 2019-03-14

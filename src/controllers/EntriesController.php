@@ -45,7 +45,9 @@ class EntriesController extends Controller
      *         The actions must be in 'kebab-case'
      * @access protected
      */
-    protected $allowAnonymous = ['actionIndex', 'actionGetUnreadEntries', 'actionSave'];
+    protected $allowAnonymous = [
+        'save' => self::ALLOW_ANONYMOUS_LIVE
+    ];
 
     // Public Properties
     // =========================================================================
