@@ -56,7 +56,7 @@ class Variables
         } else {
             $form = FormBuilder::$plugin->forms->getFormByHandle($variables['formHandle']);
         }
-        
+
         $options = isset($variables['options']) ? $variables['options'] : null;
         $submission = isset($variables['submission']) ? $variables['submission'] : null;
 
@@ -128,7 +128,7 @@ class Variables
         // Get field type
         $fieldType = $this->getFieldTypeByClass(get_class($field));
         $settings = $form->settings;
-        
+
         if (isset($settings['fields']['global']['inputTemplate']) && $settings['fields']['global']['inputTemplate'] !== '') {
             $customPath = $settings['fields']['global']['inputTemplate'];
             Craft::$app->view->setTemplatesPath(Craft::$app->getPath()->getSiteTemplatesPath() . '/' . $customPath);
@@ -194,7 +194,7 @@ class Variables
 
         // Get input html
         $input = $this->getInput($fieldType, $field, $variables);
-        
+
         Craft::$app->view->setTemplateMode($oldPath);
 
         if (isset($input) && $input !== '') {
@@ -412,6 +412,7 @@ class Variables
     public function getInput($type, $field, $variables)
     {
         $input = '';
+
 
         switch ($type) {
             case 'plain-text':

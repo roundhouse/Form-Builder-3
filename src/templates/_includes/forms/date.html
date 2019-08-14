@@ -5,7 +5,7 @@
 {% if field.showDate %}
     <div class="datewrapper">
             <input type="date"
-                name="{{ name }}"
+                name="{{ name }}[date]"
                 value="{{ value ? value|date('short') : '' }}"
                 placeholder=" "
                 autocomplete="off"
@@ -18,7 +18,7 @@
 {% if field.showTime %}
     <div class="timewrapper">
             <input type="time"
-               name="{{ name }}"
+               name="{{ name }}[time]"
                value="{{ value ? value|time('short') : '' }}"
                placeholder=" "
                autocomplete="off"
@@ -27,3 +27,5 @@
         <div data-icon="time"></div>
     </div>
 {% endif %}
+
+<input type="hidden" name="{{ name }}[timezone]" value="{{ craft.app.getTimeZone() }}">

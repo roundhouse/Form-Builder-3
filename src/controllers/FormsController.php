@@ -90,7 +90,7 @@ class FormsController extends Controller
         $view->registerJs('LD_Fields.fields='.Json::encode(FormBuilder::$plugin->fields->getFields(), JSON_UNESCAPED_UNICODE));
         $view->registerJs('LD_Fields.options='.Json::encode(FormBuilder::$plugin->fields->getAllFieldOptions(), JSON_UNESCAPED_UNICODE));
         $view->registerJs('LD_Fields.setup()');
-        
+
         $view->registerJs('LD_Tabs.tabs='.Json::encode(FormBuilder::$plugin->tabs->getTabs(), JSON_UNESCAPED_UNICODE));
         $view->registerJs('LD_Tabs.options='.Json::encode(FormBuilder::$plugin->tabs->getAllTabOptions(), JSON_UNESCAPED_UNICODE));
         $view->registerJs('LD_Tabs.setup()');
@@ -135,7 +135,7 @@ class FormsController extends Controller
 
         if (!FormBuilder::$plugin->forms->save($form)) {
             Craft::$app->getSession()->setError(Craft::t('form-builder', 'Couldn’t save the form.'));
-            
+
             Craft::$app->getUrlManager()->setRouteParams([
                 'form' => $form
             ]);
@@ -225,7 +225,7 @@ class FormsController extends Controller
 
             $form = new Form();
         }
-        
+
         $form->groupId = Craft::$app->getRequest()->getBodyParam('groupId');
         $form->statusId = Craft::$app->getRequest()->getBodyParam('statusId');
         $form->name = Craft::$app->getRequest()->getBodyParam('name');
@@ -245,10 +245,10 @@ class FormsController extends Controller
      * @throws NotFoundHttpException
      */
     private function _prepEditFormVariables(array &$variables)
-    {   
+    {
         if ($variables['formId']) {
             $variables['form'] = FormBuilder::$plugin->forms->getFormRecordById($variables['formId']);
-        
+
             if (!$variables['form']) {
                 throw new NotFoundHttpException('Form not found');
             }
@@ -256,7 +256,7 @@ class FormsController extends Controller
 
             if (!empty($variables['groupId'])) {
                 $variables['group'] = FormBuilder::$plugin->groups->getGroupById($variables['groupId']);
-               
+
                 if (empty($variables['group'])) {
                     throw new NotFoundHttpException('Form group not found');
                 }

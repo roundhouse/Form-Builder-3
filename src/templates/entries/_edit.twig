@@ -77,7 +77,12 @@
                                         </div>
                                     {% else %}
                                         {% if fieldClass == 'Date' %}
-                                            <span class="item-title">{{ value.date |date('M j, Y', 'UTC') }}</span>
+                                            {% if value and field.showDate %}
+                                                <span class="item-title">{{ value.date |date('M j, Y', 'UTC') }}</span>
+                                            {% endif %}
+                                            {% if value and field.showTime %}
+                                                <span class="item-title">{{ value.date |date('h:i A') }}</span>
+                                            {% endif %}
                                         {% else %}
                                             <span class="item-title">{{ value }}</span>
                                         {% endif %}

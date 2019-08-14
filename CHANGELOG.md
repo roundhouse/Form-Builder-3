@@ -1,5 +1,10 @@
 # Form Builder Changelog
 
+## 3.0.17 - 2019-08-14
+
+### Fixed
+- Date/Time should now save correctly to database and display correct format
+
 ## 3.0.16 - 2019-08-06
 
 ### Fixed

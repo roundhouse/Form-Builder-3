@@ -277,13 +277,13 @@ class Form extends Element
     public function getIntegrations()
     {
         $isArray = ArrayHelper::isTraversable($this->integrations);
-        
+
         if ($isArray) {
             $integrations = $this->integrations;
         } else {
             $integrations = Json::decode($this->integrations);
         }
-        
+
         if ($integrations) {
             $allIntegrations = [];
 

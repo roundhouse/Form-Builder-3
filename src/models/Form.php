@@ -23,6 +23,7 @@ class Form extends Model
     // Public Properties
     // =========================================================================
 
+    public $uid;
     public $id;
     public $fieldLayoutId;
     public $name;
