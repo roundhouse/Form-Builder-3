@@ -223,6 +223,7 @@ class EntriesController extends Controller
 
         // Check form errors
         if ($this->entry->hasErrors()) {
+            $this->entry->clearErrors('title');
             Craft::$app->getUrlManager()->setRouteParams([
                 'submission' => $this->entry
             ]);

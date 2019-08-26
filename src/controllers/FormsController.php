@@ -11,6 +11,7 @@
 namespace roundhouse\formbuilder\controllers;
 
 use craft\helpers\ArrayHelper;
+use craft\services\Elements;
 use roundhouse\formbuilder\FormBuilder;
 
 use Craft;
@@ -212,7 +213,7 @@ class FormsController extends Controller
         $formId = Craft::$app->getRequest()->getBodyParam('formId');
 
         if ($formId) {
-            $form = FormBuilder::$plugin->forms->getFormRecordById($formId);
+            $form = Craft::$app->getElements()->getElementById($formId);
 
             if (!$form) {
                 throw new NotFoundHttpException('Form not found');

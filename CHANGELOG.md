@@ -1,5 +1,14 @@
 # Form Builder Changelog
 
+## 3.0.18 - 2019-08-26
+
+### Fixed
+- Fixed integrity constraint violation for 'uid' when saving forms
+
+### Added
+- Entries can now be exported into CSV
+- Added the missing "required" input attribute from datetime fields
+
 ## 3.0.17 - 2019-08-14
 
 ### Fixed

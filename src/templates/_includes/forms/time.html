@@ -8,6 +8,7 @@
            value="{{ value ? value|time('short') : '' }}"
            placeholder=" "
            autocomplete="off"
+           {%- if field.required is defined and field.required %} required {% endif %}
            size="10">
 
     <div data-icon="time"></div>
