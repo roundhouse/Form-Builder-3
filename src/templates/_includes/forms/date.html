@@ -6,7 +6,7 @@
     <div class="datewrapper">
             <input type="date"
                 name="{{ name }}[date]"
-                value="{{ value ? value|date('short') : '' }}"
+                value="{{ value ? value|date('Y-m-d') : '' }}"
                 placeholder=" "
                 autocomplete="off"
                 {%- if field.required is defined and field.required %} required {% endif %}
@@ -20,7 +20,7 @@
     <div class="timewrapper">
             <input type="time"
                name="{{ name }}[time]"
-               value="{{ value ? value|time('short') : '' }}"
+               value="{{ value ? value|time('H:i:s') : '' }}"
                placeholder=" "
                autocomplete="off"
                {%- if field.required is defined and field.required %} required {% endif %}

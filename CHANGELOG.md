@@ -1,5 +1,11 @@
 # Form Builder Changelog
 
+## 3.0.19 - 2019-08-28
+
+### Fixed
+- Fixed DateTime error when sending out notification emails
+- Fixed DateTime format for html5 date inputs
+
 ## 3.0.18 - 2019-08-26
 
 ### Fixed

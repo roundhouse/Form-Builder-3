@@ -5,7 +5,7 @@
 <div class="timewrapper">
     <input type="time"
            name="{{ name }}"
-           value="{{ value ? value|time('short') : '' }}"
+           value="{{ value ? value|time('H:i:s') : '' }}"
            placeholder=" "
            autocomplete="off"
            {%- if field.required is defined and field.required %} required {% endif %}
