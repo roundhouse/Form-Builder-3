@@ -10,7 +10,7 @@
 <div class="{{ class }}"
         {%- if block('attr') is defined %} {{ block('attr') }}{% endif %}>
     <select
-        {%- if id is defined %} id="{{ id }}"{% endif %}
+        id="{{ id is defined and id != '' ? id : field.handle }}"
         {%- if toggle is defined and toggle %} class="fieldtoggle"{% endif %}
         {%- if name is defined %} name="{{ name }}"{% endif %}
         {%- if autofocus is defined and autofocus and not craft.app.request.isMobileBrowser(true) %} autofocus{% endif %}

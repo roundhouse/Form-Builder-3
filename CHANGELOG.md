@@ -1,5 +1,10 @@
 # Form Builder Changelog
 
+## 3.0.20 - 2019-10-16
+
+### Fixed
+- Fixed usage of custom templates for fields
+
 ## 3.0.19 - 2019-08-28
 
 ### Fixed

@@ -21,9 +21,14 @@ use roundhouse\formbuilder\FormBuilder;
 use roundhouse\formbuilder\elements\Form;
 use roundhouse\formbuilder\elements\Entry;
 use roundhouse\formbuilder\elements\db\EntryQuery;
+use roundhouse\formbuilder\models\Field;
 
 class Variables
 {
+    // Public Properties
+    // =========================================================================
+    public $defaultTemplateExtensions = ['html', 'twig'];
+
     // Public Methods
     // =========================================================================
 
@@ -44,9 +49,12 @@ class Variables
      * }) }}
      * ```
      *
+     * @param $formHandle
      * @param $variables
-     * @return bool|\Twig_Markup
-     * @throws \Twig_Error_Loader
+     * @return bool|\Twig\Markup|\Twig_Markup
+     * @throws \Twig\Error\LoaderError
+     * @throws \Twig\Error\RuntimeError
+     * @throws \Twig\Error\SyntaxError
      * @throws \yii\base\Exception
      */
     public function form($formHandle, $variables = null)
@@ -83,27 +91,100 @@ class Variables
             Craft::$app->view->setTemplateMode(View::TEMPLATE_MODE_CP);
 
             $fieldsets = Craft::$app->view->renderTemplate('form-builder/frontend/fieldset', [
-                'tabs'          => $tabs,
-                'form'          => $form,
-                'entry'         => $entry,
-                'options'       => $options
+                'tabs' => $tabs,
+                'form' => $form,
+                'entry' => $entry,
+                'options' => $options
             ]);
 
             $formHtml = Craft::$app->view->renderTemplate('form-builder/frontend/form', [
-                'form'      => $form,
-                'fieldset'  => $fieldsets,
-                'entry'     => $entry,
-                'options'   => $options
+                'form' => $form,
+                'fieldset' => $fieldsets,
+                'entry' => $entry,
+                'options' => $options
             ]);
 
             Craft::$app->view->setTemplateMode($oldPath);
 
             return Template::raw($formHtml);
         } else {
-            $notice = '<code>'.FormBuilder::t('There is no form with handle: '. $variables['formHandle']).'</code>';
+            $notice = '<code>' . FormBuilder::t('There is no form with handle: ' . $variables['formHandle']) . '</code>';
 
             echo $notice;
         }
+    }
+
+    /**
+     * Custom input HTML
+     *
+     * @param $value
+     * @param Entry $entry
+     * @param $field
+     * @param Form $form
+     * @return string
+     * @throws \Twig\Error\LoaderError
+     * @throws \Twig\Error\RuntimeError
+     * @throws \Twig\Error\SyntaxError
+     * @throws \yii\base\Exception
+     * @throws \yii\base\ExitException
+     */
+    public function getCustomInputHtml($value, Entry $entry, $field, Form $form): string
+    {
+        $view                   = Craft::$app->getView();
+        $formSettings           = $form->settings;
+        $fieldType              = $this->getFieldTypeByClass(get_class($field));
+        $fieldOptions           = FormBuilder::$plugin->fields->getFieldRecordByFieldId($field->id, $form->id);
+        $globalTemplatesPath    = $this->_setGlobalTemplatePath($formSettings, $fieldOptions, $fieldType, $view);
+
+        $variables = [
+            'name' => $field->handle,
+            'value' => $value,
+            'field' => $field,
+            'settings' => $field,
+            'form' => $form,
+            'options' => null,
+            'class' => '',
+            'id' => ''
+        ];
+
+        if (isset($field->placeholder)) {
+            $variables['placeholder'] = $field->placeholder;
+        }
+        if (isset($field->charLimit)) {
+            $variables['maxlength'] = $field->charLimit;
+        }
+        if (isset($field->size)) {
+            $variables['size'] = $field->size;
+        }
+        if (isset($field->initialRows)) {
+            $variables['rows'] = $field->initialRows;
+        }
+        $fieldOptions = FormBuilder::$plugin->fields->getFieldRecordByFieldId($field->id, $form->id);
+        if ($fieldOptions) {
+            $options = Json::decode($fieldOptions->options);
+            if (isset($options['class'])) {
+                $variables['class'] = $options['class'];
+            }
+            if (isset($options['id'])) {
+                $variables['id'] = $options['id'];
+            }
+        }
+        if (isset($formSettings['fields']['global']['inputClass'])) {
+            $availableClasses = $variables['class'];
+            $variables['class'] = $availableClasses . ' ' . $formSettings['fields']['global']['inputClass'];
+        }
+
+        $input = Craft::$app->view->renderTemplate($globalTemplatesPath, $variables);
+
+        $view->setTemplateMode(View::TEMPLATE_MODE_CP);
+
+        if (isset($input) && $input !== '') {
+            return Template::raw($input);
+        } else {
+            FormBuilder::log('Input field is not available, $input does not exist or returns empty');
+            return Formbuilder::t('Input field is not available');
+        }
+
     }
 
     /**
@@ -114,16 +195,15 @@ class Variables
      * @param $field
      * @param Form $form
      * @return string
-     * @throws \Twig_Error_Loader
+     * @throws \Twig\Error\LoaderError
+     * @throws \Twig\Error\RuntimeError
+     * @throws \Twig\Error\SyntaxError
      * @throws \yii\base\Exception
      */
     public function getInputHtml($value, Entry $entry, $field, Form $form): string
     {
         $oldPath = Craft::$app->view->getTemplateMode();
         Craft::$app->view->setTemplateMode(View::TEMPLATE_MODE_CP);
-
-        // Deprecate on next release
-        // $type = StringHelper::toKebabCase(StringHelper::toLowerCase($field->displayName()));
 
         // Get field type
         $fieldType = $this->getFieldTypeByClass(get_class($field));
@@ -134,59 +214,45 @@ class Variables
             Craft::$app->view->setTemplatesPath(Craft::$app->getPath()->getSiteTemplatesPath() . '/' . $customPath);
             FormBuilder::log('Using custom input fields');
         } else {
-            Craft::$app->view->setTemplatesPath(Craft::$app->getPath()->getVendorPath().'/roundhouse/form-builder/src/templates/_includes/forms/');
+            Craft::$app->view->setTemplatesPath(Craft::$app->getPath()->getVendorPath() . '/roundhouse/form-builder/src/templates/_includes/forms/');
             FormBuilder::log('Using default input fields');
         }
 
-        $fileExist = file_exists(Craft::$app->view->getTemplatesPath().'/'.$fieldType.'/input.twig');
-
-        if (!$fileExist) {
-            Craft::$app->view->setTemplatesPath(Craft::$app->getPath()->getVendorPath().'/roundhouse/form-builder/src/templates/_includes/forms/');
-        } else {
-            return FormBuilder::t(':: File type does not exist at the path: ' . $fieldType);
-        }
+        Craft::$app->view->setTemplatesPath(Craft::$app->getPath()->getVendorPath() . '/roundhouse/form-builder/src/templates/_includes/forms/');
 
         $variables = [
-            'name'          => $field->handle,
-            'value'         => $value,
-            'field'         => $field,
-            'settings'      => $field,
-            'form'          => $form,
-            'options'       => null,
-            'class'         => '',
-            'id'            => ''
+            'name' => $field->handle,
+            'value' => $value,
+            'field' => $field,
+            'settings' => $field,
+            'form' => $form,
+            'options' => null,
+            'class' => '',
+            'id' => ''
         ];
 
         if (isset($field->placeholder)) {
             $variables['placeholder'] = $field->placeholder;
         }
-
         if (isset($field->charLimit)) {
             $variables['maxlength'] = $field->charLimit;
         }
-
         if (isset($field->size)) {
             $variables['size'] = $field->size;
         }
-
         if (isset($field->initialRows)) {
             $variables['rows'] = $field->initialRows;
         }
-
         $fieldOptions = FormBuilder::$plugin->fields->getFieldRecordByFieldId($field->id, $form->id);
-
         if ($fieldOptions) {
             $options = Json::decode($fieldOptions->options);
-
             if (isset($options['class'])) {
                 $variables['class'] = $options['class'];
             }
-
             if (isset($options['id'])) {
                 $variables['id'] = $options['id'];
             }
         }
-
         if (isset($settings['fields']['global']['inputClass'])) {
             $availableClasses = $variables['class'];
             $variables['class'] = $availableClasses . ' ' . $settings['fields']['global']['inputClass'];
@@ -194,17 +260,110 @@ class Variables
 
         // Get input html
         $input = $this->getInput($fieldType, $field, $variables);
-
         Craft::$app->view->setTemplateMode($oldPath);
 
         if (isset($input) && $input !== '') {
             return Template::raw($input);
         } else {
             FormBuilder::log('Input field is not available, $input does not exist or returns empty');
-
             return Formbuilder::t('Input field is not available');
         }
     }
+
+//    /**
+//     * Get input HTML for frontend fields
+//     *
+//     * @param $value
+//     * @param Entry $entry
+//     * @param $field
+//     * @param Form $form
+//     * @return string
+//     * @throws \Twig_Error_Loader
+//     * @throws \yii\base\Exception
+//     */
+//    public function getInputHtml($value, Entry $entry, $field, Form $form): string
+//    {
+//        $view = Craft::$app->getView();
+//
+//        // Field Settings & Options
+//        $fieldOptions   = FormBuilder::$plugin->fields->getFieldRecordByFieldId($field->id, $form->id);
+//        $fieldType      = $this->getFieldTypeByClass(get_class($field), $field);
+//
+//        // Global Settings
+//        $formSettings               = $form->settings;
+////        $globalTemplateOverridePath = $this->_setGlobalTemplatePath($formSettings, $fieldOptions, $fieldType, $view);
+//
+//        $variables = [
+//            'name'          => $field->handle,
+//            'value'         => $value,
+//            'type'          => $fieldType,
+//            'field'         => $field,
+//            'settings'      => $field,
+//            'form'          => $form,
+//            'options'       => $field->options ?? null,
+//            'class'         => '',
+//            'id'            => ''
+//        ];
+//
+//        if ($fieldOptions) {
+//            $options = Json::decode($fieldOptions->options);
+//
+//            if (isset($options['class'])) {
+//                $variables['class'] = $options['class'];
+//            }
+//
+//            if (isset($options['id'])) {
+//                $variables['id'] = $options['id'];
+//            }
+//        }
+//
+//        if (isset($formSettings['fields']['global']['inputClass'])) {
+//            $availableClasses = $variables['class'];
+//            $variables['class'] = $availableClasses . ' ' . $formSettings['fields']['global']['inputClass'];
+//        }
+//
+//        if (isset($field->placeholder)) {
+//            $variables['placeholder'] = $field->placeholder;
+//        }
+//
+//        if (isset($field->charLimit)) {
+//            $variables['maxlength'] = $field->charLimit;
+//        }
+//
+//        if (isset($field->size)) {
+//            $variables['size'] = $field->size;
+//        }
+//
+//        if (isset($field->initialRows)) {
+//            $variables['rows'] = $field->initialRows;
+//        }
+//
+//        $customPath = 'formbuilder/text';
+//        $view->setTemplateMode(View::TEMPLATE_MODE_SITE);
+//        $input = Craft::$app->view->renderTemplate($customPath, $variables);
+//
+////        $input = Craft::$app->view->renderTemplate('form-builder/_includes/forms/text', $variables);
+////        $input = Craft::$app->view->renderTemplate('formbuilder/custom/text.twig', $variables);
+//
+//
+//        // Template Resolver
+////        $input = $this->getInput($globalTemplateOverridePath, $fieldType, $field, $variables);
+//
+//
+////        if ($globalTemplateOverridePath) {
+////            $input = $this->getInput($fieldType, $globalTemplateOverridePath, $field, $variables);
+////        } else {
+////            $input = $this->getInput($fieldType, '', $field, $variables);
+////        }
+//
+//        if (isset($input) && $input !== '') {
+//            return Template::raw($input);
+//        } else {
+//            FormBuilder::log('Input field is not available, $input does not exist or returns empty');
+//
+//            return Formbuilder::t('Input field is not available');
+//        }
+//    }
 
     /**
      * Get entries
@@ -320,8 +479,37 @@ class Variables
      * @param $tabId
      * @return mixed
      */
-    public function getTabSettings($tabId) {
+    public function getTabSettings($tabId)
+    {
         return FormBuilder::$plugin->tabs->getTabSettings($tabId);
+    }
+
+    public function getFieldOptions($fieldId, $formId)
+    {
+        $fieldOptions = FormBuilder::$plugin->fields->getFieldRecordByFieldId($fieldId, $formId);
+
+        if ($fieldOptions) {
+            $options = Json::decode($fieldOptions->options);
+
+            return $options;
+        }
+
+        return $fieldOptions;
+    }
+
+    public function checkInputTemplate($fieldId, $formId)
+    {
+        $fieldOptions = FormBuilder::$plugin->fields->getFieldRecordByFieldId($fieldId, $formId);
+
+        if ($fieldOptions) {
+            $options = Json::decode($fieldOptions->options);
+
+            if (isset($options['template']) && $options['template'] !== '') {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /** Get allowed text fields
@@ -352,15 +540,15 @@ class Variables
      * Get clean field name by class
      *
      * @param $class
+     * @param $field
      * @return string
      */
     public function getFieldTypeByClass($class)
     {
         $type = 'Field type is not available';
-
         switch ($class) {
             case 'craft\\fields\\PlainText':
-                $type = 'plain-text';
+                $type = 'text';
                 break;
             case 'craft\\fields\\Email':
                 $type = 'email';
@@ -395,29 +583,27 @@ class Variables
             default:
                 break;
         }
-
         return $type;
     }
 
     /**
      * Get input markup
      *
+     * @param $path
      * @param $type
      * @param $field
      * @param $variables
      * @return string
-     * @throws \Twig_Error_Loader
-     * @throws \yii\base\Exception
+     * @throws \Twig\Error\LoaderError
+     * @throws \Twig\Error\RuntimeError
+     * @throws \Twig\Error\SyntaxError
      */
     public function getInput($type, $field, $variables)
     {
         $input = '';
-
-
         switch ($type) {
-            case 'plain-text':
+            case 'text':
                 $variables['type'] = 'text';
-
                 if ($field->multiline) {
                     $input = Craft::$app->view->renderTemplate('form-builder/_includes/forms/textarea', $variables);
                 } else {
@@ -468,8 +654,78 @@ class Variables
             default:
                 break;
         }
-
         return $input;
+    }
+
+    // Private Methods
+    // =========================================================================
+    /**
+     * Function to get custom templates path
+     *
+     * @param string $path
+     * @param string $filename
+     * @return string
+     * @throws \yii\base\ExitException
+     */
+    private function _resolveTemplate(string $path, string $filename)
+    {
+        foreach ($this->defaultTemplateExtensions as $extension) {
+            $testPath = $path . DIRECTORY_SEPARATOR . $filename . '.' . $extension;
+
+            if (is_file($testPath)) {
+                return $filename . '.' . $extension;
+            }
+        }
+    }
+
+    /**
+     * Check if form has global input templates override
+     *
+     * @param $formSettings
+     * @param $fieldOptions
+     * @param $fieldType
+     * @param $view
+     * @return string
+     * @throws \yii\base\ExitException
+     */
+    private function _setGlobalTemplatePath($formSettings, $fieldOptions, $fieldType, $view)
+    {
+        if ($fieldOptions) {
+            $fieldOptions = Json::decode($fieldOptions->options);
+        }
+        // Check for custom input template path
+        $inputTemplatePath = null;
+        if ($fieldOptions && isset($fieldOptions['template']) && $fieldOptions['template'] !== '') {
+            $view->setTemplateMode(View::TEMPLATE_MODE_SITE);
+            $inputDirectoryName = $fieldOptions['template'];
+            $templatePath = $view->getTemplatesPath() . DIRECTORY_SEPARATOR . $inputDirectoryName;
+            $fileExist = $this->_resolveTemplate($templatePath, $fieldType);
+
+            if ($fileExist) {
+                return $inputDirectoryName . DIRECTORY_SEPARATOR . $fileExist;
+            }
+        }
+
+        // Check for global input template path
+        if (isset($formSettings['fields']['global']['inputTemplate']) && $formSettings['fields']['global']['inputTemplate'] !== '') {
+            $view->setTemplateMode(View::TEMPLATE_MODE_SITE);
+
+            $inputDirectoryName = $formSettings['fields']['global']['inputTemplate'];
+            $templatePath = $view->getTemplatesPath() . DIRECTORY_SEPARATOR . $inputDirectoryName;
+            $fileExist = $this->_resolveTemplate($templatePath, $fieldType);
+
+            if ($fileExist) {
+                return $inputDirectoryName . DIRECTORY_SEPARATOR . $fileExist;
+            } else {
+                $view->setTemplateMode(View::TEMPLATE_MODE_CP);
+                FormBuilder::log('Global templates are enabled but this file not found in directory: ' . $fieldType);
+                return false;
+            }
+        } else {
+            $view->setTemplateMode(View::TEMPLATE_MODE_CP);
+
+            return false;
+        }
     }
 
 }

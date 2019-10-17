@@ -8,14 +8,25 @@
         {%- set fields = tab.getFields() %}
         {% for field in fields -%}
             {%- if field -%}
-                {% include "form-builder/frontend/field" with {
-                    form:       form,
-                    field:      field,
-                    required:   field.required,
-                    element:    entry,
-                    options:    options,
-                    static:     null,
-                } only %}
+                {% set hasCustomInput = craft.fb.checkInputTemplate(field.id, form.id) %}
+
+                {% if hasCustomInput %}
+                    {# Custom Template #}
+                    {%- set value  = (entry ? entry.getFieldValue(field.handle) : field.normalizeValue(null)) %}
+                    {%- set input = craft.fb.getCustomInputHtml(value, entry, field, form) %}
+
+                    {{ input |raw }}
+
+                {% else %}
+                    {% include "form-builder/frontend/field" with {
+                        form:       form,
+                        field:      field,
+                        required:   field.required,
+                        element:    entry,
+                        options:    options,
+                        static:     null,
+                    } only %}
+                {% endif %}
             {%- endif %}
 
         {% endfor %}

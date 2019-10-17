@@ -8,7 +8,7 @@
 {%- set cols = (cols is defined ? cols : 50) -%}
 
 <textarea class="{{ class }} {%- if field.required is defined and field.required %} required {% endif %}" rows="{{ rows }}" cols="{{ cols }}"
-    {%- if id is defined %} id="{{ id }}"{% endif %}
+    id="{{ id is defined and id != '' ? id : field.handle }}"
     {%- if name is defined %} name="{{ name }}"{% endif %}
     {%- if maxlength is defined and maxlength %} maxlength="{{ maxlength }}"{% endif %}
     {%- if showCharsLeft is defined and showCharsLeft %} data-show-chars-left{% endif %}

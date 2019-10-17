@@ -14,7 +14,7 @@
 <div class="{{ class }}"
         {%- if block('attr') is defined %} {{ block('attr') }}{% endif %}>
     <select multiple
-            {%- if id is defined %} id="{{ id }}"{% endif %}
+            id="{{ id is defined and id != '' ? id : field.handle }}"
             {%- if name is defined and name %} name="{{ name }}[]"{% endif %}
             {%- if autofocus is defined and autofocus and not craft.app.request.isMobileBrowser(true) %} autofocus{% endif %}
             {%- if disabled is defined and disabled %} disabled{% endif %}

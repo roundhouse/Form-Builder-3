@@ -1,5 +1,4 @@
 {%- set type = (type is defined ? type : 'text') %}
-
 {%- set class = [
     'text',
     (class is defined and class ? class : null),
@@ -15,7 +14,7 @@
 {%- if type == 'password' %}<div class="passwordwrapper">{% endif -%}
 <input class="{{ class }} {%- if field.required is defined and field.required %} required {% endif %}" type="{{ type }}"
     {%- if style is defined %} style="{{ style }}"{% endif %}
-    {%- if id is defined %} id="{{ id }}"{% endif %}
+    id="{{ id is defined and id != '' ? id : field.handle }}"
     {%- if size is defined %} size="{{ size }}"{% endif %}
     {%- if name is defined %} name="{{ name }}"{% endif %}
     {%- if value is defined %} value="{{ value }}"{% endif %}

@@ -1,6 +1,6 @@
 <input type="file"
        {%- if field.limit !="1" %}} multiple {% endif %}
-    {%- if id is defined %} id="{{ id }}"{% endif %}
+       id="{{ id is defined and id != '' ? id : field.handle }}"
     {%- if class is defined %} class="{{ class }}"{% endif %}
     {%- if name is defined %} name="{{ name }}[]"{% endif %}
     {%- if autofocus is defined and autofocus and not craft.app.request.isMobileBrowser(true) %} autofocus{% endif %}
