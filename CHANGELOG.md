@@ -1,5 +1,10 @@
 # Form Builder Changelog
 
+## 3.1.2 - 2020-07-07
+
+### Added
+- Email integration can now send a copy to sender
+
 ## 3.1.1 - 2020-07-07
 
 ### Added

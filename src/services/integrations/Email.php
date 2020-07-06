@@ -13,6 +13,7 @@ namespace roundhouse\formbuilder\services\integrations;
 use Craft;
 use craft\base\Component;
 use craft\helpers\App;
+use craft\helpers\ArrayHelper;
 use craft\web\View;
 use craft\helpers\Json;
 use craft\mail\Message;
@@ -40,12 +41,14 @@ class Email extends Component
 
         if ($items) {
             foreach ($items as $item) {
-
                 $variables = [
                     'id' => $item['integration']->id,
                     'enabled' => $item['integration']->status,
                     'settings' => [
                         'includeSubmission' => $item['includeSubmission'],
+                        'sendCopyToSender' => $item['sendCopyToSender'],
+                        'senderEmail' => Craft::$app->getView()->renderObjectTemplate('{' . $item['senderEmail'] . '}', $entry),
+                        'senderSubject' => Craft::$app->getView()->renderObjectTemplate($item['senderSubject'], $entry),
                         'toEmail' => Craft::$app->getView()->renderObjectTemplate($item['toEmail'], $entry),
                         'fromEmail' => Craft::$app->getView()->renderObjectTemplate($item['fromEmail'], $entry),
                         'fromName' => Craft::$app->getView()->renderObjectTemplate($item['fromName'], $entry),
@@ -54,7 +57,7 @@ class Email extends Component
                     'entry' => $entry,
                     'fields' => $fields
                 ];
-                
+
                 $result = $this->_preparePayload($variables);
             }
         }
@@ -79,7 +82,7 @@ class Email extends Component
         Craft::$app->view->setTemplateMode(View::TEMPLATE_MODE_CP);
         $template = Craft::$app->view->renderTemplate('form-builder/integrations/_type/email/email-template', $variables);
         Craft::$app->view->setTemplateMode($oldPath);
-        
+
         $this->_sendEmail($variables['settings'], $template);
     }
 
@@ -93,19 +96,43 @@ class Email extends Component
      */
     private function _sendEmail($settings, $template)
     {
+        $recipientMessage = false;
+
+        if (isset($settings['sendCopyToSender']) && $settings['sendCopyToSender'] == '1') {
+            if (isset($settings['senderEmail']) && $settings['senderEmail'] != '') {
+                $messageRecipient = new Message();
+                $messageRecipient->setFrom($this->_getFrom($settings));
+                $messageRecipient->setTo($this->_getToRecipient($settings));
+                $messageRecipient->setSubject($settings['senderSubject']);
+                $messageRecipient->setHtmlBody($template);
+
+                $recipientMessage = $messageRecipient;
+            }
+        }
+        
         $message = new Message();
         $message->setFrom($this->_getFrom($settings));
         $message->setTo($this->_getTo($settings));
         $message->setSubject($settings['subject']);
         $message->setHtmlBody($template);
+        
+        $messages = [$message];
 
-        return Craft::$app->mailer->send($message);
+        if ($recipientMessage) {
+            ArrayHelper::append($messages, $recipientMessage);
+        }
+
+        foreach ($messages as $message) {
+            Craft::$app->mailer->send($message);
+        }
+
+        return true;
     }
 
 
     /**
      * Get from email and name
-     * 
+     *
      * @param $settings
      * @return array
      */
@@ -142,6 +169,17 @@ class Email extends Component
             $settings['toEmail'] => ''
         ];
     }
-    
-    
+
+    /**
+     * Get to recipient email
+     *
+     * @param $settings
+     * @return array
+     */
+    private function _getToRecipient($settings)
+    {
+        return [
+            $settings['senderEmail'] => ''
+        ];
+    }
 }

@@ -39,6 +39,64 @@
                 on: enableIncludeSubmission
             }) }}
 
+            {% set sendCopyToSender = 'integrations[email]['~ index ~'][sendCopyToSender]' %}
+            {% set enableSendCopyToSender = attribute(form.integrations.email, index).sendCopyToSender is defined and attribute(form.integrations.email, index).sendCopyToSender ? 1 : 0 %}
+            {{ forms.lightswitchField({
+                label: "Send Copy To Sender"|t('form-builder'),
+                instructions: "Should we send a copy of this submission to sender?"|t('form-builder'),
+                id: "include-send-to-sender",
+                name: sendCopyToSender,
+                on: enableSendCopyToSender
+            }) }}
+
+            {% set availableFields = form.fieldLayoutId is defined and form.fieldLayoutId ? craft.app.getFields.getLayoutById(form.fieldLayoutId).getFields() : null %}
+            {% set fieldsOption = [] %}
+            {% set fieldsOption = [{'label': 'Select Field', 'value': ''}] %}
+            {% for field in availableFields %}
+                {% set fieldsOption = fieldsOption|merge([{ 'label': field.name, 'value': field.handle }]) %}
+            {% endfor %}
+            {{ forms.selectField({
+                label: "Sender Email Field"|t('form-builder'),
+                instructions: "Please map an email field from dropdown."|t('form-builder'),
+                value: attribute(form.integrations.email, index).senderEmail is defined and attribute(form.integrations.email, index).senderEmail ? attribute(form.integrations.email, index).senderEmail : '',
+                name: 'integrations[email]['~ index ~'][senderEmail]',
+                options: fieldsOption,
+                id: 'include-send-to-sender-email'
+            }) }}
+
+            {{ forms.textField({
+                label: "Sender Subject"|t('form-builder'),
+                value: attribute(form.integrations.email, index).senderSubject is defined and attribute(form.integrations.email, index).senderSubject != '' ? attribute(form.integrations.email, index).senderSubject : 'Copy of your email from ' ~ currentSite.name,
+                id: 'sender-subject-for-email',
+                name: 'integrations[email]['~ index ~'][senderSubject]',
+                size: 80,
+                instructions: "Enter subject line for sender."|t('form-builder')
+            }) }}
+
+            {% js %}
+                setTimeout(function() {
+                    var checked = $('#include-send-to-sender').attr('aria-checked')
+                    if (checked == 'true') {
+                        $('#include-send-to-sender-email-field').slideDown(100);
+                        $('#sender-subject-for-email-field').slideDown(100);
+                    } else {
+                        $('#include-send-to-sender-email-field').slideUp(40);
+                        $('#sender-subject-for-email-field').slideUp(100);
+                    }
+                }, 1000);
+
+                $('#include-send-to-sender').on('click', function(e) {
+                    var checked = $(this).attr('aria-checked')
+                    if (checked == 'true') {
+                        $('#include-send-to-sender-email-field').slideDown(100);
+                        $('#sender-subject-for-email-field').slideDown(100);
+                    } else {
+                        $('#include-send-to-sender-email-field').slideUp(40);
+                        $('#sender-subject-for-email-field').slideUp(100);
+                    }
+                });
+            {% endjs %}
+
             {% set toEmailName = 'integrations[email]['~ index ~'][toEmail]' %}
             {{ forms.textField({
                 type: 'email',
@@ -78,7 +136,7 @@
                 id: 'subject-for-email',
                 name: subjectName,
                 size: 80,
-                instructions: "Enter custom subject line or select a field that will be used for the custom subject line."|t('form-builder')
+                instructions: "Enter custom subject line."|t('form-builder')
             }) }}
         </div>
     </div>
