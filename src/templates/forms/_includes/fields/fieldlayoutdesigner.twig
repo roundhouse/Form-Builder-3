@@ -90,11 +90,11 @@
     <h2 class="first">{{ "Design your field layout"|t('app') }}</h2>
 
 
-{#    {% if customizableTabs %}#}
-{#        <div class="newtabbtn-container buttons">#}
-{#            <div class="btn btns btn-info"><i class="fas fa-plus"></i><span class="txt">{{ "Add Fieldset"|t('form-builder') }}</span></div>#}
-{#        </div>#}
-{#    {% endif %}#}
+    {#    {% if customizableTabs %}#}
+    {#        <div class="newtabbtn-container buttons">#}
+    {#            <div class="btn btns btn-info"><i class="fas fa-plus"></i><span class="txt">{{ "Add Fieldset"|t('form-builder') }}</span></div>#}
+    {#        </div>#}
+    {#    {% endif %}#}
 
     <div class="fld-tabs">
         {% if fieldLayout %}
@@ -167,7 +167,11 @@
                             {% elseif fieldType == 'Dropdown' %}
                                 <i class="far fa-caret-square-down"></i>
                             {% else %}
-                                <i class="far fa-ban"></i>
+                                {% if fieldType not in allowed %}
+                                    <i class="far fa-ban"></i>
+                                {% else %}
+                                    <i class="far fa-i-cursor"></i>
+                                {% endif %}
                             {% endif %}
                             </span>
                             <span>{{ field.name|t('site') }}</span>
@@ -183,32 +187,32 @@
 
 {% js %}
     var initFLD = function() {
-        new Craft.FieldLayoutDesigner('#{{ "fieldlayoutform"|namespaceInputId }}', {
-            customizableTabs: {{ customizableTabs ? 'true' : 'false' }},
-            fieldInputName: '{{ "fieldLayout[__TAB_NAME__][]"|namespaceInputName|e("js") }}',
-            requiredFieldInputName: '{{ "requiredFields[]"|namespaceInputName|e("js") }}'
-        });
+    new Craft.FieldLayoutDesigner('#{{ "fieldlayoutform"|namespaceInputId }}', {
+    customizableTabs: {{ customizableTabs ? 'true' : 'false' }},
+    fieldInputName: '{{ "fieldLayout[__TAB_NAME__][]"|namespaceInputName|e("js") }}',
+    requiredFieldInputName: '{{ "requiredFields[]"|namespaceInputName|e("js") }}'
+    });
     };
 
-{#    {% if tab is defined %}#}
+    {#    {% if tab is defined %}#}
 
-{#        var $fldTab = $('#{{ ("tab-"~tab)|namespaceInputId }}');#}
+    {#        var $fldTab = $('#{{ ("tab-"~tab)|namespaceInputId }}');#}
 
-{#        if ($fldTab.hasClass('sel'))#}
-{#        {#}
-{#        initFLD();#}
-{#        }#}
-{#        else#}
-{#        {#}
-{#        $fldTab.on('activate.fld', function() {#}
-{#        initFLD();#}
-{#        $fldTab.off('activate.fld');#}
-{#        });#}
-{#        }#}
+    {#        if ($fldTab.hasClass('sel'))#}
+    {#        {#}
+    {#        initFLD();#}
+    {#        }#}
+    {#        else#}
+    {#        {#}
+    {#        $fldTab.on('activate.fld', function() {#}
+    {#        initFLD();#}
+    {#        $fldTab.off('activate.fld');#}
+    {#        });#}
+    {#        }#}
 
-{#    {% else %}#}
+    {#    {% else %}#}
 
-{#        initFLD();#}
+    {#        initFLD();#}
 
-{#    {% endif %}#}
+    {#    {% endif %}#}
 {% endjs %}

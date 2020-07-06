@@ -25,10 +25,13 @@ use craft\events\RegisterElementActionsEvent;
 use craft\events\FieldLayoutEvent;
 use craft\helpers\Json;
 
+use roundhouse\formbuilder\elements\Form;
 use roundhouse\formbuilder\elements\Form as FormElement;
 use roundhouse\formbuilder\elements\Entry as EntryElement;
 use roundhouse\formbuilder\elements\actions\SetStatus;
 use roundhouse\formbuilder\elements\actions\Delete;
+use roundhouse\formbuilder\events\AllowedFieldTypesEvent;
+use roundhouse\formbuilder\fields\Forms;
 use roundhouse\formbuilder\services\Forms as FormsService;
 use roundhouse\formbuilder\services\Migrations as MigrationsService;
 use roundhouse\formbuilder\web\twig\Variables;
@@ -81,6 +84,7 @@ class FormBuilder extends Plugin
         $this->_registerPermissions();
         $this->_registerVariables();
         $this->_registerCustomEvents();
+        $this->_registerFields();
     }
 
     public function getPluginName()
@@ -331,6 +335,16 @@ class FormBuilder extends Plugin
                 $event->permissions[FormBuilder::t('Form Builder')] = $permissions;
             }
         );
+    }
+
+    /**
+     * Register fields
+     */
+    private function _registerFields()
+    {
+        Event::on(Fields::class, Fields::EVENT_REGISTER_FIELD_TYPES, function (RegisterComponentTypesEvent $event) {
+            $event->types[] = Forms::class;
+        });
     }
 
     /**

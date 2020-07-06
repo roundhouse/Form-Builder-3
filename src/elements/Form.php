@@ -21,6 +21,7 @@ use craft\validators\HandleValidator;
 use craft\validators\UniqueValidator;
 use craft\behaviors\FieldLayoutBehavior;
 
+use roundhouse\formbuilder\events\AllowedFieldTypesEvent;
 use roundhouse\formbuilder\FormBuilder;
 use roundhouse\formbuilder\elements\db\FormQuery;
 use roundhouse\formbuilder\records\Form as FormRecord;
@@ -28,7 +29,7 @@ use yii\base\Exception;
 
 class Form extends Element
 {
-    // TODO: figure out why element status doesn't update
+    const EVENT_ALLOWED_FIELD_TYPES = 'allowedFieldTypes';
 
     // Constants
     // =========================================================================
@@ -178,6 +179,11 @@ class Form extends Element
         return $this->group;
     }
 
+    /**
+     * Return allowed filed types
+     *
+     * @return array
+     */
     public function getAllowedFieldTypes()
     {
         $allowed = [
@@ -194,7 +200,13 @@ class Form extends Element
             'Color'
         ];
 
-        return $allowed;
+        // Give plugins a chance to modify these, or add new ones
+        $event = new AllowedFieldTypesEvent([
+            'allowedFieldTypes' => $allowed,
+        ]);
+        $this->trigger(self::EVENT_ALLOWED_FIELD_TYPES, $event);
+
+        return $event->allowedFieldTypes;
     }
 
     /**

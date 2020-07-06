@@ -1,5 +1,11 @@
 # Form Builder Changelog
 
+## 3.1.1 - 2020-07-07
+
+### Added
+- Added event for plugins to modify or add new allowed field types
+- Added field type Forms, forms can now be added to entries
+
 ## 3.1.0 - 2020-07-06
 
 ### Improved
