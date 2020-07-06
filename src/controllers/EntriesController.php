@@ -10,6 +10,8 @@
 
 namespace roundhouse\formbuilder\controllers;
 
+use craft\errors\ElementNotFoundException;
+use craft\errors\MissingComponentException;
 use roundhouse\formbuilder\FormBuilder;
 
 use Craft;
@@ -18,6 +20,12 @@ use craft\web\Controller;
 use craft\helpers\DateTimeHelper;
 use craft\helpers\StringHelper;
 use roundhouse\formbuilder\records\Note;
+use Throwable;
+use Twig_Error_Loader;
+use yii\base\Exception;
+use yii\base\ExitException;
+use yii\base\InvalidConfigException;
+use yii\web\BadRequestHttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\ForbiddenHttpException;
 use yii\web\Response;
@@ -64,8 +72,8 @@ class EntriesController extends Controller
      * Entries index page
      *
      * @return Response
-     * @throws \yii\base\InvalidConfigException
-     * @throws \yii\web\ForbiddenHttpException
+     * @throws InvalidConfigException
+     * @throws ForbiddenHttpException
      */
     public function actionIndex()
     {
@@ -83,9 +91,9 @@ class EntriesController extends Controller
      *
      * @param int|null $entryId
      * @return Response
-     * @throws \yii\base\InvalidConfigException
+     * @throws InvalidConfigException
      * @throws \yii\db\Exception
-     * @throws \yii\web\ForbiddenHttpException
+     * @throws ForbiddenHttpException
      */
     public function actionEdit(int $entryId = null): Response
     {
@@ -117,8 +125,8 @@ class EntriesController extends Controller
      * Get all unread entries
      *
      * @return Response
-     * @throws \Twig_Error_Loader
-     * @throws \yii\base\Exception
+     * @throws Twig_Error_Loader
+     * @throws Exception
      */
     public function actionGetUnreadEntries()
     {
@@ -148,9 +156,9 @@ class EntriesController extends Controller
      * Get all unread entries by form ID
      *
      * @return Response
-     * @throws \Twig_Error_Loader
-     * @throws \yii\base\Exception
-     * @throws \yii\web\BadRequestHttpException
+     * @throws Twig_Error_Loader
+     * @throws Exception
+     * @throws BadRequestHttpException
      */
     public function actionGetUnreadEntriesBySource()
     {
@@ -185,10 +193,10 @@ class EntriesController extends Controller
      * Save entry
      *
      * @return null
-     * @throws \Throwable
-     * @throws \craft\errors\ElementNotFoundException
-     * @throws \yii\base\Exception
-     * @throws \yii\web\BadRequestHttpException
+     * @throws Throwable
+     * @throws ElementNotFoundException
+     * @throws Exception
+     * @throws BadRequestHttpException
      */
     public function actionSave()
     {
@@ -203,23 +211,12 @@ class EntriesController extends Controller
         $saveToDatabase = isset($this->form->settings['database']['enabled']) && $this->form->settings['database']['enabled'] == '1' ? true : false;
 
         // Setup entry model
-        $this->entry = $this->_getEntryModel($request);
+        $this->entry = new Entry();
         $this->_populateEntryModel($this->entry, $request);
 
         // Spam Protection
-        $this->_spamProtection($this->entry, $request);
+        $this->_spamProtection($request);
 
-        $this->entry->setScenario(Element::SCENARIO_LIVE);
-        $this->entry->validate();
-        
-Craft::dd($this->entry->hasErrors());
-        // Fire a 'beforeSubmitEntry' event
-        $event = new EntryEvent([
-            'entry' => $this->entry,
-            'form' => $this->form
-        ]);
-
-        $this->trigger(self::EVENT_BEFORE_SUBMIT_ENTRY, $event);
         // Check form errors
         if ($this->entry->hasErrors()) {
             $this->entry->clearErrors('title');
@@ -229,6 +226,17 @@ Craft::dd($this->entry->hasErrors());
 
             return null;
         }
+
+        $this->entry->setScenario(Element::SCENARIO_LIVE);
+        $this->entry->validate();
+
+        // Fire a 'beforeSubmitEntry' event
+        $event = new EntryEvent([
+            'entry' => $this->entry,
+            'form' => $this->form
+        ]);
+
+        $this->trigger(self::EVENT_BEFORE_SUBMIT_ENTRY, $event);
 
         if ($saveToDatabase && $event->isValid) {
             if (Craft::$app->getElements()->saveElement($this->entry)) {
@@ -266,9 +274,9 @@ Craft::dd($this->entry->hasErrors());
      *
      * @return null|Response
      * @throws NotFoundHttpException
-     * @throws \Throwable
-     * @throws \craft\errors\MissingComponentException
-     * @throws \yii\web\BadRequestHttpException
+     * @throws Throwable
+     * @throws MissingComponentException
+     * @throws BadRequestHttpException
      */
     public function actionDelete()
     {
@@ -319,24 +327,12 @@ Craft::dd($this->entry->hasErrors());
     // =========================================================================
 
     /**
-     * Create an entry model
-     *
-     * @return Entry
-     */
-    private function _getEntryModel(): Entry
-    {
-        $entry = new Entry();
-
-        return $entry;
-    }
-
-    /**
      * Populate entry model from post
      *
      * @param Entry $entry
      * @param $request
-     * @throws \Throwable
-     * @throws \yii\base\Exception
+     * @throws Throwable
+     * @throws Exception
      */
     private function _populateEntryModel(Entry $entry, $request)
     {
@@ -358,16 +354,16 @@ Craft::dd($this->entry->hasErrors());
     /**
      * Validate spam protection
      *
-     * @param Entry $entry
      * @param $request
+     * @throws ExitException
      */
-    private function _spamProtection(Entry $entry, $request)
+    private function _spamProtection($request)
     {
         // Honeypot
         if (isset($this->form->spam['honeypot']['enabled']) && $this->form->spam['honeypot']['enabled'] == '1') {
             $honeypotField = $request->getRequiredBodyParam('email-address-new-one');
             if ($honeypotField != '') {
-                $entry->addError('honeypot', FormBuilder::t('Failed honeypot validation!'));
+                $this->entry->addError('honeypot', FormBuilder::t('Failed honeypot validation!'));
             }
         }
 
@@ -378,7 +374,7 @@ Craft::dd($this->entry->hasErrors());
             $allowedTime = (int)$this->form->spam['timed']['number'];
 
             if ($submissionDuration < $allowedTime) {
-                $entry->addError('timed', FormBuilder::t('You submitted too fast!'));
+                $this->entry->addError('timed', FormBuilder::t('You submitted too fast!'));
             }
         }
     }
@@ -407,7 +403,7 @@ Craft::dd($this->entry->hasErrors());
      * Return success message
      *
      * @return Response
-     * @throws \craft\errors\MissingComponentException
+     * @throws MissingComponentException
      */
     private function _returnSuccessMessage()
     {

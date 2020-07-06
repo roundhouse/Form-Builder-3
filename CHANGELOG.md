@@ -1,10 +1,13 @@
 # Form Builder Changelog
 
-## 3.1.0 - 2020-02-07
+## 3.1.0 - 2020-07-06
 
 ### Improved
 - Updated UI to match with Craft UI
-- Exposed handful of service methods to be accessible by frontend
+- Exposed Forms Services via `craft.fbForms.methods()`
+
+### Fixed
+- Various bug fixes, updated deprecated functions
 
 ## 3.0.20 - 2019-10-16
 

@@ -37,7 +37,7 @@
                                     {% set form = entry.getForm() %}
                                     {% set group = form.getGroup() %}
 
-                                    <div class="list-item has-hover pad {% if loop.last %}last{% endif %}">
+                                    <div class="list-item {% if loop.last %}last{% endif %}">
                                         <div class="item-meta">
                                             <span class="item-meta-icon"><i class="far fa-list"></i></span>
                                             <span class="item-meta-title">{{ form.name }}</span>
@@ -48,7 +48,7 @@
                                         </div>
                                     </div>
                                 {% else %}
-                                    <div class="list-item pad">
+                                    <div class="list-item">
                                         <div class="item-title">
                                             <p>{{ "No submissions yet"|t('form-builder') }}</p>
                                         </div>
