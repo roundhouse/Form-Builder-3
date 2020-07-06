@@ -1,99 +1,69 @@
-{% extends "_layouts/cp" %}
-{% import "_includes/forms" as forms %}
+{% extends "form-builder/_layouts/layout" %}
 
 {% set title = "Dashboard"|t('form-builder') %}
 {% set bodyClass = 'formbuilder fb-dashboard' %}
 {% set selectedSubnavItem = "dashboard" %}
 
-{% block header %}
-    {% include 'form-builder/_includes/_header' ignore missing with { title: title } %}
-{% endblock %}
-
-{% block content %}
-    <section class="flex-container">
-
-        <div class="widget wide-col">
-            <header class="pad">
-                <h2>{{ "Submissions"|t('form-builder') }}</h2>
-            </header>
-            <div class="body">
-                <div class="chart-explorer-container"></div>
+{% block main %}
+    <div id="dashboard-grid" class="grid">
+        <div class="item" data-colspan="3">
+            <div class="widget" id="widget-recent-submissions-chart-widget">
+                <div class="front">
+                    <div class="pane">
+                        <div class="widget-heading">
+                            <h2>{{ "Submissions"|t('form-builder') }}</h2>
+                        </div>
+                        <div class="body"></div>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <div class="short-col">
+        <div class="item" data-colspan="1">
+            <div class="widget" >
+                <div class="front">
+                    <div class="pane">
+                        <div class="widget-heading">
+                            <h2>{{ "Recent Submissions"|t('form-builder') }}</h2>
+                            <a href="{{ url('form-builder/entries') }}" class="link">See all</a>
+                        </div>
+                        <div class="body">
+                            {% set recentEntries = craft.fb.entries({
+                                limit: 5
+                            }).all() %}
 
-            <div class="widget">
-                <header class="pad">
-                    <h2>{{ "Recent Submissions"|t('form-builder') }}</h2>
-                    <a href="{{ url('form-builder/entries') }}" class="link">See all</a>
-                </header>
-                <div class="body">
-                    {% set recentEntries = craft.fb.entries({
-                        limit: 5
-                    }).all() %}
+                            <div class="list">
+                                {% for entry in recentEntries %}
+                                    {% set form = entry.getForm() %}
+                                    {% set group = form.getGroup() %}
 
-                    <div class="list">
-                        {% for entry in recentEntries %}
-                            {% set form = entry.getForm() %}
-                            {% set group = form.getGroup() %}
+                                    <div class="list-item has-hover pad {% if loop.last %}last{% endif %}">
+                                        <div class="item-meta">
+                                            <span class="item-meta-icon"><i class="far fa-list"></i></span>
+                                            <span class="item-meta-title">{{ form.name }}</span>
+                                        </div>
 
-                            <div class="list-item has-hover pad {% if loop.last %}last{% endif %}">
-                                <div class="item-meta">
-                                    <span class="item-meta-icon"><i class="far fa-list"></i></span>
-                                    <span class="item-meta-title">{{ form.name }}</span>
-                                </div>
-
-                                <div class="item-title">
-                                    <a href="{{ entry.url }}">{{ entry.title }}</a>
-                                </div>
-                            </div>
-                        {% else %}
-                            <div class="list-item pad">
-                                <div class="item-title">
-                                    <p>{{ "No submissions yet"|t('form-builder') }}</p>
-                                </div>
-                            </div>
-                        {% endfor %}
-                    </div>
-
-                </div>
-            </div>
-
-            <div class="widget plugin-updates">
-                <header class="pad">
-                    <h2>{{ "Plugin Information"|t }}</h2>
-                </header>
-
-                <div class="body">
-                    <div class="list">
-                        <div class="list-item pad">
-                            <div class="item-meta">
-                                <span class="item-meta-icon"><i class="far fa-cog"></i></span>
-                                <span class="item-meta-title">{{ "Current Version "|t('form-builder') }} {{ plugin.getVersion() }}</span>
-                                <span class="item-meta-right"><a href="{{ url('form-builder/settings') }}">{{ "View Changelog"|t('form-builder') }}</a></span>
-                            </div>
-                            <div class="item-title">
-
-
-                                {% if hasUpdate %}
-                                    <span class="plugin-warning">
-                                        <i class="far fa-exclamation-circle"></i>
-                                        Plugin needs an update!
-                                    </span>
+                                        <div class="item-title">
+                                            <a href="{{ entry.url }}">{{ entry.title }}</a>
+                                        </div>
+                                    </div>
                                 {% else %}
-                                    <span class="plugin-success">
-                                        <i class="far fa-check-circle"></i>
-                                        Plugin is up to date.
-                                    </span>
-                                {% endif %}
+                                    <div class="list-item pad">
+                                        <div class="item-title">
+                                            <p>{{ "No submissions yet"|t('form-builder') }}</p>
+                                        </div>
+                                    </div>
+                                {% endfor %}
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-
         </div>
 
-    </section>
+    </div>
 {% endblock %}
+
+{% js %}
+    new window.FormBuilder.GetEntriesCount('recent-submissions-chart-widget');
+{% endjs %}

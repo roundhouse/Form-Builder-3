@@ -1,5 +1,11 @@
 # Form Builder Changelog
 
+## 3.1.0 - 2020-02-07
+
+### Improved
+- Updated UI to match with Craft UI
+- Exposed handful of service methods to be accessible by frontend
+
 ## 3.0.20 - 2019-10-16
 
 ### Fixed

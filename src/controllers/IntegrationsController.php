@@ -11,6 +11,7 @@
 namespace roundhouse\formbuilder\controllers;
 
 use Craft;
+use craft\errors\MissingComponentException;
 use craft\helpers\ArrayHelper;
 use craft\helpers\Json;
 use craft\helpers\StringHelper;
@@ -18,14 +19,20 @@ use craft\web\Controller;
 use craft\web\View;
 
 use roundhouse\formbuilder\elements\Form;
+use Twig\Error\LoaderError;
+use Twig\Error\RuntimeError;
+use Twig\Error\SyntaxError;
+use Twig_Error_Loader;
+use yii\base\Exception;
 use yii\web\BadRequestHttpException;
+use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
 
 use roundhouse\formbuilder\FormBuilder;
 use roundhouse\formbuilder\models\Integration;
 use roundhouse\formbuilder\web\assets\FormBuilder as FormBuilderAsset;
-use roundhouse\formbuilder\web\assets\Integrations ;
+use roundhouse\formbuilder\web\assets\Integrations;
 
 class IntegrationsController extends Controller
 {
@@ -55,7 +62,7 @@ class IntegrationsController extends Controller
         ]);
     }
 
-    public function actionEdit(int $integrationId = null): Response
+    public function actionEdit(int $integrationId = null, string $type = null): Response
     {
         $this->requirePermission('fb:editIntegrations');
 
@@ -63,10 +70,14 @@ class IntegrationsController extends Controller
         $view->registerAssetBundle(FormBuilderAsset::class);
 
         $variables['entryId'] = $integrationId;
+        $variables['type'] = $type;
 
         if ($integrationId) {
             $variables['entry'] = FormBuilder::$plugin->integrations->getIntegrationById($integrationId);
             $variables['title'] = $variables['entry']->name;
+        } else {
+            $variables['entry'] = new Integration();
+            $variables['title'] = FormBuilder::t('New integration for ' . $type);
         }
 
         $variables['fullPageForm'] = true;
@@ -83,34 +94,34 @@ class IntegrationsController extends Controller
         $variables = [];
         $variables['type'] = Craft::$app->getRequest()->getBodyParam('type');
 
-        $isTemplate = Craft::$app->view->doesTemplateExist('form-builder/integrations/_type/'. $variables['type'] .'/form');
+        $isTemplate = Craft::$app->view->doesTemplateExist('form-builder/integrations/_type/' . $variables['type'] . '/form');
 
         if ($isTemplate) {
-            $template = Craft::$app->view->renderTemplate('form-builder/integrations/_type/'. $variables['type'] .'/form', $variables);
+            $template = Craft::$app->view->renderTemplate('form-builder/integrations/_type/' . $variables['type'] . '/form', $variables);
         } else {
             $isIntegrationPlugin = Craft::$app->plugins->isPluginInstalled('form-builder-integrations');
             if ($isIntegrationPlugin) {
-                $isIntegrationTemplate = Craft::$app->view->doesTemplateExist('form-builder-integrations/types/'. $variables['type'] .'/form');
+                $isIntegrationTemplate = Craft::$app->view->doesTemplateExist('form-builder-integrations/types/' . $variables['type'] . '/form');
 
                 if ($isIntegrationTemplate) {
-                    $template = Craft::$app->view->renderTemplate('form-builder-integrations/types/'. $variables['type'] .'/form', $variables);
+                    $template = Craft::$app->view->renderTemplate('form-builder-integrations/types/' . $variables['type'] . '/form', $variables);
                 } else {
                     return $this->asJson([
                         'success' => false,
-                        'error'   => FormBuilder::t('Template not found')
+                        'error' => FormBuilder::t('Template not found')
                     ]);
                 }
             } else {
                 return $this->asJson([
                     'success' => false,
-                    'error'   => FormBuilder::t('Template not found')
+                    'error' => FormBuilder::t('Template not found')
                 ]);
             }
         }
 
         return $this->asJson([
             'success' => true,
-            'template'   => $template
+            'template' => $template
         ]);
     }
 
@@ -124,17 +135,19 @@ class IntegrationsController extends Controller
 
         return $this->asJson([
             'success' => true,
-            'template'   => $template
+            'template' => $template
         ]);
     }
 
     /**
      * Get Integration Section
      *
-     * @return \yii\web\Response
-     * @throws \Twig_Error_Loader
-     * @throws \yii\base\Exception
-     * @throws \yii\web\BadRequestHttpException
+     * @return Response
+     * @throws BadRequestHttpException
+     * @throws Exception
+     * @throws LoaderError
+     * @throws RuntimeError
+     * @throws SyntaxError
      */
     public function actionGetIntegrationSection()
     {
@@ -150,27 +163,27 @@ class IntegrationsController extends Controller
         $variables['index'] = StringHelper::randomString(4);
         $variables['form'] = Form::findOne($formId);
 
-        $isTemplate = Craft::$app->view->doesTemplateExist('form-builder/integrations/_type/'. $type .'/form');
+        $isTemplate = Craft::$app->view->doesTemplateExist('form-builder/integrations/_type/' . $type . '/form');
 
         if ($isTemplate) {
-            $template = Craft::$app->view->renderTemplate('form-builder/integrations/_type/'. $type .'/integration-section', $variables);
+            $template = Craft::$app->view->renderTemplate('form-builder/integrations/_type/' . $type . '/integration-section', $variables);
         } else {
             $isIntegrationPlugin = Craft::$app->plugins->isPluginInstalled('form-builder-integrations');
             if ($isIntegrationPlugin) {
-                $isIntegrationTemplate = Craft::$app->view->doesTemplateExist('form-builder-integrations/types/'. $type .'/form');
+                $isIntegrationTemplate = Craft::$app->view->doesTemplateExist('form-builder-integrations/types/' . $type . '/form');
 
                 if ($isIntegrationTemplate) {
-                    $template = Craft::$app->view->renderTemplate('form-builder-integrations/types/'. $type .'/integration-section', $variables);
+                    $template = Craft::$app->view->renderTemplate('form-builder-integrations/types/' . $type . '/integration-section', $variables);
                 } else {
                     return $this->asJson([
                         'success' => false,
-                        'error'   => FormBuilder::t('Template not found')
+                        'error' => FormBuilder::t('Template not found')
                     ]);
                 }
             } else {
                 return $this->asJson([
                     'success' => false,
-                    'error'   => FormBuilder::t('Template not found')
+                    'error' => FormBuilder::t('Template not found')
                 ]);
             }
         }
@@ -178,7 +191,7 @@ class IntegrationsController extends Controller
 
         return $this->asJson([
             'success' => true,
-            'template'   => $template,
+            'template' => $template,
             'type' => $type,
             'index' => $variables['index']
         ]);
@@ -189,8 +202,10 @@ class IntegrationsController extends Controller
      *
      * @return Response
      * @throws BadRequestHttpException
-     * @throws \Twig_Error_Loader
-     * @throws \yii\base\Exception
+     * @throws LoaderError
+     * @throws RuntimeError
+     * @throws SyntaxError
+     * @throws Exception
      */
     public function actionSave()
     {
@@ -203,16 +218,15 @@ class IntegrationsController extends Controller
         $category = Craft::$app->getRequest()->getBodyParam('category');
         $frontend = Craft::$app->getRequest()->getBodyParam('frontend');
 
-        $model              = new Integration();
-        $model->name        = $name;
-        $model->handle      = $handle;
-        $model->type        = $type;
-        $model->token       = $token;
-        $model->category    = $category;
-        $model->frontend    = $frontend;
-        $model->content     = Craft::$app->getRequest()->getBodyParam('content');
-        $model->settings    = Craft::$app->getRequest()->getBodyParam('settings');
-
+        $model = new Integration();
+        $model->name = $name;
+        $model->handle = $handle;
+        $model->type = $type;
+        $model->token = $token;
+        $model->category = $category;
+        $model->frontend = $frontend;
+        $model->content = Craft::$app->getRequest()->getBodyParam('content');
+        $model->settings = Craft::$app->getRequest()->getBodyParam('settings');
         $model->validate();
 
         if (!$model->hasErrors()) {
@@ -224,8 +238,8 @@ class IntegrationsController extends Controller
                 $template = $template = Craft::$app->view->renderTemplate('form-builder/integrations/_includes/item', $array);
 
                 return $this->asJson([
-                    'success'   => true,
-                    'template'  => $template
+                    'success' => true,
+                    'template' => $template
                 ]);
             }
         } else {
@@ -243,8 +257,8 @@ class IntegrationsController extends Controller
      * @return null|Response
      * @throws BadRequestHttpException
      * @throws NotFoundHttpException
-     * @throws \craft\errors\MissingComponentException
-     * @throws \yii\web\ForbiddenHttpException
+     * @throws MissingComponentException
+     * @throws ForbiddenHttpException
      */
     public function actionSaveEntry()
     {
@@ -253,7 +267,7 @@ class IntegrationsController extends Controller
         $this->requirePostRequest();
 
         $integration = $this->_getIntegrationModel();
-        
+
         if (!FormBuilder::$plugin->integrations->save($integration)) {
             Craft::$app->getSession()->setError(Craft::t('form-builder', 'Cannot save integration.'));
 
@@ -293,7 +307,6 @@ class IntegrationsController extends Controller
      * Get Integration model
      *
      * @return Integration
-     * @throws BadRequestHttpException
      * @throws NotFoundHttpException
      */
     private function _getIntegrationModel()
@@ -309,13 +322,20 @@ class IntegrationsController extends Controller
         } else {
             $model = new Integration();
         }
-        
+
         $model->name = Craft::$app->getRequest()->getBodyParam('name');
         $model->handle = Craft::$app->getRequest()->getBodyParam('handle');
         $model->type = Craft::$app->getRequest()->getBodyParam('type');
-        $model->status = Craft::$app->getRequest()->getBodyParam('status');
         $model->content = Craft::$app->getRequest()->getBodyParam('content') ? Json::encode(Craft::$app->getRequest()->getBodyParam('content')) : null;
         $model->settings = Craft::$app->getRequest()->getBodyParam('settings') ? Json::encode(Craft::$app->getRequest()->getBodyParam('settings')) : null;
+
+        $status = Craft::$app->getRequest()->getBodyParam('status');
+
+        if ($status) {
+            $model->status = 'enabled';
+        } else {
+            $model->status = 'disabled';
+        }
 
         return $model;
     }

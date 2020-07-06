@@ -1,6 +1,4 @@
-{% import "form-builder/_includes/_components" as components %}
-
-{% set templatePath = 'form-builder/integrations/_type/email/fields/' %}
+{% import "_includes/forms" as forms %}
 
 <section class="cmp-tout-alt" id="integration-{{ type }}-{{ index }}" data-type="{{ type }}">
 
@@ -29,10 +27,59 @@
 
     <div class="body">
         <div class="fields">
-            {% include templatePath ~ 'submission' ignore missing %}
-            {% include templatePath ~ 'to-email' ignore missing %}
-            {% include templatePath ~ 'from-email' ignore missing %}
-            {% include templatePath ~ 'subject' ignore missing %}
+            {% import "_includes/forms" as forms %}
+
+            {% set includeSubmission = 'integrations[email]['~ index ~'][includeSubmission]' %}
+            {% set enableIncludeSubmission = attribute(form.integrations.email, index).includeSubmission is defined and attribute(form.integrations.email, index).includeSubmission ? 1 : 0 %}
+            {{ forms.lightswitchField({
+                label: "Include Submission"|t('form-builder'),
+                instructions: "Should we include submission data in the email?"|t('form-builder'),
+                id: "include-submission-for-email",
+                name: includeSubmission,
+                on: enableIncludeSubmission
+            }) }}
+
+            {% set toEmailName = 'integrations[email]['~ index ~'][toEmail]' %}
+            {{ forms.textField({
+                type: 'email',
+                label: "To Email"|t('form-builder'),
+                value: attribute(form.integrations.email, index).toEmail is defined and attribute(form.integrations.email, index).toEmail != '' ? attribute(form.integrations.email, index).toEmail : '',
+                id: 'to-email',
+                name: toEmailName,
+                size: 80,
+                instructions: "The recipient’s email address"|t('form-builder')
+            }) }}
+
+            {% set fromEmailName = 'integrations[email]['~ index ~'][fromEmail]' %}
+            {{ forms.textField({
+                type: 'email',
+                label: "From Email"|t('form-builder'),
+                value: attribute(form.integrations.email, index).fromEmail is defined and attribute(form.integrations.email, index).fromEmail != '' ? attribute(form.integrations.email, index).fromEmail : '',
+                id: 'from-email',
+                name: fromEmailName,
+                size: 80,
+                instructions: "The sender’s email address. Defaults to the System Email Address defined in Settings → Email."|t('form-builder')
+            }) }}
+
+            {% set fromNameName = 'integrations[email]['~ index ~'][fromName]' %}
+            {{ forms.textField({
+                label: "From Name"|t('form-builder'),
+                value: attribute(form.integrations.email, index).fromName is defined and attribute(form.integrations.email, index).fromName != '' ? attribute(form.integrations.email, index).fromName : '',
+                id: 'from-name',
+                name: fromNameName,
+                size: 80,
+                instructions: "The sender’s from name. Defaults to the System From Name defined in Settings → Email."|t('form-builder')
+            }) }}
+
+            {% set subjectName = 'integrations[email]['~ index ~'][subject]' %}
+            {{ forms.textField({
+                label: "Subject"|t('form-builder'),
+                value: attribute(form.integrations.email, index).subject is defined and attribute(form.integrations.email, index).subject != '' ? attribute(form.integrations.email, index).subject : '',
+                id: 'subject-for-email',
+                name: subjectName,
+                size: 80,
+                instructions: "Enter custom subject line or select a field that will be used for the custom subject line."|t('form-builder')
+            }) }}
         </div>
     </div>
 

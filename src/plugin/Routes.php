@@ -36,6 +36,7 @@ trait Routes
                 $event->rules['form-builder/settings/migration'] = 'form-builder/tools/index';
                 $event->rules['form-builder/integrations'] = 'form-builder/integrations/index';
                 $event->rules['form-builder/integrations/<integrationId:\d+>'] = 'form-builder/integrations/edit';
+                $event->rules['form-builder/integrations/new/<type:[^\\/]+>'] = 'form-builder/integrations/edit';
             }
         );
     }

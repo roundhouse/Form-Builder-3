@@ -29,14 +29,12 @@ use roundhouse\formbuilder\elements\Form as FormElement;
 use roundhouse\formbuilder\elements\Entry as EntryElement;
 use roundhouse\formbuilder\elements\actions\SetStatus;
 use roundhouse\formbuilder\elements\actions\Delete;
-use roundhouse\formbuilder\services\Migrations;
+use roundhouse\formbuilder\services\Forms as FormsService;
+use roundhouse\formbuilder\services\Migrations as MigrationsService;
 use roundhouse\formbuilder\web\twig\Variables;
-
 use roundhouse\formbuilder\web\twig\Extensions;
-
 use roundhouse\formbuilder\models\Settings;
 use roundhouse\formbuilder\models\Field as FieldModel;
-
 use roundhouse\formbuilder\plugin\Services as FormBuilderServices;
 use roundhouse\formbuilder\plugin\Routes as FormBuilderRoutes;
 
@@ -83,6 +81,11 @@ class FormBuilder extends Plugin
         $this->_registerPermissions();
         $this->_registerVariables();
         $this->_registerCustomEvents();
+    }
+
+    public function getPluginName()
+    {
+        return Craft::t('form-builder', $this->getSettings()->pluginName);
     }
 
     /**
@@ -341,7 +344,8 @@ class FormBuilder extends Plugin
             function (Event $event) {
                 $variable = $event->sender;
                 $variable->set('fb', Variables::class);
-                $variable->set('fbMigration', Migrations::class);
+                $variable->set('fbMigration', MigrationsService::class);
+                $variable->set('fbForms', FormsService::class);
             }
         );
     }

@@ -10,6 +10,7 @@
 
 namespace roundhouse\formbuilder\controllers;
 
+use craft\base\Element;
 use craft\helpers\ArrayHelper;
 use craft\services\Elements;
 use roundhouse\formbuilder\FormBuilder;
@@ -76,31 +77,32 @@ class FormsController extends Controller
         $this->requirePermission('fb:editForms');
         $this->requirePermission('fb:createForms');
 
-        $variables['formId'] = $formId;
+        $variables['id'] = $formId;
         $this->_prepEditFormVariables($variables);
-
+        
         $view = $this->getView();
         $view->registerAssetBundle(FormBuilderAsset::class);
         $view->registerAssetBundle(FormAsset::class);
+
         if (isset($variables["form"]->fieldLayoutId)) {
-            $view->registerJs('LD.layoutId='.$variables["form"]->fieldLayoutId);
-            $view->registerJs('LD.formId='.$variables["form"]->id);
+            $view->registerJs('LD.layoutId=' . $variables["form"]->fieldLayoutId);
+            $view->registerJs('LD.formId=' . $variables["form"]->id);
         }
         $view->registerJs('LD.setup()');
 
-        $view->registerJs('LD_Fields.fields='.Json::encode(FormBuilder::$plugin->fields->getFields(), JSON_UNESCAPED_UNICODE));
-        $view->registerJs('LD_Fields.options='.Json::encode(FormBuilder::$plugin->fields->getAllFieldOptions(), JSON_UNESCAPED_UNICODE));
+        $view->registerJs('LD_Fields.fields=' . Json::encode(FormBuilder::$plugin->fields->getFields(), JSON_UNESCAPED_UNICODE));
+        $view->registerJs('LD_Fields.options=' . Json::encode(FormBuilder::$plugin->fields->getAllFieldOptions(), JSON_UNESCAPED_UNICODE));
         $view->registerJs('LD_Fields.setup()');
 
-        $view->registerJs('LD_Tabs.tabs='.Json::encode(FormBuilder::$plugin->tabs->getTabs(), JSON_UNESCAPED_UNICODE));
-        $view->registerJs('LD_Tabs.options='.Json::encode(FormBuilder::$plugin->tabs->getAllTabOptions(), JSON_UNESCAPED_UNICODE));
+        $view->registerJs('LD_Tabs.tabs=' . Json::encode(FormBuilder::$plugin->tabs->getTabs(), JSON_UNESCAPED_UNICODE));
+        $view->registerJs('LD_Tabs.options=' . Json::encode(FormBuilder::$plugin->tabs->getAllTabOptions(), JSON_UNESCAPED_UNICODE));
         $view->registerJs('LD_Tabs.setup()');
-
         $view->registerJs('initFLD();');
 
+        $view->registerJs('new window.FormBuilder.FormEdit()');
 
         if ($variables['form']) {
-            $variables['title'] = 'Edit '.$variables['form']->name;
+            $variables['title'] = 'Edit ' . $variables['form']->name;
 
         } else {
             $variables['title'] = 'New Form';
@@ -154,6 +156,7 @@ class FormsController extends Controller
      *
      * @return Response
      * @throws BadRequestHttpException
+     * @throws NotFoundHttpException
      * @throws \yii\web\ForbiddenHttpException
      */
     public function actionDelete(): Response
@@ -161,15 +164,48 @@ class FormsController extends Controller
         $this->requirePermission('fb:editForms');
         $this->requirePermission('fb:deleteForms');
         $this->requirePostRequest();
-        $this->requireAcceptsJson();
+//        $this->requireAcceptsJson();
 
-        $formId = Craft::$app->getRequest()->getRequiredBodyParam('id');
+        $request = Craft::$app->getRequest();
+        $formId = $request->getRequiredBodyParam('id');
 
-        $success = FormBuilder::$plugin->forms->delete($formId);
+        $form = Craft::$app->getElements()->getElementById($formId);
 
-        return $this->asJson([
-            'success' => $success
-        ]);
+        if (!$form) {
+            throw new NotFoundHttpException('Form not found');
+        }
+
+        if (!Craft::$app->getElements()->deleteElement($form)) {
+            if ($request->getAcceptsJson()) {
+                return $this->asJson([
+                    'success' => false
+                ]);
+            }
+
+            Craft::$app->getSession()->setError(Craft::t('form-builder', 'Could not delete form'));
+
+            Craft::$app->getUrlManager()->setRouteParams([
+                'form' => $form
+            ]);
+
+            return null;
+        }
+
+        if ($request->getAcceptsJson()) {
+            return $this->asJson([
+                'success' => true
+            ]);
+        }
+
+        Craft::$app->getSession()->setNotice(Craft::t('form-builder', 'Form deleted'));
+
+        return $this->redirectToPostedUrl($form);
+
+//        $success = FormBuilder::$plugin->forms->delete($formId);
+//
+//        return $this->asJson([
+//            'success' => $success
+//        ]);
     }
 
 
@@ -210,7 +246,7 @@ class FormsController extends Controller
      */
     private function _getFormModel(): Form
     {
-        $formId = Craft::$app->getRequest()->getBodyParam('formId');
+        $formId = Craft::$app->getRequest()->getBodyParam('id');
 
         if ($formId) {
             $form = Craft::$app->getElements()->getElementById($formId);
@@ -229,6 +265,15 @@ class FormsController extends Controller
 
         $form->groupId = Craft::$app->getRequest()->getBodyParam('groupId');
         $form->statusId = Craft::$app->getRequest()->getBodyParam('statusId');
+
+        if ($form->statusId == '1') {
+            $form->enabled = true;
+            $form->enabledForSite = true;
+        } else {
+            $form->enabled = false;
+            $form->enabledForSite = false;
+        }
+
         $form->name = Craft::$app->getRequest()->getBodyParam('name');
         $form->handle = Craft::$app->getRequest()->getBodyParam('handle');
         $form->options = Craft::$app->getRequest()->getBodyParam('options');
@@ -247,8 +292,12 @@ class FormsController extends Controller
      */
     private function _prepEditFormVariables(array &$variables)
     {
-        if ($variables['formId']) {
-            $variables['form'] = FormBuilder::$plugin->forms->getFormRecordById($variables['formId']);
+        if ($variables['id']) {
+            $variables['form'] = Form::find()
+                ->id($variables['id'])
+                ->siteId(null)
+                ->anyStatus()
+                ->one();
 
             if (!$variables['form']) {
                 throw new NotFoundHttpException('Form not found');
@@ -262,10 +311,17 @@ class FormsController extends Controller
                     throw new NotFoundHttpException('Form group not found');
                 }
             }
+
+            $variables['form']->options = Json::decode($variables['form']->options);
+            $variables['form']->spam = Json::decode($variables['form']->spam);
+            $variables['form']->integrations = Json::decode($variables['form']->integrations);
+            $variables['form']->settings = Json::decode($variables['form']->settings);
+
         } else {
             $variables['form'] = new Form();
             $variables['form']->groupId = 1;
             $variables['form']->statusId = 1;
+            $variables['form']->enabled = 1;
         }
 
         // Integrations

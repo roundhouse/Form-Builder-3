@@ -1,35 +1,48 @@
-{% import "form-builder/_includes/_components" as components %}
+{% import "_includes/forms" as forms %}
 
 {% set nameEmail = 'integrations[email]['~ index ~'][toEmail]' %}
 
-{% set container = {
-    title: 'To Email' |t,
-    info: null,
-    icon: null,
-    class: null,
-    id: null
-} %}
+ {{ forms.textField({
+     label: "To Email"|t('form-builder'),
+     value: attribute(form.integrations.email, index).toEmail is defined and attribute(form.integrations.email, index).toEmail != '' ? attribute(form.integrations.email, index).toEmail : '',
+     id: 'titleFormat',
+     name: nameEmail,
+     placeholder: "The recipient’s email address"|t('form-builder')
+ }) }}
 
-{% set inputs = {
-    0: {
-        type: 'text',
-        name: nameEmail,
-        value: attribute(form.integrations.email, index).toEmail is defined and attribute(form.integrations.email, index).toEmail != '' ? attribute(form.integrations.email, index).toEmail : '',
-        class: 'hidden',
-        id: null,
-        hint: 'EMAIL'
-    },
-} %}
 
-{% set modal = {
-    title: 'To Email' |t,
-    instructions: 'The recipient’s email address' |t,
-    successMessage: 'To Email Updated' |t,
-    inputs: inputs
-} %}
 
-{{ components.optionItem(
-    container,
-    modal,
-    inputs
-) }}
+{#{% import "form-builder/_includes/_components" as components %}#}
+
+
+{#{% set container = {#}
+{#    title: 'To Email' |t,#}
+{#    info: null,#}
+{#    icon: null,#}
+{#    class: null,#}
+{#    id: null#}
+{#} %}#}
+
+{#{% set inputs = {#}
+{#    0: {#}
+{#        type: 'text',#}
+{#        name: nameEmail,#}
+{#        value: attribute(form.integrations.email, index).toEmail is defined and attribute(form.integrations.email, index).toEmail != '' ? attribute(form.integrations.email, index).toEmail : '',#}
+{#        class: 'hidden',#}
+{#        id: null,#}
+{#        hint: 'EMAIL'#}
+{#    },#}
+{#} %}#}
+
+{#{% set modal = {#}
+{#    title: 'To Email' |t,#}
+{#    instructions: 'The recipient’s email address' |t,#}
+{#    successMessage: 'To Email Updated' |t,#}
+{#    inputs: inputs#}
+{#} %}#}
+
+{#{{ components.optionItem(#}
+{#    container,#}
+{#    modal,#}
+{#    inputs#}
+{#) }}#}

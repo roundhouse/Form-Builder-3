@@ -200,7 +200,6 @@ class EntriesController extends Controller
         $this->post     = $request->post();
         $this->files    = $_FILES;
 
-
         $saveToDatabase = isset($this->form->settings['database']['enabled']) && $this->form->settings['database']['enabled'] == '1' ? true : false;
 
         // Setup entry model
@@ -212,7 +211,8 @@ class EntriesController extends Controller
 
         $this->entry->setScenario(Element::SCENARIO_LIVE);
         $this->entry->validate();
-
+        
+Craft::dd($this->entry->hasErrors());
         // Fire a 'beforeSubmitEntry' event
         $event = new EntryEvent([
             'entry' => $this->entry,
@@ -220,7 +220,6 @@ class EntriesController extends Controller
         ]);
 
         $this->trigger(self::EVENT_BEFORE_SUBMIT_ENTRY, $event);
-
         // Check form errors
         if ($this->entry->hasErrors()) {
             $this->entry->clearErrors('title');

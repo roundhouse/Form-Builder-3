@@ -11,18 +11,22 @@
 namespace roundhouse\formbuilder\controllers;
 
 use Craft;
+use craft\errors\MissingComponentException;
 use craft\web\Controller;
 
 use roundhouse\formbuilder\FormBuilder;
 use roundhouse\formbuilder\models\Group;
+use yii\web\BadRequestHttpException;
+use yii\web\Response;
 
 class GroupsController extends Controller
 {
     /**
      * Save group
      *
-     * @return \yii\web\Response
-     * @throws \yii\web\BadRequestHttpException
+     * @return Response
+     * @throws MissingComponentException
+     * @throws BadRequestHttpException
      */
     public function actionSave()
     {

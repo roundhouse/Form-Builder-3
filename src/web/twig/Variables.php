@@ -536,6 +536,11 @@ class Variables
         return FormBuilder::$plugin->integrations->isIntegrations();
     }
 
+    public function getPluginName()
+    {
+        return FormBuilder::$plugin->getPluginName();
+    }
+
     /**
      * Get clean field name by class
      *

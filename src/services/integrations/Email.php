@@ -12,6 +12,7 @@ namespace roundhouse\formbuilder\services\integrations;
 
 use Craft;
 use craft\base\Component;
+use craft\helpers\App;
 use craft\web\View;
 use craft\helpers\Json;
 use craft\mail\Message;
@@ -47,6 +48,7 @@ class Email extends Component
                         'includeSubmission' => $item['includeSubmission'],
                         'toEmail' => Craft::$app->getView()->renderObjectTemplate($item['toEmail'], $entry),
                         'fromEmail' => Craft::$app->getView()->renderObjectTemplate($item['fromEmail'], $entry),
+                        'fromName' => Craft::$app->getView()->renderObjectTemplate($item['fromName'], $entry),
                         'subject' => Craft::$app->getView()->renderObjectTemplate($item['subject'], $entry),
                     ],
                     'entry' => $entry,
@@ -92,11 +94,54 @@ class Email extends Component
     private function _sendEmail($settings, $template)
     {
         $message = new Message();
-        $message->setFrom([$settings['fromEmail'] => $settings['fromEmail']]);
-        $message->setTo($settings['toEmail']);
+        $message->setFrom($this->_getFrom($settings));
+        $message->setTo($this->_getTo($settings));
         $message->setSubject($settings['subject']);
         $message->setHtmlBody($template);
 
         return Craft::$app->mailer->send($message);
     }
+
+
+    /**
+     * Get from email and name
+     * 
+     * @param $settings
+     * @return array
+     */
+    private function _getFrom($settings)
+    {
+        $from = [];
+
+        if ($settings['fromEmail'] != '') {
+            $from['fromEmail'] = $settings['fromEmail'];
+        } else {
+            $from['fromEmail'] = App::mailSettings()->fromEmail;
+        }
+
+        if ($settings['fromName'] != '') {
+            $from['fromName'] = $settings['fromName'];
+        } else {
+            $from['fromName'] = App::mailSettings()->fromName;
+        }
+
+        return [
+            $from['fromEmail'] => $from['fromName']
+        ];
+    }
+
+    /**
+     * Get to email
+     *
+     * @param $settings
+     * @return array
+     */
+    private function _getTo($settings)
+    {
+        return [
+            $settings['toEmail'] => ''
+        ];
+    }
+    
+    
 }

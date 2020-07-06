@@ -126,10 +126,9 @@ class Tabs extends Component
             ->one();
 
         if ($tabRecord) {
-            $tabRecord->options = Json::decode($tabRecord->options);
-
+            return Json::decodeIfJson($tabRecord->options);
         }
-
+        
         return $tabRecord;
     }
 
