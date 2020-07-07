@@ -142,6 +142,58 @@
   width: 100%;
 }
 
+/* ============================================ *
+
+ |  ____|                     |  _ \        (_)| |    | |          
+ | |__  ___   _ __  _ __ ___  | |_) | _   _  _ | |  __| |  ___  _ __ 
+ |  __|/ _ \ | '__|| '_ ` _ \ |  _ < | | | || || | / _` | / _ \| '__|
+ | |  | (_) || |   | | | | | || |_) || |_| || || || (_| ||  __/| |  
+ |_|   \___/ |_|   |_| |_| |_||____/  \__,_||_||_| \__,_| \___||_| 
+
+* ============================================ */
+.formbuilder .total-entry-count {
+  position: absolute;
+  top: 50%;
+  right: 15px;
+  bottom: auto;
+  left: auto;
+  height: auto;
+  width: auto;
+  margin-top: -9px;
+  padding: 0 7px;
+  border-radius: 5px;
+  background-color: #4cb9d5;
+  text-align: center;
+  font-weight: bold;
+  font-size: 9px;
+  letter-spacing: 0.04em;
+  color: #ffffff;
+  -webkit-font-smoothing: antialiased;
+  -webkit-text-size-adjust: 100%;
+  text-rendering: optimizeLegibility;
+}
+.formbuilder .menu .status.read, .formbuilder .menu .status.on, .formbuilder .menu .status.enabled {
+  background-color: #a6e50f !important;
+}
+.formbuilder .menu .status.unread, .formbuilder .menu .status.blue {
+  background-color: #4cb9d5 !important;
+}
+.formbuilder .menu .status.archived {
+  background-color: black !important;
+}
+.formbuilder .menu .status.off, .formbuilder .menu .status.disabled {
+  background-color: #f07575 !important;
+}
+.formbuilder .menu a {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: #323C47;
+}
+.formbuilder .menu a:hover {
+  background-color: #F4F7F9;
+}
+
 .formbuilder.fb-entries .form-details {
   display: flex;
   flex-direction: column;

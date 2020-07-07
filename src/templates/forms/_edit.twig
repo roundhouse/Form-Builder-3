@@ -7,6 +7,11 @@
 {% set element = form %}
 {% set saveDraftAction = null %}
 
+{% set crumbs = [
+    { label: craft.fb.getPluginName(), url: url('form-builder') },
+    { label: 'Forms' | t('form-builder'), url: url('form-builder/forms') },
+] %}
+
 {% set isNewElement = form.id ? false : true %}
 
 {% set docLinks = {

@@ -1,5 +1,13 @@
 # Form Builder Changelog
 
+## 3.1.3.1 - 2020-07-07
+
+### Fixed
+- Fixed ajax error in Entries index page
+
+### Improved
+- Added crumbs to edit pages
+
 ## 3.1.3 - 2020-07-07
 
 ### Added

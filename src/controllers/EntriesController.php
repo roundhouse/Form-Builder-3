@@ -21,6 +21,9 @@ use craft\helpers\DateTimeHelper;
 use craft\helpers\StringHelper;
 use roundhouse\formbuilder\records\Note;
 use Throwable;
+use Twig\Error\LoaderError;
+use Twig\Error\RuntimeError;
+use Twig\Error\SyntaxError;
 use Twig_Error_Loader;
 use yii\base\Exception;
 use yii\base\ExitException;
@@ -125,15 +128,17 @@ class EntriesController extends Controller
      * Get all unread entries
      *
      * @return Response
-     * @throws Twig_Error_Loader
      * @throws Exception
+     * @throws LoaderError
+     * @throws RuntimeError
+     * @throws SyntaxError
      */
     public function actionGetUnreadEntries()
     {
         $entries = Entry::find()
             ->where(['statusId' => 1])
             ->all();
-
+        
         $grouped = array_group_by($entries, "formId");
 
         if ($entries) {
@@ -156,9 +161,11 @@ class EntriesController extends Controller
      * Get all unread entries by form ID
      *
      * @return Response
-     * @throws Twig_Error_Loader
-     * @throws Exception
      * @throws BadRequestHttpException
+     * @throws Exception
+     * @throws LoaderError
+     * @throws RuntimeError
+     * @throws SyntaxError
      */
     public function actionGetUnreadEntriesBySource()
     {

@@ -4,6 +4,11 @@
 {% set pluginCpUrl = url('form-builder') %}
 {% set selectedSubnavItem = "entries" %}
 
+{% set crumbs = [
+    { label: craft.fb.getPluginName(), url: url('form-builder') },
+    { label: 'Entries' | t('form-builder'), url: url('form-builder/entries') },
+] %}
+
 {% block content %}
     <input type="hidden" name="action" value="form-builder/entries/save">
     {{ redirectInput('form-builder/entries/{groupId}') }}
