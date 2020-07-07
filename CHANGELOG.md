@@ -4,6 +4,7 @@
 
 ### Added
 - Submission will return `errors` object when submission fails validation
+- Ajax added custom redirect value, if setup
 
 ### Fixed
 - Moved integration actions to after the submission has been saved

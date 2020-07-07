@@ -410,29 +410,29 @@ class EntriesController extends Controller
      */
     private function _returnSuccessMessage()
     {
+        $options = $this->form->options;
+        $customRedirect = isset($options['redirect']['enabled']) && $options['redirect']['enabled'] === '1' ? true : false;
+        $currentRoute = Craft::$app->request->url;
+        $customRedirectUrl =  $currentRoute;
+
         if (Craft::$app->getRequest()->getIsAjax()) {
             return $this->asJson([
                 'success' => true,
-                'message' => isset($this->form['options']['messages']['success']) ? $this->form['options']['messages']['success'] : FormBuilder::t('Form submission successful.')
+                'message' => isset($this->form['options']['messages']['success']) ? $this->form['options']['messages']['success'] : FormBuilder::t('Form submission successful.'),
+                'redirect' => $customRedirectUrl
             ]);
         } else {
-            $options = $this->form->options;
-            $customRedirect = isset($options['redirect']['enabled']) && $options['redirect']['enabled'] === '1' ? true : false;
-
             if ($customRedirect) {
-                $currentRoute = Craft::$app->request->url;
-                $url =  isset($options['redirect']['url']) && $options['redirect']['url'] != '' ? $options['redirect']['url'] : $currentRoute;
+                $customRedirectUrl =  isset($options['redirect']['url']) && $options['redirect']['url'] != '' ? $options['redirect']['url'] : $currentRoute;
 
-                if ($currentRoute === $url) {
+                if ($currentRoute === $customRedirectUrl) {
                     Craft::$app->getSession()->setFlash('success', isset($this->form['options']['messages']['success']) ? $this->form['options']['messages']['success'] : FormBuilder::t('Form submission successful.'));
                 } else {
-                    $this->redirect($url);
+                    $this->redirect($customRedirectUrl);
                 }
             } else {
                 Craft::$app->getSession()->setFlash('success', isset($this->form['options']['messages']['success']) ? $this->form['options']['messages']['success'] : FormBuilder::t('Form submission successful.'));
             }
-
         }
-
     }
 }
