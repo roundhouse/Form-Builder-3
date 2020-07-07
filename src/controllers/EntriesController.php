@@ -248,10 +248,6 @@ class EntriesController extends Controller
             $saved = true;
         }
 
-        // Perform Integrations
-        if ($this->form->integrations) {
-            FormBuilder::$plugin->integrations->performIntegrations($this->entry, $this->form);
-        }
 
         // Fire a 'afterSubmitEntry' event
         $event = new EntryEvent([
@@ -263,6 +259,11 @@ class EntriesController extends Controller
 
         // Notifications
         if ($saved) {
+            // Perform Integrations
+            if ($this->form->integrations) {
+                FormBuilder::$plugin->integrations->performIntegrations($this->entry, $this->form);
+            }
+
             return $this->_returnSuccessMessage();
         } else {
             return $this->_returnErrorMessage($request);
@@ -390,11 +391,13 @@ class EntriesController extends Controller
         if (Craft::$app->getRequest()->getIsAjax()) {
             return $this->asJson([
                 'success' => false,
-                'message' => isset($this->form['options']['messages']['error']) ? $this->form['options']['messages']['error'] : FormBuilder::t('Form submission failed.')
+                'message' => isset($this->form['options']['messages']['error']) ? $this->form['options']['messages']['error'] : FormBuilder::t('Form submission failed.'),
+                'errors' => $this->entry->getErrors()
             ]);
         } else {
             Craft::$app->getUrlManager()->setRouteParams([
-                'submission' => $this->entry
+                'submission' => $this->entry,
+                'errors' => $this->entry->getErrors()
             ]);
         }
     }

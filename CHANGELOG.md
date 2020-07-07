@@ -1,5 +1,13 @@
 # Form Builder Changelog
 
+## 3.1.3 - 2020-07-07
+
+### Added
+- Submission will return `errors` object when submission fails validation
+
+### Fixed
+- Moved integration actions to after the submission has been saved
+
 ## 3.1.2 - 2020-07-07
 
 ### Added
