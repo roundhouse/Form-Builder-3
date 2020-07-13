@@ -1,5 +1,10 @@
 # Form Builder Changelog
 
+## 3.1.4.1 - 2020-07-13
+
+### Fixed
+- Forgot to defined variable
+
 ## 3.1.4 - 2020-07-13
 
 ### Added

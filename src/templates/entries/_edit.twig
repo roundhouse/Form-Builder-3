@@ -35,6 +35,7 @@
                     </div>
 
                     {% if value is iterable %}
+                        {% set matrixBlockQuery = [] %}
                         {% set valueClass = value|getClass %}
                         <div class="item-list">
                             {% switch valueClass %}
