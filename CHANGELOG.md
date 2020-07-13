@@ -1,5 +1,10 @@
 # Form Builder Changelog
 
+## 3.1.4 - 2020-07-13
+
+### Added
+-- Added template hooks for submission template. `fb-view-submission-matrixBlockQuery-hook` and `fb-view-submission-section-hook`
+
 ## 3.1.3.1 - 2020-07-07
 
 ### Fixed

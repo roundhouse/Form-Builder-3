@@ -65,7 +65,9 @@
                                         {% endif %}
                                     {% endfor %}
                                 </span>
-
+                            {% case "MatrixBlockQuery" %}
+                                {% set matrixBlockQuery = matrixBlockQuery|merge(value) %}
+                                {% hook 'fb-view-submission-matrixBlockQuery-hook' %}
                             {% endswitch %}
                         </div>
                     {% else %}
@@ -93,7 +95,7 @@
         </div>
     {% endfor %}
 
-
+    {% hook 'fb-view-submission-section-hook' %}
 
     {% set notes = craft.fb.notes(entry.id) %}
     {% if currentUser.can('fb:leaveNotes') %}
