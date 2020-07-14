@@ -1,5 +1,10 @@
 # Form Builder Changelog
 
+## 3.1.4.2 - 2020-07-13
+
+### Added
+-- Added template hooks to submission email template. `fb-email-template-matrixBlockQuery-hook` and `fb-email-template-section-hook`
+
 ## 3.1.4.1 - 2020-07-13
 
 ### Fixed
