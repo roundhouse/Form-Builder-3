@@ -39,6 +39,16 @@
                 on: enableIncludeSubmission
             }) }}
 
+            {% set includeFileAttachments = 'integrations[email]['~ index ~'][includeFileAttachments]' %}
+            {% set enableIncludeFileAttachments = attribute(form.integrations.email, index).includeFileAttachments is defined and attribute(form.integrations.email, index).includeFileAttachments ? 1 : 0 %}
+            {{ forms.lightswitchField({
+                label: "Include File Attachments"|t('form-builder'),
+                instructions: "Should we include file attachments in the email?"|t('form-builder'),
+                id: "include-file-attachments-for-email",
+                name: includeFileAttachments,
+                on: enableIncludeFileAttachments
+            }) }}
+
             {% set sendCopyToSender = 'integrations[email]['~ index ~'][sendCopyToSender]' %}
             {% set enableSendCopyToSender = attribute(form.integrations.email, index).sendCopyToSender is defined and attribute(form.integrations.email, index).sendCopyToSender ? 1 : 0 %}
             {{ forms.lightswitchField({
@@ -137,6 +147,16 @@
                 name: subjectName,
                 size: 80,
                 instructions: "Enter custom subject line."|t('form-builder')
+            }) }}
+
+            {% set customTemplateName = 'integrations[email]['~ index ~'][customTemplate]' %}
+            {{ forms.textField({
+                label: "Custom Template"|t('form-builder'),
+                value: attribute(form.integrations.email, index).customTemplate is defined and attribute(form.integrations.email, index).customTemplate != '' ? attribute(form.integrations.email, index).customTemplate : '',
+                id: 'customTemplate-for-email',
+                name: customTemplateName,
+                size: 80,
+                instructions: "Enter custom template path."|t('form-builder')
             }) }}
         </div>
     </div>

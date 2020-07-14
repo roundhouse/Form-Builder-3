@@ -14,6 +14,7 @@ use Craft;
 use craft\base\Component;
 use craft\helpers\App;
 use craft\helpers\ArrayHelper;
+use craft\web\UploadedFile;
 use craft\web\View;
 use craft\helpers\Json;
 use craft\mail\Message;
@@ -39,6 +40,8 @@ class Email extends Component
     {
         $fields = $entry->form->getFieldLayout()->getFields();
 
+        $hasFiles = $this->_checkForFiles($fields, $entry);
+
         if ($items) {
             foreach ($items as $item) {
                 $variables = [
@@ -46,13 +49,16 @@ class Email extends Component
                     'enabled' => $item['integration']->status,
                     'settings' => [
                         'includeSubmission' => $item['includeSubmission'],
-                        'sendCopyToSender' => $item['sendCopyToSender'],
+                        'sendCopyToSender' => isset($item['sendCopyToSender']) ? $item['sendCopyToSender'] : false,
                         'senderEmail' => Craft::$app->getView()->renderObjectTemplate('{' . $item['senderEmail'] . '}', $entry),
                         'senderSubject' => Craft::$app->getView()->renderObjectTemplate($item['senderSubject'], $entry),
                         'toEmail' => Craft::$app->getView()->renderObjectTemplate($item['toEmail'], $entry),
                         'fromEmail' => Craft::$app->getView()->renderObjectTemplate($item['fromEmail'], $entry),
                         'fromName' => Craft::$app->getView()->renderObjectTemplate($item['fromName'], $entry),
                         'subject' => Craft::$app->getView()->renderObjectTemplate($item['subject'], $entry),
+                        'customTemplate' => Craft::$app->getView()->renderObjectTemplate($item['customTemplate'], $entry),
+                        'includeFileAttachments' => isset($item['includeFileAttachments']) ? $item['includeFileAttachments'] : false,
+                        'hasFiles' => $hasFiles,
                     ],
                     'entry' => $entry,
                     'fields' => $fields
@@ -68,6 +74,40 @@ class Email extends Component
     // Private Methods
     // =========================================================================
 
+    private function _checkForFiles($fields, $entry)
+    {
+        $assets = [];
+
+        foreach ($fields as $field) {
+            $class = get_class($field);
+
+            if ($class == 'craft\fields\Assets') {
+                $handle = $field->handle;
+                if ($handle) {
+                    $assetEntry = $entry[$handle]->one();
+                    if ($assetEntry) {
+                        $asset = [
+                            'url' => $assetEntry->url,
+                            'filename' => $assetEntry->filename,
+                            'volumeId' => $assetEntry->volumeId,
+                            'folderId' => $assetEntry->folderId,
+                            'folderPath' => $assetEntry->folderPath,
+                        ];
+
+                        $assets[] = $asset;
+                    }
+                }
+            }
+
+        }
+
+        if (!empty($assets)) {
+            return $assets;
+        }
+
+        return false;
+    }
+
     /**
      * Prepare mail payload
      *
@@ -80,7 +120,13 @@ class Email extends Component
     {
         $oldPath = Craft::$app->view->getTemplateMode();
         Craft::$app->view->setTemplateMode(View::TEMPLATE_MODE_CP);
-        $template = Craft::$app->view->renderTemplate('form-builder/integrations/_type/email/email-template', $variables);
+
+        if (isset($variables['settings']['customTemplate']) && $variables['settings']['customTemplate'] != '') {
+            $template = Craft::$app->view->renderTemplate($variables['settings']['customTemplate'], $variables);
+        } else {
+            $template = Craft::$app->view->renderTemplate('form-builder/integrations/_type/email/email-template', $variables);
+        }
+
         Craft::$app->view->setTemplateMode($oldPath);
 
         $this->_sendEmail($variables['settings'], $template);
@@ -105,8 +151,14 @@ class Email extends Component
                 $messageRecipient->setTo($this->_getToRecipient($settings));
                 $messageRecipient->setSubject($settings['senderSubject']);
                 $messageRecipient->setHtmlBody($template);
-
                 $recipientMessage = $messageRecipient;
+
+                if (isset($settings['includeFileAttachments']) && $settings['includeFileAttachments'] && $settings['hasFiles']) {
+                    foreach ($settings['hasFiles'] as $file) {
+                        $messageRecipient->attach($file['url']);
+                    }
+                }
+
             }
         }
         
@@ -115,7 +167,13 @@ class Email extends Component
         $message->setTo($this->_getTo($settings));
         $message->setSubject($settings['subject']);
         $message->setHtmlBody($template);
-        
+
+        if (isset($settings['includeFileAttachments']) && $settings['includeFileAttachments'] && $settings['hasFiles']) {
+            foreach ($settings['hasFiles'] as $file) {
+                $message->attach($file['url']);
+            }
+        }
+
         $messages = [$message];
 
         if ($recipientMessage) {

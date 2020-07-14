@@ -1,9 +1,15 @@
 # Form Builder Changelog
 
+## 3.1.4.3 - 2020-07-13
+
+### Added
+- Email integration can now have custom email template path
+- Assets can now be attached to email notification
+
 ## 3.1.4.2 - 2020-07-13
 
 ### Added
--- Added template hooks to submission email template. `fb-email-template-matrixBlockQuery-hook` and `fb-email-template-section-hook`
+- Added template hooks to submission email template. `fb-email-template-matrixBlockQuery-hook` and `fb-email-template-section-hook`
 
 ## 3.1.4.1 - 2020-07-13
 
@@ -13,7 +19,7 @@
 ## 3.1.4 - 2020-07-13
 
 ### Added
--- Added template hooks for submission template. `fb-view-submission-matrixBlockQuery-hook` and `fb-view-submission-section-hook`
+- Added template hooks for submission template. `fb-view-submission-matrixBlockQuery-hook` and `fb-view-submission-section-hook`
 
 ## 3.1.3.1 - 2020-07-07
 
