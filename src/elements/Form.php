@@ -21,12 +21,15 @@ use craft\validators\HandleValidator;
 use craft\validators\UniqueValidator;
 use craft\behaviors\FieldLayoutBehavior;
 
+use roundhouse\formbuilder\events\AllowedFieldTypesEvent;
 use roundhouse\formbuilder\FormBuilder;
 use roundhouse\formbuilder\elements\db\FormQuery;
 use roundhouse\formbuilder\records\Form as FormRecord;
+use yii\base\Exception;
 
 class Form extends Element
 {
+    const EVENT_ALLOWED_FIELD_TYPES = 'allowedFieldTypes';
 
     // Constants
     // =========================================================================
@@ -106,6 +109,17 @@ class Form extends Element
     /**
      * @inheritdoc
      */
+    public static function statuses(): array
+    {
+        return [
+            self::STATUS_ENABLED => FormBuilder::t('Enabled'),
+            self::STATUS_DISABLED => FormBuilder::t('Disabled')
+        ];
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function getFieldContext(): string
     {
         return 'global';
@@ -145,17 +159,6 @@ class Form extends Element
 
     /**
      * @inheritdoc
-     */
-    public static function statuses(): array
-    {
-        return [
-            self::STATUS_ENABLED => FormBuilder::t('Enabled'),
-            self::STATUS_DISABLED => FormBuilder::t('Disabled')
-        ];
-    }
-
-    /**
-     * @inheritdoc
      *
      * @return FormQuery The newly created [[FormQuery]] instance.
      */
@@ -176,6 +179,11 @@ class Form extends Element
         return $this->group;
     }
 
+    /**
+     * Return allowed filed types
+     *
+     * @return array
+     */
     public function getAllowedFieldTypes()
     {
         $allowed = [
@@ -192,7 +200,13 @@ class Form extends Element
             'Color'
         ];
 
-        return $allowed;
+        // Give plugins a chance to modify these, or add new ones
+        $event = new AllowedFieldTypesEvent([
+            'allowedFieldTypes' => $allowed,
+        ]);
+        $this->trigger(self::EVENT_ALLOWED_FIELD_TYPES, $event);
+
+        return $event->allowedFieldTypes;
     }
 
     /**
@@ -267,6 +281,20 @@ class Form extends Element
         $behavior = $this->getBehavior('fieldLayout');
 
         return $behavior->getFieldLayout();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getStatus()
+    {
+        $status = parent::getStatus();
+
+        if ($status == self::STATUS_ENABLED && $this->statusId == '1') {
+            return self::STATUS_ENABLED;
+        }
+
+        return $status;
     }
 
     /**
@@ -448,4 +476,45 @@ class Form extends Element
 
     // Events
     // -------------------------------------------------------------------------
+
+    /**
+     * @inheritdoc
+     */
+    public function afterSave(bool $isNew)
+    {
+        if (!$isNew) {
+            $record = FormRecord::findOne($this->id);
+
+            if (!$record) {
+                throw new Exception('Invalid form ID: ' . $this->id);
+            }
+        } else {
+            $record = new FormRecord();
+            $record->id = $this->id;
+        }
+        
+        $record->name               = $this->name;
+        $record->handle             = $this->handle;
+        $record->statusId           = $this->statusId;
+        $record->fieldLayoutId      = $this->fieldLayoutId;
+        $record->groupId            = $this->groupId;
+        $record->options            = Json::encode($this->options);
+        $record->spam               = Json::encode($this->spam);
+        $record->integrations      = Json::encode($this->integrations);
+        $record->settings           = Json::encode($this->settings);
+        
+        $record->save(false);
+
+        parent::afterSave($isNew);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function afterDelete()
+    {
+        FormBuilder::$plugin->forms->delete($this->id);
+
+        parent::afterDelete();
+    }
 }

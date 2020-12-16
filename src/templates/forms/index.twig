@@ -1,4 +1,4 @@
-{% extends "_layouts/cp" %}
+{% extends "form-builder/_layouts/elementindex" %}
 
 {% set title = "Forms"|t('form-builder') %}
 {% set bodyClass = 'formbuilder fb-forms' %}
@@ -12,136 +12,153 @@
     {% exit 404 %}
 {% endif %}
 
-{% set sources = craft.app.elementIndexes.getSources(elementType, 'index') %}
-{% set customizableSources = (sources is not empty and context == 'index' and currentUser.admin) %}
+{% block actionButton %}
+    {% set newFormUrl = url('form-builder/forms/new', (groupId is defined ? { groupId: groupId } : { groupId: 1 })) %}
 
-{% block header %}
-    {% include 'form-builder/_includes/_header' ignore missing with { title: title, createForm: true, groups: groups } %}
-{% endblock %}
-
-{% block sidebar %}
-    {% if sources is not empty %}
-        <nav id="sources">
-            <ul>
-                {% for key, source in sources %}
-                    {% if source.heading is defined %}
-                        <li class="heading"><span>{{ source.heading|t('form-builder') }}</span></li>
-                    {% else %}
-                        <li {% if source.key != '*' %}class="group-item"{% endif %}>
-                            <a data-label="{{ source.label }}" {% if source.icon is defined and source.icon %}data-icon-name="{{ source.icon }}"{% endif %} data-key="{{ source.key is defined ? source.key : key }}" {%- if source.defaultSort is defined %}{% set defaultSort = source.defaultSort %} data-default-sort="{{ defaultSort is iterable ? defaultSort|join(':') : defaultSort }}"{% endif %}{%- if source.data is defined -%}{% for dataKey, dataVal in source.data %} data-{{ dataKey }}="{{ dataVal }}"{% endfor %}{%- endif %}>
-                                {% if source.icon is defined and source.icon %}
-                                    <i class="far fa-{{ source.icon }}"></i>
-                                {% endif %}
-                                {{- source.label -}}
-
-                                {% if source.key != '*' %}
-                                    <span class="edit-group"><i class="fal fa-pencil"></i></span>
-                                {% endif %}
-                            </a>
-                        </li>
-                    {% endif %}
-                {% endfor %}
-            </ul>
-
-            <section class="group-selector">
-                <div class="buttons">
-                    <div id="newgroupbtn" class="btns btn-info submit"><i class="fas fa-plus"></i><span class="txt">{{ "New Group"|t('form-builder') }}</span></div>
-                </div>
-            </section>
-        </nav>
-
-        {% if customizableSources %}
-            <a class="btns btn-white customize-sources" title="{{ 'Customize sources'|t('form-builder') }}">{{ 'Customize Sidebar'|t('form-builder') }}</a>
-        {% endif %}
-    {% endif %}
-{% endblock %}
-
-{% block content %}
-    <div class="elementindex">
-        {% from "_includes/forms" import text -%}
-
-        {% do view.registerTranslations('app', [
-            "Sort by {attribute}",
-            "Score",
-            "Structure",
-            "Display in a table",
-            "Display hierarchically",
-            "Display as thumbnails",
-        ]) %}
-
-        {% set elementInstance = craft.app.elements.createElement(elementType) %}
-        {% set context = context is defined ? context : 'index' %}
-        {% set showStatusMenu = (showStatusMenu is defined and showStatusMenu != 'auto' ? showStatusMenu : elementInstance.hasStatuses()) %}
-        {% set showSiteMenu = (craft.app.getIsMultiSite() ? (showSiteMenu ?? 'auto') : false) %}
-        {% if showSiteMenu == 'auto' %}
-            {% set showSiteMenu = elementInstance.isLocalized() %}
-        {% endif %}
-        {% set sortOptions = elementInstance.sortOptions() %}
-
-        {% macro sortOptionLabel(sortOption) %}
-            {{ sortOption.label ?? sortOption  }}
-        {% endmacro %}
-        {% from _self import sortOptionLabel %}
-
-        <div class="main">
-            <div class="toolbar">
-                <div class="flex">
-                    {% if showStatusMenu %}
-                        <div>
-                            <div class="btn menubtn statusmenubtn"><span class="status"></span>{{ "All"|t('app') }}</div>
-                            <div class="menu">
-                                <ul class="padded">
-                                    <li><a data-status="" class="sel"><span class="status"></span>{{ "All"|t('app') }}</a></li>
-                                    {% for status, info in elementInstance.statuses() %}
-                                        {% set label = info.label ?? info %}
-                                        {% set color = info.color ?? '' %}
-                                        <li><a data-status="{{ status }}"><span class="status {{ status }} {{ color }}"></span>{{ label }}</a></li>
-                                    {% endfor %}
-                                </ul>
-                            </div>
-                        </div>
-                    {% endif %}
-                    {% if showSiteMenu %}
-                        {% include "_elements/sitemenu" %}
-                    {% endif %}
-                    <div class="flex-grow texticon search icon clearable">
-                        {{ text({
-                            placeholder: "Search"|t('app')
-                        }) }}
-                        <div class="clear hidden" title="{{ 'Clear'|t('app') }}"></div>
-                    </div>
-                    <div>
-                        <div class="btn menubtn sortmenubtn"{% if sortOptions %} title="{{ 'Sort by {attribute}'|t('app', { attribute: sortOptionLabel(sortOptions|first) }) }}"{% endif %} data-icon="asc">{{ sortOptions ? sortOptionLabel(sortOptions|first) }}</div>
-                        <div class="menu">
-                            <ul class="padded sort-attributes">
-                                {% for key, sortOption in sortOptions %}
-                                    <li><a{% if loop.first %} class="sel"{% endif %} data-attr="{{ sortOption.attribute ?? sortOption.orderBy ?? key }}">{{ sortOptionLabel(sortOption) }}</a></li>
-                                {% endfor %}
-                            </ul>
-                            <hr>
-                            <ul class="padded sort-directions">
-                                <li><a data-dir="asc" class="sel">{{ "Ascending"|t('app') }}</a></li>
-                                <li><a data-dir="desc">{{ "Descending"|t('app') }}</a></li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="spinner invisible"></div>
-                </div>
-            </div>
-
-            <div class="elements"></div>
+    <div id="action-button">
+        <div class="btngroup">
+            <a class="btn submit add icon" href="{{ newFormUrl }}">{{ "Create New Form"|t('form-builder') }}</a>
         </div>
-
     </div>
 {% endblock %}
 
+{% block sidebar %}
 
-{% block initJs %}
-    Craft.elementIndex = Craft.createElementIndex('{{ elementType|e("js") }}', $('#main'), {
-    context:        'index',
-    storageKey:     'elementindex.{{ elementType }}',
-    criteria:       Craft.defaultIndexCriteria
-    });
+    <div class="group-selector">
+        <div class="btngroup">
+            <a href="#" class="btn submit add icon" id="newgroupbtn">{{ "New Group"|t('form-builder') }}</a>
+        </div>
+    </div>
+
+    {{ parent() }}
 {% endblock %}
 
-{% js block('initJs') %}
+{#{% set sources = craft.app.elementIndexes.getSources(elementType, 'index') %}#}
+{#{% set customizableSources = (sources is not empty and context == 'index' and currentUser.admin) %}#}
+
+{#{% block sidebar %}#}
+{#    {% if sources is not empty %}#}
+{#        <nav id="sources">#}
+{#            <ul>#}
+{#                {% for key, source in sources %}#}
+{#                    {% if source.heading is defined %}#}
+{#                        <li class="heading"><span>{{ source.heading|t('form-builder') }}</span></li>#}
+{#                    {% else %}#}
+{#                        <li {% if source.key != '*' %}class="group-item"{% endif %}>#}
+{#                            <a data-label="{{ source.label }}" {% if source.icon is defined and source.icon %}data-icon-name="{{ source.icon }}"{% endif %} data-key="{{ source.key is defined ? source.key : key }}" {%- if source.defaultSort is defined %}{% set defaultSort = source.defaultSort %} data-default-sort="{{ defaultSort is iterable ? defaultSort|join(':') : defaultSort }}"{% endif %}{%- if source.data is defined -%}{% for dataKey, dataVal in source.data %} data-{{ dataKey }}="{{ dataVal }}"{% endfor %}{%- endif %}>#}
+{#                                {% if source.icon is defined and source.icon %}#}
+{#                                    <i class="far fa-{{ source.icon }}"></i>#}
+{#                                {% endif %}#}
+{#                                {{- source.label -}}#}
+
+{#                                {% if source.key != '*' %}#}
+{#                                    <span class="edit-group"><i class="fal fa-pencil"></i></span>#}
+{#                                {% endif %}#}
+{#                            </a>#}
+{#                        </li>#}
+{#                    {% endif %}#}
+{#                {% endfor %}#}
+{#            </ul>#}
+
+{#            <section class="group-selector">#}
+{#                <div class="buttons">#}
+{#                    <div id="newgroupbtn" class="btns btn-info submit"><i class="fas fa-plus"></i><span class="txt">{{ "New Group"|t('form-builder') }}</span></div>#}
+{#                </div>#}
+{#            </section>#}
+{#        </nav>#}
+
+{#        {% if customizableSources %}#}
+{#            <a class="btns btn-white customize-sources" title="{{ 'Customize sources'|t('form-builder') }}">{{ 'Customize Sidebar'|t('form-builder') }}</a>#}
+{#        {% endif %}#}
+{#    {% endif %}#}
+{#{% endblock %}#}
+
+{#{% block content %}#}
+{#    <div class="elementindex">#}
+{#        {% from "_includes/forms" import text -%}#}
+
+{#        {% do view.registerTranslations('app', [#}
+{#            "Sort by {attribute}",#}
+{#            "Score",#}
+{#            "Structure",#}
+{#            "Display in a table",#}
+{#            "Display hierarchically",#}
+{#            "Display as thumbnails",#}
+{#        ]) %}#}
+
+{#        {% set elementInstance = craft.app.elements.createElement(elementType) %}#}
+{#        {% set context = context is defined ? context : 'index' %}#}
+{#        {% set showStatusMenu = (showStatusMenu is defined and showStatusMenu != 'auto' ? showStatusMenu : elementInstance.hasStatuses()) %}#}
+{#        {% set showSiteMenu = (craft.app.getIsMultiSite() ? (showSiteMenu ?? 'auto') : false) %}#}
+{#        {% if showSiteMenu == 'auto' %}#}
+{#            {% set showSiteMenu = elementInstance.isLocalized() %}#}
+{#        {% endif %}#}
+{#        {% set sortOptions = elementInstance.sortOptions() %}#}
+
+{#        {% macro sortOptionLabel(sortOption) %}#}
+{#            {{ sortOption.label ?? sortOption  }}#}
+{#        {% endmacro %}#}
+{#        {% from _self import sortOptionLabel %}#}
+
+{#        <div class="main">#}
+{#            <div class="toolbar">#}
+{#                <div class="flex">#}
+{#                    {% if showStatusMenu %}#}
+{#                        <div>#}
+{#                            <div class="btn menubtn statusmenubtn"><span class="status"></span>{{ "All"|t('app') }}</div>#}
+{#                            <div class="menu">#}
+{#                                <ul class="padded">#}
+{#                                    <li><a data-status="" class="sel"><span class="status"></span>{{ "All"|t('app') }}</a></li>#}
+{#                                    {% for status, info in elementInstance.statuses() %}#}
+{#                                        {% set label = info.label ?? info %}#}
+{#                                        {% set color = info.color ?? '' %}#}
+{#                                        <li><a data-status="{{ status }}"><span class="status {{ status }} {{ color }}"></span>{{ label }}</a></li>#}
+{#                                    {% endfor %}#}
+{#                                </ul>#}
+{#                            </div>#}
+{#                        </div>#}
+{#                    {% endif %}#}
+{#                    {% if showSiteMenu %}#}
+{#                        {% include "_elements/sitemenu" %}#}
+{#                    {% endif %}#}
+{#                    <div class="flex-grow texticon search icon clearable">#}
+{#                        {{ text({#}
+{#                            placeholder: "Search"|t('app')#}
+{#                        }) }}#}
+{#                        <div class="clear hidden" title="{{ 'Clear'|t('app') }}"></div>#}
+{#                    </div>#}
+{#                    <div>#}
+{#                        <div class="btn menubtn sortmenubtn"{% if sortOptions %} title="{{ 'Sort by {attribute}'|t('app', { attribute: sortOptionLabel(sortOptions|first) }) }}"{% endif %} data-icon="asc">{{ sortOptions ? sortOptionLabel(sortOptions|first) }}</div>#}
+{#                        <div class="menu">#}
+{#                            <ul class="padded sort-attributes">#}
+{#                                {% for key, sortOption in sortOptions %}#}
+{#                                    <li><a{% if loop.first %} class="sel"{% endif %} data-attr="{{ sortOption.attribute ?? sortOption.orderBy ?? key }}">{{ sortOptionLabel(sortOption) }}</a></li>#}
+{#                                {% endfor %}#}
+{#                            </ul>#}
+{#                            <hr>#}
+{#                            <ul class="padded sort-directions">#}
+{#                                <li><a data-dir="asc" class="sel">{{ "Ascending"|t('app') }}</a></li>#}
+{#                                <li><a data-dir="desc">{{ "Descending"|t('app') }}</a></li>#}
+{#                            </ul>#}
+{#                        </div>#}
+{#                    </div>#}
+{#                    <div class="spinner invisible"></div>#}
+{#                </div>#}
+{#            </div>#}
+
+{#            <div class="elements"></div>#}
+{#        </div>#}
+
+{#    </div>#}
+{#{% endblock %}#}
+
+
+{#{% block initJs %}#}
+{#    Craft.elementIndex = Craft.createElementIndex('{{ elementType|e("js") }}', $('#main'), {#}
+{#    context:        'index',#}
+{#    storageKey:     'elementindex.{{ elementType }}',#}
+{#    criteria:       Craft.defaultIndexCriteria#}
+{#    });#}
+{#{% endblock %}#}
+
+{#{% js block('initJs') %}#}

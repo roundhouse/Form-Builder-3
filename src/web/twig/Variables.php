@@ -22,6 +22,14 @@ use roundhouse\formbuilder\elements\Form;
 use roundhouse\formbuilder\elements\Entry;
 use roundhouse\formbuilder\elements\db\EntryQuery;
 use roundhouse\formbuilder\models\Field;
+use roundhouse\formbuilder\services\Notes;
+use Twig\Error\LoaderError;
+use Twig\Error\RuntimeError;
+use Twig\Error\SyntaxError;
+use Twig\Markup;
+use Twig_Markup;
+use yii\base\Exception;
+use yii\base\ExitException;
 
 class Variables
 {
@@ -51,11 +59,11 @@ class Variables
      *
      * @param $formHandle
      * @param $variables
-     * @return bool|\Twig\Markup|\Twig_Markup
-     * @throws \Twig\Error\LoaderError
-     * @throws \Twig\Error\RuntimeError
-     * @throws \Twig\Error\SyntaxError
-     * @throws \yii\base\Exception
+     * @return bool|Markup|Twig_Markup
+     * @throws Exception
+     * @throws LoaderError
+     * @throws RuntimeError
+     * @throws SyntaxError
      */
     public function form($formHandle, $variables = null)
     {
@@ -122,11 +130,11 @@ class Variables
      * @param $field
      * @param Form $form
      * @return string
-     * @throws \Twig\Error\LoaderError
-     * @throws \Twig\Error\RuntimeError
-     * @throws \Twig\Error\SyntaxError
-     * @throws \yii\base\Exception
-     * @throws \yii\base\ExitException
+     * @throws LoaderError
+     * @throws RuntimeError
+     * @throws SyntaxError
+     * @throws Exception
+     * @throws ExitException
      */
     public function getCustomInputHtml($value, Entry $entry, $field, Form $form): string
     {
@@ -195,10 +203,10 @@ class Variables
      * @param $field
      * @param Form $form
      * @return string
-     * @throws \Twig\Error\LoaderError
-     * @throws \Twig\Error\RuntimeError
-     * @throws \Twig\Error\SyntaxError
-     * @throws \yii\base\Exception
+     * @throws LoaderError
+     * @throws RuntimeError
+     * @throws SyntaxError
+     * @throws Exception
      */
     public function getInputHtml($value, Entry $entry, $field, Form $form): string
     {
@@ -270,101 +278,6 @@ class Variables
         }
     }
 
-//    /**
-//     * Get input HTML for frontend fields
-//     *
-//     * @param $value
-//     * @param Entry $entry
-//     * @param $field
-//     * @param Form $form
-//     * @return string
-//     * @throws \Twig_Error_Loader
-//     * @throws \yii\base\Exception
-//     */
-//    public function getInputHtml($value, Entry $entry, $field, Form $form): string
-//    {
-//        $view = Craft::$app->getView();
-//
-//        // Field Settings & Options
-//        $fieldOptions   = FormBuilder::$plugin->fields->getFieldRecordByFieldId($field->id, $form->id);
-//        $fieldType      = $this->getFieldTypeByClass(get_class($field), $field);
-//
-//        // Global Settings
-//        $formSettings               = $form->settings;
-////        $globalTemplateOverridePath = $this->_setGlobalTemplatePath($formSettings, $fieldOptions, $fieldType, $view);
-//
-//        $variables = [
-//            'name'          => $field->handle,
-//            'value'         => $value,
-//            'type'          => $fieldType,
-//            'field'         => $field,
-//            'settings'      => $field,
-//            'form'          => $form,
-//            'options'       => $field->options ?? null,
-//            'class'         => '',
-//            'id'            => ''
-//        ];
-//
-//        if ($fieldOptions) {
-//            $options = Json::decode($fieldOptions->options);
-//
-//            if (isset($options['class'])) {
-//                $variables['class'] = $options['class'];
-//            }
-//
-//            if (isset($options['id'])) {
-//                $variables['id'] = $options['id'];
-//            }
-//        }
-//
-//        if (isset($formSettings['fields']['global']['inputClass'])) {
-//            $availableClasses = $variables['class'];
-//            $variables['class'] = $availableClasses . ' ' . $formSettings['fields']['global']['inputClass'];
-//        }
-//
-//        if (isset($field->placeholder)) {
-//            $variables['placeholder'] = $field->placeholder;
-//        }
-//
-//        if (isset($field->charLimit)) {
-//            $variables['maxlength'] = $field->charLimit;
-//        }
-//
-//        if (isset($field->size)) {
-//            $variables['size'] = $field->size;
-//        }
-//
-//        if (isset($field->initialRows)) {
-//            $variables['rows'] = $field->initialRows;
-//        }
-//
-//        $customPath = 'formbuilder/text';
-//        $view->setTemplateMode(View::TEMPLATE_MODE_SITE);
-//        $input = Craft::$app->view->renderTemplate($customPath, $variables);
-//
-////        $input = Craft::$app->view->renderTemplate('form-builder/_includes/forms/text', $variables);
-////        $input = Craft::$app->view->renderTemplate('formbuilder/custom/text.twig', $variables);
-//
-//
-//        // Template Resolver
-////        $input = $this->getInput($globalTemplateOverridePath, $fieldType, $field, $variables);
-//
-//
-////        if ($globalTemplateOverridePath) {
-////            $input = $this->getInput($fieldType, $globalTemplateOverridePath, $field, $variables);
-////        } else {
-////            $input = $this->getInput($fieldType, '', $field, $variables);
-////        }
-//
-//        if (isset($input) && $input !== '') {
-//            return Template::raw($input);
-//        } else {
-//            FormBuilder::log('Input field is not available, $input does not exist or returns empty');
-//
-//            return Formbuilder::t('Input field is not available');
-//        }
-//    }
-
     /**
      * Get entries
      *
@@ -386,7 +299,7 @@ class Variables
      * Get entry's notes
      *
      * @param $entryId
-     * @return \roundhouse\formbuilder\services\Notes
+     * @return Notes
      */
     public function notes($entryId)
     {
@@ -536,6 +449,11 @@ class Variables
         return FormBuilder::$plugin->integrations->isIntegrations();
     }
 
+    public function getPluginName()
+    {
+        return FormBuilder::$plugin->getPluginName();
+    }
+
     /**
      * Get clean field name by class
      *
@@ -594,9 +512,9 @@ class Variables
      * @param $field
      * @param $variables
      * @return string
-     * @throws \Twig\Error\LoaderError
-     * @throws \Twig\Error\RuntimeError
-     * @throws \Twig\Error\SyntaxError
+     * @throws LoaderError
+     * @throws RuntimeError
+     * @throws SyntaxError
      */
     public function getInput($type, $field, $variables)
     {
@@ -665,7 +583,7 @@ class Variables
      * @param string $path
      * @param string $filename
      * @return string
-     * @throws \yii\base\ExitException
+     * @throws ExitException
      */
     private function _resolveTemplate(string $path, string $filename)
     {
@@ -686,7 +604,7 @@ class Variables
      * @param $fieldType
      * @param $view
      * @return string
-     * @throws \yii\base\ExitException
+     * @throws ExitException
      */
     private function _setGlobalTemplatePath($formSettings, $fieldOptions, $fieldType, $view)
     {

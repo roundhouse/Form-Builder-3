@@ -1,83 +1,136 @@
-{% extends "_layouts/cp" %}
-{% import "_includes/forms" as forms %}
+{% extends "form-builder/_layouts/layout" %}
+{#{% import "_includes/forms" as forms %}#}
+
+{% do view.registerAssetBundle('craft\\web\\assets\\admintable\\AdminTableAsset') -%}
 
 {% set title = "Integrations"|t('form-builder') %}
 {% set bodyClass = 'formbuilder fb-integrations' %}
 {% set selectedSubnavItem = "integrations" %}
 
-{% block header %}
-    {% include 'form-builder/_includes/_header' ignore missing with { title: title } %}
+{% block actionButton %}
+    <div class="btngroup submit">
+        <div class="btn submit menubtn"><span>New Integration</span></div>
+        <div class="menu" data-align="right">
+            <ul>
+                <li>
+                    <a href="{{ url('form-builder/integrations/new/email') }}" class="item-meta add-integration" data-type="email">
+                        <div class="menu-wrapper">
+                            <div class="item-meta-icon">{% include 'form-builder/_includes/icons/integrations-email' ignore missing %}</div>
+                            <div>{{ "Email"|t('form-builder') }}</div>
+                        </div>
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url('form-builder/integrations/new/slack') }}" class="item-meta add-integration" data-type="slack">
+                        <span class="menu-wrapper">
+                            <div class="item-meta-icon">{% include 'form-builder/_includes/icons/integrations-slack' ignore missing %}</div>
+                            <div>{{ "Slack"|t('form-builder') }}</div>
+                        </span>
+                    </a>
+                </li>
+                {% hook 'formbuilder-integrations-types' %}
+            </ul>
+        </div>
+    </div>
 {% endblock %}
 
 {% block content %}
-
-    <section class="flex-container">
-        <div class="full-col widget">
-            <header class="pad">
-                <h2>{{ 'Integration Types'|t('form-builder') }}</h2>
-            </header>
-            <div class="body">
-                <div class="list available-integrations-list">
-                    <div class="item has-hover pad">
-                        <a href="#" class="item-meta add-integration" data-type="email">
-                            <div class="item-meta-icon">{% include 'form-builder/_includes/icons/integrations-email' ignore missing %}</div>
-                        </a>
-                        <div class="item-info">
-                            <div class="item-meta-title">Email</div>
-                        </div>
-                    </div>
-                    <div class="item has-hover pad">
-                        <a href="#" class="item-meta add-integration" data-type="slack">
-                            <div class="item-meta-icon">{% include 'form-builder/_includes/icons/integrations-slack' ignore missing %}</div>
-                        </a>
-                        <div class="item-info">
-                            <div class="item-meta-title">Slack</div>
-                        </div>
-                    </div>
-                    {% hook 'formbuilder-integrations-types' %}
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section class="flex-container">
-        <div class="full-col widget">
-            <header class="pad">
-                <h2>{{ 'Integrations'|t('form-builder') }}</h2>
-            </header>
-            <div class="body">
-
-                <div class="list current-integrations-list" id="current-integrations-list">
-                    {% for integration in integrations %}
-                        <div class="item has-hover pad">
-                            <div class="item-meta">
-                                {% if craft.app.view.doesTemplateExist('form-builder/_includes/icons/integrations-' ~ integration.type) %}
-                                    <div class="item-meta-icon">{% include 'form-builder/_includes/icons/integrations-' ~ integration.type ignore missing %}</div>
-                                {% else %}
-                                    <div class="item-meta-icon">{% include 'form-builder-integrations/icons/integrations-' ~ integration.type ignore missing %}</div>
-                                {% endif %}
-                            </div>
-                            <div class="item-info">
-                                <div class="item-meta-title"><a href="{{ url('form-builder/integrations/' ~ integration.id) }}">{{ integration.name }}</a></div>
-                                <div class="coded">{{ integration.handle }}</div>
-                            </div>
-                            <div class="item-status">
-                                {% if integration.status == 'enabled' %}
-                                    <div class="status on" title="Enabled"></div>
-                                {% else %}
-                                    <div class="status off" title="Disabled"></div>
-                                {% endif %}
-                            </div>
-                            <div class="item-remove" data-id="{{ integration.id }}">
-                               <i class="fa fa-times"></i>
-                            </div>
-                        </div>
-                    {% else %}
-                        <p class="empty pad">{{ 'No integrations added yet'|t('form-builde') }}</p>
-                    {% endfor %}
-                </div>
-            </div>
-        </div>
-    </section>
-
+    <div id="integrations-vue-admin-table"></div>
 {% endblock %}
+
+{% set tableData = [] %}
+
+ {% for integration in integrations %}
+    {% set tableData = tableData | merge([{
+        id: integration.id,
+        title: integration.name | t('site'),
+        url: url('form-builder/integrations/' ~ integration.id),
+        name: integration.name | t('site') | e,
+        handle: integration.handle,
+        status: integration.status,
+    }]) %}
+{% endfor %}
+
+{% js %}
+    var columns = [
+    { name: '__slot:title', title: Craft.t('form-builder', 'Name') },
+    { name: '__slot:handle', title: Craft.t('form-builder', 'Handle') },
+    ];
+
+    new Craft.VueAdminTable({
+    columns: columns,
+    container: '#integrations-vue-admin-table',
+    deleteAction: 'form-builder/integrations/delete',
+    emptyMessage: Craft.t('form-builder', 'No integrations exist yet.'),
+    tableData: {{ tableData|json_encode|raw }},
+    });
+{% endjs %}
+
+{#    <section class="flex-container">#}
+{#        <div class="full-col widget">#}
+{#            <h2>{{ 'Integration Types'|t('form-builder') }}</h2>#}
+
+{#            <div class="body">#}
+{#                <div class="list available-integrations-list">#}
+{#                    <div class="item has-hover pad">#}
+{#                        <a href="#" class="item-meta add-integration" data-type="email">#}
+{#                            <div class="item-meta-icon">{% include 'form-builder/_includes/icons/integrations-email' ignore missing %}</div>#}
+{#                        </a>#}
+{#                        <div class="item-info">#}
+{#                            <div class="item-meta-title">Email</div>#}
+{#                        </div>#}
+{#                    </div>#}
+{#                    <div class="item has-hover pad">#}
+{#                        <a href="#" class="item-meta add-integration" data-type="slack">#}
+{#                            <div class="item-meta-icon">{% include 'form-builder/_includes/icons/integrations-slack' ignore missing %}</div>#}
+{#                        </a>#}
+{#                        <div class="item-info">#}
+{#                            <div class="item-meta-title">Slack</div>#}
+{#                        </div>#}
+{#                    </div>#}
+{#                    {% hook 'formbuilder-integrations-types' %}#}
+{#                </div>#}
+{#            </div>#}
+{#        </div>#}
+{#    </section>#}
+
+{#    <hr>#}
+
+{#    <section class="flex-container">#}
+{#        <div class="full-col widget">#}
+{#            <h2>{{ 'Integrations'|t('form-builder') }}</h2>#}
+
+{#            <div class="body">#}
+
+{#                <div class="list current-integrations-list" id="current-integrations-list">#}
+{#                    {% for integration in integrations %}#}
+{#                        <div class="item has-hover pad">#}
+{#                            <div class="item-meta">#}
+{#                                {% if craft.app.view.doesTemplateExist('form-builder/_includes/icons/integrations-' ~ integration.type) %}#}
+{#                                    <div class="item-meta-icon">{% include 'form-builder/_includes/icons/integrations-' ~ integration.type ignore missing %}</div>#}
+{#                                {% else %}#}
+{#                                    <div class="item-meta-icon">{% include 'form-builder-integrations/icons/integrations-' ~ integration.type ignore missing %}</div>#}
+{#                                {% endif %}#}
+{#                            </div>#}
+{#                            <div class="item-info">#}
+{#                                <div class="item-meta-title"><a href="{{ url('form-builder/integrations/' ~ integration.id) }}">{{ integration.name }}</a></div>#}
+{#                                <div class="coded">{{ integration.handle }}</div>#}
+{#                            </div>#}
+{#                            <div class="item-status">#}
+{#                                {% if integration.status == 'enabled' %}#}
+{#                                    <div class="status on" title="Enabled"></div>#}
+{#                                {% else %}#}
+{#                                    <div class="status off" title="Disabled"></div>#}
+{#                                {% endif %}#}
+{#                            </div>#}
+{#                            <div class="item-remove" data-id="{{ integration.id }}">#}
+{#                               <i class="fa fa-times"></i>#}
+{#                            </div>#}
+{#                        </div>#}
+{#                    {% else %}#}
+{#                        <p class="empty pad">{{ 'No integrations added yet'|t('form-builde') }}</p>#}
+{#                    {% endfor %}#}
+{#                </div>#}
+{#            </div>#}
+{#        </div>#}
+{#    </section>#}

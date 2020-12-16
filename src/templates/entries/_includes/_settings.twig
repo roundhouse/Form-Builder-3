@@ -1,0 +1,42 @@
+{% import "_includes/forms" as forms %}
+
+{% set form = entry.getForm() %}
+{% set group = form.getGroup() %}
+
+<div id="meta-details" class="meta read-only">
+    <div class="data">
+        <h5 class="heading">{{ 'Form'|t('form-builder') }}</h5>
+        <div class="value"><i class="far fa-{{ group.settings.icon.name }}"></i>&nbsp; {{ form.name }}</div>
+    </div>
+
+    <div class="data">
+        <h5 class="heading">{{ 'Posted on'|t('form-builder') }}</h5>
+        <div class="value">{{ entry.postedOn |date() }}</div>
+    </div>
+
+    <div class="data">
+        <h5 class="heading">{{ 'IP Address'|t('form-builder') }}</h5>
+        <div class="value">{{ entry.ipAddress }}</div>
+    </div>
+
+    <div class="data">
+        <h5 class="heading">{{ 'Browser'|t('form-builder') }}</h5>
+        <div class="value">{{ entry.userAgent |browser(entry.userAgent) }}</div>
+    </div>
+
+    <div class="data">
+        {% if currentUser.can('fb:deleteEntry') %}
+            <button id="delete-entry" class="btn btn-danger" data-entry-id="{{ entry.id }}"><span>{{ "Delete Entry"|t('form-builder') }}</span></button>
+        {% endif %}
+
+        {% if currentUser.can('fb:downloadFiles') %}
+            <form id="download-all-assets" method="post" accept-charset="UTF-8">
+                {{ actionInput('form-builder/assets/download-all-files') }}
+                {{ hiddenInput('entryId', entry.id) }}
+                <button type="submit" class="btn hidden"><span>{{ "Download Assets"|t('form-builder') }}</span><span class="asset-count">0</span></button>
+                <div class="download-status"></div>
+            </form>
+        {% endif %}
+    </div>
+
+</div>

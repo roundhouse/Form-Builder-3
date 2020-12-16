@@ -23,6 +23,10 @@ class Dashboard extends AssetBundle
             CpAsset::class,
         ];
 
+        $this->css = [
+            'css/dashboard.css',
+        ];
+
         $this->js = [
             'js/dashboard.js',
         ];

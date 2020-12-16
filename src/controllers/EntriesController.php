@@ -10,6 +10,8 @@
 
 namespace roundhouse\formbuilder\controllers;
 
+use craft\errors\ElementNotFoundException;
+use craft\errors\MissingComponentException;
 use roundhouse\formbuilder\FormBuilder;
 
 use Craft;
@@ -18,6 +20,15 @@ use craft\web\Controller;
 use craft\helpers\DateTimeHelper;
 use craft\helpers\StringHelper;
 use roundhouse\formbuilder\records\Note;
+use Throwable;
+use Twig\Error\LoaderError;
+use Twig\Error\RuntimeError;
+use Twig\Error\SyntaxError;
+use Twig_Error_Loader;
+use yii\base\Exception;
+use yii\base\ExitException;
+use yii\base\InvalidConfigException;
+use yii\web\BadRequestHttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\ForbiddenHttpException;
 use yii\web\Response;
@@ -64,8 +75,8 @@ class EntriesController extends Controller
      * Entries index page
      *
      * @return Response
-     * @throws \yii\base\InvalidConfigException
-     * @throws \yii\web\ForbiddenHttpException
+     * @throws InvalidConfigException
+     * @throws ForbiddenHttpException
      */
     public function actionIndex()
     {
@@ -83,9 +94,9 @@ class EntriesController extends Controller
      *
      * @param int|null $entryId
      * @return Response
-     * @throws \yii\base\InvalidConfigException
+     * @throws InvalidConfigException
      * @throws \yii\db\Exception
-     * @throws \yii\web\ForbiddenHttpException
+     * @throws ForbiddenHttpException
      */
     public function actionEdit(int $entryId = null): Response
     {
@@ -117,15 +128,17 @@ class EntriesController extends Controller
      * Get all unread entries
      *
      * @return Response
-     * @throws \Twig_Error_Loader
-     * @throws \yii\base\Exception
+     * @throws Exception
+     * @throws LoaderError
+     * @throws RuntimeError
+     * @throws SyntaxError
      */
     public function actionGetUnreadEntries()
     {
         $entries = Entry::find()
             ->where(['statusId' => 1])
             ->all();
-
+        
         $grouped = array_group_by($entries, "formId");
 
         if ($entries) {
@@ -148,9 +161,11 @@ class EntriesController extends Controller
      * Get all unread entries by form ID
      *
      * @return Response
-     * @throws \Twig_Error_Loader
-     * @throws \yii\base\Exception
-     * @throws \yii\web\BadRequestHttpException
+     * @throws BadRequestHttpException
+     * @throws Exception
+     * @throws LoaderError
+     * @throws RuntimeError
+     * @throws SyntaxError
      */
     public function actionGetUnreadEntriesBySource()
     {
@@ -185,10 +200,10 @@ class EntriesController extends Controller
      * Save entry
      *
      * @return null
-     * @throws \Throwable
-     * @throws \craft\errors\ElementNotFoundException
-     * @throws \yii\base\Exception
-     * @throws \yii\web\BadRequestHttpException
+     * @throws Throwable
+     * @throws ElementNotFoundException
+     * @throws Exception
+     * @throws BadRequestHttpException
      */
     public function actionSave()
     {
@@ -200,15 +215,24 @@ class EntriesController extends Controller
         $this->post     = $request->post();
         $this->files    = $_FILES;
 
-
         $saveToDatabase = isset($this->form->settings['database']['enabled']) && $this->form->settings['database']['enabled'] == '1' ? true : false;
 
         // Setup entry model
-        $this->entry = $this->_getEntryModel($request);
+        $this->entry = new Entry();
         $this->_populateEntryModel($this->entry, $request);
 
         // Spam Protection
-        $this->_spamProtection($this->entry, $request);
+        $this->_spamProtection($request);
+
+        // Check form errors
+        if ($this->entry->hasErrors()) {
+            $this->entry->clearErrors('title');
+            Craft::$app->getUrlManager()->setRouteParams([
+                'submission' => $this->entry
+            ]);
+
+            return null;
+        }
 
         $this->entry->setScenario(Element::SCENARIO_LIVE);
         $this->entry->validate();
@@ -221,16 +245,6 @@ class EntriesController extends Controller
 
         $this->trigger(self::EVENT_BEFORE_SUBMIT_ENTRY, $event);
 
-        // Check form errors
-        if ($this->entry->hasErrors()) {
-            $this->entry->clearErrors('title');
-            Craft::$app->getUrlManager()->setRouteParams([
-                'submission' => $this->entry
-            ]);
-
-            return null;
-        }
-
         if ($saveToDatabase && $event->isValid) {
             if (Craft::$app->getElements()->saveElement($this->entry)) {
                 $saved = true;
@@ -241,10 +255,6 @@ class EntriesController extends Controller
             $saved = true;
         }
 
-        // Perform Integrations
-        if ($this->form->integrations) {
-            FormBuilder::$plugin->integrations->performIntegrations($this->entry, $this->form);
-        }
 
         // Fire a 'afterSubmitEntry' event
         $event = new EntryEvent([
@@ -256,6 +266,11 @@ class EntriesController extends Controller
 
         // Notifications
         if ($saved) {
+            // Perform Integrations
+            if ($this->form->integrations) {
+                FormBuilder::$plugin->integrations->performIntegrations($this->entry, $this->form);
+            }
+
             return $this->_returnSuccessMessage();
         } else {
             return $this->_returnErrorMessage($request);
@@ -267,9 +282,9 @@ class EntriesController extends Controller
      *
      * @return null|Response
      * @throws NotFoundHttpException
-     * @throws \Throwable
-     * @throws \craft\errors\MissingComponentException
-     * @throws \yii\web\BadRequestHttpException
+     * @throws Throwable
+     * @throws MissingComponentException
+     * @throws BadRequestHttpException
      */
     public function actionDelete()
     {
@@ -320,24 +335,12 @@ class EntriesController extends Controller
     // =========================================================================
 
     /**
-     * Create an entry model
-     *
-     * @return Entry
-     */
-    private function _getEntryModel(): Entry
-    {
-        $entry = new Entry();
-
-        return $entry;
-    }
-
-    /**
      * Populate entry model from post
      *
      * @param Entry $entry
      * @param $request
-     * @throws \Throwable
-     * @throws \yii\base\Exception
+     * @throws Throwable
+     * @throws Exception
      */
     private function _populateEntryModel(Entry $entry, $request)
     {
@@ -359,16 +362,16 @@ class EntriesController extends Controller
     /**
      * Validate spam protection
      *
-     * @param Entry $entry
      * @param $request
+     * @throws ExitException
      */
-    private function _spamProtection(Entry $entry, $request)
+    private function _spamProtection($request)
     {
         // Honeypot
         if (isset($this->form->spam['honeypot']['enabled']) && $this->form->spam['honeypot']['enabled'] == '1') {
             $honeypotField = $request->getRequiredBodyParam('email-address-new-one');
             if ($honeypotField != '') {
-                $entry->addError('honeypot', FormBuilder::t('Failed honeypot validation!'));
+                $this->entry->addError('honeypot', FormBuilder::t('Failed honeypot validation!'));
             }
         }
 
@@ -379,7 +382,7 @@ class EntriesController extends Controller
             $allowedTime = (int)$this->form->spam['timed']['number'];
 
             if ($submissionDuration < $allowedTime) {
-                $entry->addError('timed', FormBuilder::t('You submitted too fast!'));
+                $this->entry->addError('timed', FormBuilder::t('You submitted too fast!'));
             }
         }
     }
@@ -395,11 +398,13 @@ class EntriesController extends Controller
         if (Craft::$app->getRequest()->getIsAjax()) {
             return $this->asJson([
                 'success' => false,
-                'message' => isset($this->form['options']['messages']['error']) ? $this->form['options']['messages']['error'] : FormBuilder::t('Form submission failed.')
+                'message' => isset($this->form['options']['messages']['error']) ? $this->form['options']['messages']['error'] : FormBuilder::t('Form submission failed.'),
+                'errors' => $this->entry->getErrors()
             ]);
         } else {
             Craft::$app->getUrlManager()->setRouteParams([
-                'submission' => $this->entry
+                'submission' => $this->entry,
+                'errors' => $this->entry->getErrors()
             ]);
         }
     }
@@ -408,33 +413,33 @@ class EntriesController extends Controller
      * Return success message
      *
      * @return Response
-     * @throws \craft\errors\MissingComponentException
+     * @throws MissingComponentException
      */
     private function _returnSuccessMessage()
     {
+        $options = $this->form->options;
+        $customRedirect = isset($options['redirect']['enabled']) && $options['redirect']['enabled'] === '1' ? true : false;
+        $currentRoute = Craft::$app->request->url;
+        $customRedirectUrl =  $currentRoute;
+
         if (Craft::$app->getRequest()->getIsAjax()) {
             return $this->asJson([
                 'success' => true,
-                'message' => isset($this->form['options']['messages']['success']) ? $this->form['options']['messages']['success'] : FormBuilder::t('Form submission successful.')
+                'message' => isset($this->form['options']['messages']['success']) ? $this->form['options']['messages']['success'] : FormBuilder::t('Form submission successful.'),
+                'redirect' => $customRedirectUrl
             ]);
         } else {
-            $options = $this->form->options;
-            $customRedirect = isset($options['redirect']['enabled']) && $options['redirect']['enabled'] === '1' ? true : false;
-
             if ($customRedirect) {
-                $currentRoute = Craft::$app->request->url;
-                $url =  isset($options['redirect']['url']) && $options['redirect']['url'] != '' ? $options['redirect']['url'] : $currentRoute;
+                $customRedirectUrl =  isset($options['redirect']['url']) && $options['redirect']['url'] != '' ? $options['redirect']['url'] : $currentRoute;
 
-                if ($currentRoute === $url) {
+                if ($currentRoute === $customRedirectUrl) {
                     Craft::$app->getSession()->setFlash('success', isset($this->form['options']['messages']['success']) ? $this->form['options']['messages']['success'] : FormBuilder::t('Form submission successful.'));
                 } else {
-                    $this->redirect($url);
+                    $this->redirect($customRedirectUrl);
                 }
             } else {
                 Craft::$app->getSession()->setFlash('success', isset($this->form['options']['messages']['success']) ? $this->form['options']['messages']['success'] : FormBuilder::t('Form submission successful.'));
             }
-
         }
-
     }
 }

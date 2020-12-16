@@ -1,13 +1,9 @@
-{% extends "_layouts/cp" %}
+{% extends "form-builder/_layouts/layout" %}
 {% import "_includes/forms" as forms %}
 
 {% set title = "Migration"|t('form-builder') %}
 {% set bodyClass = 'formbuilder fb-migrations' %}
 {% set selectedSubnavItem = "settings" %}
-
-{% block header %}
-    {% include 'form-builder/_includes/_header' ignore missing with { title: title } %}
-{% endblock %}
 
 {% block content %}
 

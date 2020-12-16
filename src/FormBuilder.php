@@ -25,18 +25,19 @@ use craft\events\RegisterElementActionsEvent;
 use craft\events\FieldLayoutEvent;
 use craft\helpers\Json;
 
+use roundhouse\formbuilder\elements\Form;
 use roundhouse\formbuilder\elements\Form as FormElement;
 use roundhouse\formbuilder\elements\Entry as EntryElement;
 use roundhouse\formbuilder\elements\actions\SetStatus;
 use roundhouse\formbuilder\elements\actions\Delete;
-use roundhouse\formbuilder\services\Migrations;
+use roundhouse\formbuilder\events\AllowedFieldTypesEvent;
+use roundhouse\formbuilder\fields\Forms;
+use roundhouse\formbuilder\services\Forms as FormsService;
+use roundhouse\formbuilder\services\Migrations as MigrationsService;
 use roundhouse\formbuilder\web\twig\Variables;
-
 use roundhouse\formbuilder\web\twig\Extensions;
-
 use roundhouse\formbuilder\models\Settings;
 use roundhouse\formbuilder\models\Field as FieldModel;
-
 use roundhouse\formbuilder\plugin\Services as FormBuilderServices;
 use roundhouse\formbuilder\plugin\Routes as FormBuilderRoutes;
 
@@ -83,6 +84,12 @@ class FormBuilder extends Plugin
         $this->_registerPermissions();
         $this->_registerVariables();
         $this->_registerCustomEvents();
+        $this->_registerFields();
+    }
+
+    public function getPluginName()
+    {
+        return Craft::t('form-builder', $this->getSettings()->pluginName);
     }
 
     /**
@@ -331,6 +338,16 @@ class FormBuilder extends Plugin
     }
 
     /**
+     * Register fields
+     */
+    private function _registerFields()
+    {
+        Event::on(Fields::class, Fields::EVENT_REGISTER_FIELD_TYPES, function (RegisterComponentTypesEvent $event) {
+            $event->types[] = Forms::class;
+        });
+    }
+
+    /**
      * Register variables
      */
     private function _registerVariables()
@@ -341,7 +358,8 @@ class FormBuilder extends Plugin
             function (Event $event) {
                 $variable = $event->sender;
                 $variable->set('fb', Variables::class);
-                $variable->set('fbMigration', Migrations::class);
+                $variable->set('fbMigration', MigrationsService::class);
+                $variable->set('fbForms', FormsService::class);
             }
         );
     }

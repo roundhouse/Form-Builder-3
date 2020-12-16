@@ -20,6 +20,7 @@ use craft\behaviors\FieldLayoutBehavior;
 
 use roundhouse\formbuilder\FormBuilder;
 use roundhouse\formbuilder\elements\db\EntryQuery;
+use roundhouse\formbuilder\plugin\Table;
 use roundhouse\formbuilder\records\Entry as EntryRecord;
 use roundhouse\formbuilder\elements\actions\SetStatus;
 use roundhouse\formbuilder\elements\actions\Delete;
@@ -142,7 +143,7 @@ class Entry extends Element
      */
     public function getUrl()
     {
-        return UrlHelper::cpUrl('form-builder/entries/'.$this->id);
+        return UrlHelper::cpUrl('form-builder/entries/' . $this->id);
     }
 
     /**
@@ -219,7 +220,7 @@ class Entry extends Element
     {
         $sources = [
             [
-                'key'   => '*',
+                'key' => '*',
                 'label' => FormBuilder::t('All Entries')
             ]
         ];
@@ -229,8 +230,8 @@ class Entry extends Element
         foreach ($forms as $form) {
             $key = 'form:' . $form->id;
             $sources[$key] = [
-                'key'      => $key,
-                'label'    => $form->name,
+                'key' => $key,
+                'label' => $form->name,
                 'criteria' => ['formId' => $form->id]
             ];
         }
@@ -243,7 +244,7 @@ class Entry extends Element
      */
     public function getCpEditUrl(): string
     {
-        return UrlHelper::cpUrl('form-builder/entries/'.$this->id);
+        return UrlHelper::cpUrl('form-builder/entries/' . $this->id);
     }
 
     // Indexes, etc.
@@ -257,7 +258,6 @@ class Entry extends Element
         switch ($attribute) {
             case 'formId':
                 $form = $this->getForm();
-//                $markup = '<span class="group">' . $form->name . '</span>';
                 $template = Craft::$app->view->renderTemplate('form-builder/_includes/common/_form-details', ['form' => $form]);
                 return $template;
                 break;
@@ -265,8 +265,6 @@ class Entry extends Element
                 return parent::tableAttributeHtml($attribute);
                 break;
         }
-        
-        return parent::tableAttributeHtml($attribute);
     }
 
     /**
@@ -283,9 +281,9 @@ class Entry extends Element
     protected static function defineSortOptions(): array
     {
         $attributes = [
-            'formbuilder_entries.statusId'  => FormBuilder::t('Status'),
-            'formbuilder_entries.formId'    => FormBuilder::t('Form'),
-            'elements.dateCreated'          => FormBuilder::t('Submitted')
+            'formbuilder_entries.statusId' => FormBuilder::t('Status'),
+            'formbuilder_entries.formId' => FormBuilder::t('Form'),
+            'elements.dateCreated' => FormBuilder::t('Submitted')
         ];
 
         return $attributes;
@@ -297,9 +295,9 @@ class Entry extends Element
     protected static function defineTableAttributes(): array
     {
         $attributes = [];
-        $customAttributes['title']        = ['label' => FormBuilder::t('Title')];
-        $customAttributes['formId']       = ['label' => FormBuilder::t('Form')];
-        $customAttributes['dateCreated']  = ['label' => FormBuilder::t('Submitted')];
+        $customAttributes['title'] = ['label' => FormBuilder::t('Title')];
+        $customAttributes['formId'] = ['label' => FormBuilder::t('Form')];
+        $customAttributes['dateCreated'] = ['label' => FormBuilder::t('Submitted')];
 
         $formAttributes = Craft::$app->getElementIndexes()->getAvailableTableAttributes(Form::class);
         unset($formAttributes['name']);
@@ -350,9 +348,6 @@ class Entry extends Element
 
     // Events
     // -------------------------------------------------------------------------
-//    public function beforeSave(bool $isNew): bool
-//    {
-//    }
 
     /**
      * @inheritdoc
@@ -361,15 +356,33 @@ class Entry extends Element
     {
         $entryRecord = new EntryRecord();
 
-        $entryRecord->id                = $this->id;
-        $entryRecord->formId            = $this->formId;
-        $entryRecord->statusId          = $this->statusId;
-        $entryRecord->title             = $this->title;
-        $entryRecord->postedOn          = DateTimeHelper::toDateTime($this->postedOn)->format('Y-m-d');
-        $entryRecord->ipAddress         = $this->ipAddress;
-        $entryRecord->userAgent         = $this->userAgent;
+        $entryRecord->id = $this->id;
+        $entryRecord->formId = $this->formId;
+        $entryRecord->statusId = $this->statusId;
+        $entryRecord->title = $this->title;
+        $entryRecord->postedOn = DateTimeHelper::toDateTime($this->postedOn)->format('Y-m-d');
+        $entryRecord->ipAddress = $this->ipAddress;
+        $entryRecord->userAgent = $this->userAgent;
         $entryRecord->save(false);
 
         parent::afterSave($isNew);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function afterDelete()
+    {
+        // Delete entry record
+        Craft::$app->getDb()->createCommand()
+            ->delete(
+                Table::ENTRIES,
+                [
+                    'id' => $this->id,
+                    'formId' => $this->formId
+                ])
+            ->execute();
+
+        parent::afterDelete();
     }
 }

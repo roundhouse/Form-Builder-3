@@ -1,40 +1,40 @@
-{% set groupOptions = [] %}
-{% for group in groups %}
-    {% set groupOptions = groupOptions|merge([{ label: group.name, value: group.id }]) %}
-{% endfor %}
+{#{% set groupOptions = [] %}#}
+{#{% for group in groups %}#}
+{#    {% set groupOptions = groupOptions|merge([{ label: group.name, value: group.id }]) %}#}
+{#{% endfor %}#}
 
-{% set statuses = craft.fb.getFormStatuses() %}
+{#{% set statuses = craft.fb.getFormStatuses() %}#}
 
-<div class="fb-field {{ errors is defined and form.getErrors('name') ? 'error' }}" {% if form.getErrors('name') %}data-error-message="{{ form.getErrors('name') }}"{% endif %}>
-    <label for="formName" class="input-hint">{{ "NAME" |t }}</label>
-    <input type="text" id="formName" class="text input-control"  name="name" value="{{ form is defined ? form.name }}" autocomplete="off">
-    {% if form.getErrors('name') %}<div class="input-error">{{ form.getErrors('name') }}</div>{% endif %}
-</div>
+{#<div class="fb-field {{ errors is defined and form.getErrors('name') ? 'error' }}" {% if form.getErrors('name') %}data-error-message="{{ form.getErrors('name') }}"{% endif %}>#}
+{#    <label for="formName" class="input-hint">{{ "NAME" |t }}</label>#}
+{#    <input type="text" id="formName" class="text input-control"  name="name" value="{{ form is defined ? form.name }}" autocomplete="off">#}
+{#    {% if form.getErrors('name') %}<div class="input-error">{{ form.getErrors('name') }}</div>{% endif %}#}
+{#</div>#}
 
-<div class="fb-field {{ errors is defined and form.getErrors('handle') ? 'error' }}" {% if form.getErrors('handle') %}data-error-message="{{ form.getErrors('handle') }}"{% endif %}>
-    <label for="formHandle" class="input-hint">{{ "HANDLE" |t }}</label>
-    <input type="text" class="text code input-control" id="formHandle" name="handle" value="{{ form is defined ? form.handle }}" autocomplete="off">
-    {% if form.getErrors('handle') %}<div class="input-error">{{ form.getErrors('handle') }}</div>{% endif %}
-</div>
+{#<div class="fb-field {{ errors is defined and form.getErrors('handle') ? 'error' }}" {% if form.getErrors('handle') %}data-error-message="{{ form.getErrors('handle') }}"{% endif %}>#}
+{#    <label for="formHandle" class="input-hint">{{ "HANDLE" |t }}</label>#}
+{#    <input type="text" class="text code input-control" id="formHandle" name="handle" value="{{ form is defined ? form.handle }}" autocomplete="off">#}
+{#    {% if form.getErrors('handle') %}<div class="input-error">{{ form.getErrors('handle') }}</div>{% endif %}#}
+{#</div>#}
 
-<div class="fb-field">
-    <label for="groupId" class="input-hint">{{ "GROUP" |t }}</label>
-    <div class="select">
-        <select id="groupId" name="groupId">
-            {% for option in groupOptions %}
-                <option value="{{ option.value }}" {% if option.value == groupId %}selected{% endif %}>{{ option.label }}</option>
-            {% endfor %}
-        </select>
-    </div>
-</div>
+{#<div class="fb-field">#}
+{#    <label for="groupId" class="input-hint">{{ "GROUP" |t }}</label>#}
+{#    <div class="select">#}
+{#        <select id="groupId" name="groupId">#}
+{#            {% for option in groupOptions %}#}
+{#                <option value="{{ option.value }}" {% if option.value == groupId %}selected{% endif %}>{{ option.label }}</option>#}
+{#            {% endfor %}#}
+{#        </select>#}
+{#    </div>#}
+{#</div>#}
 
-<div class="fb-field">
-    <label for="statusId" class="input-hint">{{ "STATUS" |t }}</label>
-    <div class="select">
-        <select id="statusId" name="statusId">
-            {% for status in statuses %}
-                <option value="{{ status.id }}" {% if status.id == statusId %}selected{% endif %}>{{ status.name }}</option>
-            {% endfor %}
-        </select>
-    </div>
-</div>
+{#<div class="fb-field">#}
+{#    <label for="statusId" class="input-hint">{{ "STATUS" |t }}</label>#}
+{#    <div class="select">#}
+{#        <select id="statusId" name="statusId">#}
+{#            {% for status in statuses %}#}
+{#                <option value="{{ status.id }}" {% if status.id == statusId %}selected{% endif %}>{{ status.name }}</option>#}
+{#            {% endfor %}#}
+{#        </select>#}
+{#    </div>#}
+{#</div>#}

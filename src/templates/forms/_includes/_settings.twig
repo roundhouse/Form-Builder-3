@@ -1,0 +1,209 @@
+{% import "_includes/forms" as forms %}
+
+<div id="settings" class="meta">
+    {{ forms.textField({
+        label: "Handle"|t('app'),
+        value: form.handle,
+        id: 'handle',
+        name: 'handle',
+        autocorrect: false,
+        errors: (form.getErrors('handle'))
+    }) }}
+
+    {% set groupOptions = [] %}
+    {% for group in groups %}
+        {% set groupOptions = groupOptions|merge([{ label: group.name, value: group.id }]) %}
+    {% endfor %}
+
+    {{ forms.selectField({
+        label: "Group"|t('form-builder'),
+        name: 'groupId',
+        id: 'groupId',
+        options: groupOptions,
+        errors: (form.getErrors('groupId'))
+    }) }}
+
+    {{ forms.textField({
+        label: "Form Class"|t('app'),
+        id: 'formClass',
+        name: 'settings[fields][global][formClass]',
+        value: form.settings.fields.global.formClass is defined ? form.settings.fields.global.formClass,
+        placeholder: form.handle is defined and form.handle != '' ? form.handle ~ '-form' : '',
+    }) }}
+
+    {{ forms.textField({
+        label: "Form ID"|t('app'),
+        id: 'formId',
+        name: 'settings[fields][global][formId]',
+        value: form.settings.fields.global.formId is defined ? form.settings.fields.global.formId,
+        placeholder: form.handle is defined and form.handle != '' ? form.handle ~ '-form' : '',
+    }) }}
+
+    {{ forms.textField({
+        label: "Global Input Class"|t('app'),
+        id: 'inputClass',
+        name: 'settings[fields][global][inputClass]',
+        value: form.settings.fields.global.inputClass is defined ? form.settings.fields.global.inputClass,
+    }) }}
+
+    {{ forms.textField({
+        label: "Global Input Templates"|t('app'),
+        id: 'inputTemplate',
+        class: 'global-input-template',
+        name: 'settings[fields][global][inputTemplate]',
+        value: form.settings.fields.global.inputTemplate is defined ? form.settings.fields.global.inputTemplate,
+    }) }}
+    <span class="field input-path-response"></span>
+
+
+    {#    {% set statusOptions = [] %}#}
+    {#    {% for status in craft.fb.getFormStatuses() %}#}
+    {#        {% set statusOptions = statusOptions|merge([{ label: status.name, value: status.id }]) %}#}
+    {#    {% endfor %}#}
+
+    {#    {{ forms.selectField({#}
+    {#        label: "Status"|t('form-builder'),#}
+    {#        name: 'statusId',#}
+    {#        id: 'statusId',#}
+    {#        options: statusOptions,#}
+    {#        errors: (form.getErrors('statusId'))#}
+    {#    }) }}#}
+    {{ forms.lightswitchField({
+        label: "Enabled"|t('form-builder'),
+        id: "statusId",
+        name: "statusId",
+        on: form.statusId ? 1 : 0
+    }) }}
+</div>
+
+<div class="meta">
+    {{ forms.lightswitchField({
+        label: "Save to Database"|t('form-builder'),
+        instructions: "Should entries be saved to database?"|t('form-builder'),
+        id: "saveToDatabaseToggle",
+        name: "settings[database][enabled]",
+        on: form.settings.database.enabled is defined and form.settings.database.enabled == '1' ? 1 : 0
+    }) }}
+
+    {{ forms.textField({
+        label: "Title Format"|t('form-builder'),
+        value: form.settings.database.titleFormat is defined ? form.settings.database.titleFormat : '',
+        id: 'titleFormat',
+        name: 'settings[database][titleFormat]',
+    }) }}
+</div>
+
+<div class="meta">
+    {{ forms.lightswitchField({
+        label: "Submit Button Text"|t('form-builder'),
+        id: "submitButtonToggle",
+        name: "options[submitButton][enabled]",
+        on: form.options.submitButton.enabled is defined and form.options.submitButton.enabled == '1' ? 1 : 0
+    }) }}
+
+    {{ forms.textField({
+        label: "Text"|t('form-builder'),
+        value: form.options.submitButton.text is defined ? form.options.submitButton.text : '',
+        id: 'submitButtonText',
+        name: 'options[submitButton][text]',
+    }) }}
+</div>
+
+<div class="meta">
+    {{ forms.lightswitchField({
+        label: "Custom Redirect"|t('form-builder'),
+        id: "customRedirectToggle",
+        name: "options[redirect][enabled]",
+        on: form.options.redirect.enabled is defined and form.options.redirect.enabled == '1' ? 1 : 0
+    }) }}
+
+    {{ forms.textField({
+        label: "Path"|t('form-builder'),
+        value: form.options.redirect.url is defined ? form.options.redirect.url : '',
+        id: 'customRedirect',
+        name: 'options[redirect][url]',
+    }) }}
+</div>
+
+<div class="meta">
+    {{ forms.lightswitchField({
+        label: "Messages"|t('form-builder'),
+        id: "messagesToggle",
+        name: "options[messages][enabled]",
+        on: form.options.messages.enabled is defined and form.options.messages.enabled == '1' ? 1 : 0
+    }) }}
+
+    {{ forms.textField({
+        label: "Success"|t('form-builder'),
+        value: form.options.messages.success is defined ? form.options.messages.success : '',
+        id: 'messagesSuccess',
+        name: 'options[messages][success]',
+    }) }}
+    {{ forms.textField({
+        label: "Error"|t('form-builder'),
+        value: form.options.messages.error is defined ? form.options.messages.error : '',
+        id: 'messagesError',
+        name: 'options[messages][error]',
+    }) }}
+</div>
+
+<div class="meta">
+    {{ forms.lightswitchField({
+        label: "Honeypot"|t('form-builder'),
+        id: "honeypotToggle",
+        name: "spam[honeypot][enabled]",
+        on: form.spam.honeypot.enabled is defined and form.spam.honeypot.enabled == '1' ? 1 : 0
+    }) }}
+
+    {{ forms.textField({
+        label: "Message"|t('form-builder'),
+        value: form.spam.honeypot.message is defined ? form.spam.honeypot.message : '',
+        id: 'honeypotMessage',
+        name: 'spam[honeypot][message]',
+    }) }}
+
+    <span class="light">{{ "Enter message for screen readers."|t('form-builder') }}</span>
+
+    {{ forms.lightswitchField({
+        label: "Timed"|t('form-builder'),
+        id: "timedToggle",
+        name: "spam[timed][enabled]",
+        on: form.spam.timed.enabled is defined and form.spam.timed.enabled == '1' ? 1 : 0
+    }) }}
+
+    <span class="light" style="display: block; padding-bottom: 24px;">{{ "Enter how many seconds to wait until submissions are valid."|t('form-builder') }}</span>
+
+    {{ forms.textField({
+        label: "Seconds"|t('form-builder'),
+        value: form.spam.timed.number is defined ? form.spam.timed.number : '',
+        id: 'timedNumber',
+        name: 'spam[timed][number]',
+    }) }}
+
+
+</div>
+
+<div id="meta-details" class="meta read-only">
+    <div class="data">
+        {% set status = form.getStatus() %}
+        {% set statusDef = form.statuses()[status] ?? null %}
+        {% set statusColor = statusDef.color ?? status %}
+        {% set statusLabel = statusDef.label ?? statusDef ?? status|ucfirst %}
+        <h5 class="heading">{{ 'Status'|t('app') }}</h5>
+        <div id="status-value" class="value"><span class="status {{ statusColor }}"></span>{{ statusLabel }}</div>
+    </div>
+
+    {% if form.dateCreated %}
+        <div class="data">
+            <h5 class="heading">{{ "Created at"|t('app') }}</h5>
+            <div id="date-created-value" class="value">{{ form.dateCreated|datetime('short') }}</div>
+        </div>
+    {% endif %}
+
+    {% if form.dateUpdated %}
+        <div class="data">
+            <h5 class="heading">{{ "Updated at"|t('app') }}</h5>
+            <div id="date-updated-value" class="value">{{ form.dateUpdated|datetime('short') }}</div>
+        </div>
+    {% endif %}
+</div>

@@ -87,15 +87,14 @@
 
 <div id="fieldlayoutform" class="fieldlayoutform">
 
-    {% if customizableTabs %}
-        <div class="newtabbtn-container buttons">
-            <div class="btn btns btn-info"><i class="fas fa-plus"></i><span class="txt">{{ "Add Fieldset"|t('form-builder') }}</span></div>
-            
-            <span class="settings-button">
-                <div class="btn btns btn-muted fields-settings {% if form.settings.fields.global is defined %}has-values{% endif %}"><i class="fas fa-wrench"></i></div>
-            </span>
-        </div>
-    {% endif %}
+    <h2 class="first">{{ "Design your field layout"|t('app') }}</h2>
+
+
+    {#    {% if customizableTabs %}#}
+    {#        <div class="newtabbtn-container buttons">#}
+    {#            <div class="btn btns btn-info"><i class="fas fa-plus"></i><span class="txt">{{ "Add Fieldset"|t('form-builder') }}</span></div>#}
+    {#        </div>#}
+    {#    {% endif %}#}
 
     <div class="fld-tabs">
         {% if fieldLayout %}
@@ -109,20 +108,22 @@
                 {{ macros.tab(form, customizableTabs, tab, pretendTabName, fieldLayout.getFields()) }}
             {% endif %}
 
-            {% if form.fieldLayoutId %}
-                <input type="hidden" name="form-builder[layoutId]" value="{{ form.fieldLayoutId }}">
+
+            {% if  form.fieldLayoutId %}
+                {{ hiddenInput('form-builder[layoutId]', form.fieldLayoutId) }}
             {% endif %}
 
             {% if form.id %}
-                <input type="hidden" name="form-builder[formId]" value="{{ form.id }}">
+                {{ hiddenInput('form-builder[formId]', form.id) }}
             {% endif %}
         {% endif %}
     </div>
 
-    <header class="unused-header">
-        <div class="unused-title">{{ "Unused Fields"|t('form-builder') }}</div>
-        <p>{{ "Drag these fields or whole tabs up above."|t('form-builder') }}</p>
-    </header>
+    {% if customizableTabs %}
+        <div class="newtabbtn-container">
+            <div class="btn add icon">{{ "Add Fieldset"|t('form-builder') }}</div>
+        </div>
+    {% endif %}
 
     <div class="unusedfields">
         {% for group in groups %}
@@ -166,7 +167,11 @@
                             {% elseif fieldType == 'Dropdown' %}
                                 <i class="far fa-caret-square-down"></i>
                             {% else %}
-                                <i class="far fa-ban"></i>
+                                {% if fieldType not in allowed %}
+                                    <i class="far fa-ban"></i>
+                                {% else %}
+                                    <i class="far fa-i-cursor"></i>
+                                {% endif %}
                             {% endif %}
                             </span>
                             <span>{{ field.name|t('site') }}</span>
@@ -182,10 +187,32 @@
 
 {% js %}
     var initFLD = function() {
-        new Craft.FieldLayoutDesigner('#{{ "fieldlayoutform"|namespaceInputId }}', {
-            customizableTabs: {{ customizableTabs ? 'true' : 'false' }},
-            fieldInputName: '{{ "fieldLayout[__TAB_NAME__][]"|namespaceInputName|e("js") }}',
-            requiredFieldInputName: '{{ "requiredFields[]"|namespaceInputName|e("js") }}'
-        });
+    new Craft.FieldLayoutDesigner('#{{ "fieldlayoutform"|namespaceInputId }}', {
+    customizableTabs: {{ customizableTabs ? 'true' : 'false' }},
+    fieldInputName: '{{ "fieldLayout[__TAB_NAME__][]"|namespaceInputName|e("js") }}',
+    requiredFieldInputName: '{{ "requiredFields[]"|namespaceInputName|e("js") }}'
+    });
     };
+
+    {#    {% if tab is defined %}#}
+
+    {#        var $fldTab = $('#{{ ("tab-"~tab)|namespaceInputId }}');#}
+
+    {#        if ($fldTab.hasClass('sel'))#}
+    {#        {#}
+    {#        initFLD();#}
+    {#        }#}
+    {#        else#}
+    {#        {#}
+    {#        $fldTab.on('activate.fld', function() {#}
+    {#        initFLD();#}
+    {#        $fldTab.off('activate.fld');#}
+    {#        });#}
+    {#        }#}
+
+    {#    {% else %}#}
+
+    {#        initFLD();#}
+
+    {#    {% endif %}#}
 {% endjs %}

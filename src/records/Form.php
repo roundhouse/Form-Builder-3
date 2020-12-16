@@ -13,6 +13,7 @@ namespace roundhouse\formbuilder\records;
 use craft\db\ActiveRecord;
 use craft\records\Element;
 use craft\records\FieldLayout;
+use roundhouse\formbuilder\plugin\Table;
 use yii\db\ActiveQueryInterface;
 
 class Form extends ActiveRecord
@@ -28,7 +29,7 @@ class Form extends ActiveRecord
      */
     public static function tableName()
     {
-        return '{{%formbuilder_forms}}';
+        return Table::FORMS;
     }
 
     /**

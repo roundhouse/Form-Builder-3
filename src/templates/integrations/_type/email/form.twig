@@ -1,37 +1,32 @@
-<input type="hidden" name="type" value="{{ type }}">
+{% import "_includes/forms" as forms %}
+
+{{ hiddenInput('type', type) }}
+
+<h2>{{ type|capitalize }} {{ 'Integration'|t('form-builder') }}</h2>
 
 
-<header class="hud-header">
-    <h2>{{ type|capitalize }} {{ 'Integration'|t('form-builder') }}</h2>
-</header>
+{{ forms.textField({
+    label: "Name"|t('form-builder'),
+    id: 'integration-name',
+    name: 'name',
+    first: true,
+    autocorrect: false,
+    autocapitalize: false,
+}) }}
 
-<div class="hud-body">
+{{ forms.textField({
+    label: "Handle"|t('form-builder'),
+    id: 'integration-handle',
+    name: 'handle',
+    autocorrect: false,
+    autocapitalize: false,
+}) }}
 
-    <div class="fb-field" id="field-name">
-        <div class="input-hint">NAME</div>
-        <div class="input">
-            <input type="text" class="data-required" data-hint="NAME" name="name" id="integration-name">
-        </div>
-    </div>
+<h3>{{ 'Settings'|t('form-builder') }}</h3>
 
-    <div class="fb-field" id="field-handle">
-        <div class="input-hint">HANDLE</div>
-        <div class="input">
-            <input type="text" class="data-required" data-hint="HANDLE" name="handle" id="integration-handle">
-        </div>
-    </div>
+<p>Email template customizer coming soon.</p>
 
-
-    <div class="hud-section">
-        <h3>{{ 'Settings'|t('form-builder') }}</h3>
-    </div>
-
-    <p>Email template customizer coming soon.</p>
+<div class="buttons">
+    <input type="button" class="btn cancel" value="{{ 'Cancel'|t('form-builder') }}">
+    <input type="submit" class="btn submit" value="{{ 'Save'|t('form-builder') }}"/>
 </div>
-
-<footer class="hud-footer">
-    <div class="buttons">
-        <input type="button" class="btns btn-modal cancel" value="{{ 'Cancel'|t('form-builder') }}">
-        <input type="submit" class="btns btn-modal submit" value="{{ 'Save'|t('form-builder') }}"/>
-    </div>
-</footer>

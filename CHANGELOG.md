@@ -1,5 +1,68 @@
 # Form Builder Changelog
 
+## 3.1.4.4 - 2020-11-03
+
+### Fixed
+- Merged #19
+
+## 3.1.4.3 - 2020-07-13
+
+### Added
+- Email integration can now have custom email template path
+- Assets can now be attached to email notification
+
+## 3.1.4.2 - 2020-07-13
+
+### Added
+- Added template hooks to submission email template. `fb-email-template-matrixBlockQuery-hook` and `fb-email-template-section-hook`
+
+## 3.1.4.1 - 2020-07-13
+
+### Fixed
+- Forgot to defined variable
+
+## 3.1.4 - 2020-07-13
+
+### Added
+- Added template hooks for submission template. `fb-view-submission-matrixBlockQuery-hook` and `fb-view-submission-section-hook`
+
+## 3.1.3.1 - 2020-07-07
+
+### Fixed
+- Fixed ajax error in Entries index page
+
+### Improved
+- Added crumbs to edit pages
+
+## 3.1.3 - 2020-07-07
+
+### Added
+- Submission will return `errors` object when submission fails validation
+- Ajax added custom redirect value, if setup
+
+### Fixed
+- Moved integration actions to after the submission has been saved
+
+## 3.1.2 - 2020-07-07
+
+### Added
+- Email integration can now send a copy to sender
+
+## 3.1.1 - 2020-07-07
+
+### Added
+- Added event for plugins to modify or add new allowed field types
+- Added field type Forms, forms can now be added to entries
+
+## 3.1.0 - 2020-07-06
+
+### Improved
+- Updated UI to match with Craft UI
+- Exposed Forms Services via `craft.fbForms.methods()`
+
+### Fixed
+- Various bug fixes, updated deprecated functions
+
 ## 3.0.20 - 2019-10-16
 
 ### Fixed

@@ -29,8 +29,27 @@
 
     <div class="body">
         <div class="fields">
-            {% include templatePath ~ 'submission' ignore missing %}
-            {% include templatePath ~ 'text' ignore missing %}
+            {% import "_includes/forms" as forms %}
+
+            {% set includeSubmission = 'integrations[slack]['~ index ~'][includeSubmission]' %}
+            {% set enableIncludeSubmission = attribute(form.integrations.slack, index).includeSubmission is defined and attribute(form.integrations.slack, index).includeSubmission ? true : false %}
+
+            {{ forms.lightswitchField({
+                label: "Include Submission"|t('form-builder'),
+                instructions: "Should we include submission data in slack message?"|t('form-builder'),
+                id: "include-submissin-for-slack",
+                name: includeSubmission,
+                on: enableIncludeSubmission
+            }) }}
+
+            {% set slackTextName = 'integrations[slack]['~ index ~'][text]' %}
+            {{ forms.textareaField({
+                label: "To Email"|t('form-builder'),
+                value: attribute(form.integrations.slack, index).text is defined and attribute(form.integrations.slack, index).text != '' ? attribute(form.integrations.slack, index).text : '',
+                id: 'to-email',
+                name: slackTextName,
+                instructions: "Enter slack message."|t('form-builder')
+            }) }}
         </div>
     </div>
 

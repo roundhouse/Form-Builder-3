@@ -1,4 +1,5 @@
-{% extends "_layouts/cp" %}
+{% extends "form-builder/_layouts/layout" %}
+{% import "_includes/forms" as forms %}
 
 {% set bodyClass = 'formbuilder fb-edit-integration' %}
 {% set pluginCpUrl = url('form-builder') %}
@@ -11,89 +12,78 @@
     'formSpamProtection': 'https://bing.com/'
 } %}
 
-{% set details = true %}
+{% set crumbs = [
+    { label: craft.fb.getPluginName(), url: url('form-builder') },
+    { label: 'Integrations' | t('form-builder'), url: url('form-builder/integrations') },
+] %}
 
-{% set isLocalIntegration = craft.app.view.doesTemplateExist('form-builder/_includes/icons/integrations-' ~ entry.type) %}
+{% if entry.type %}
+    {% set type = entry.type %}
+{% endif %}
 
-{% block header %}
-    {% include 'form-builder/_includes/_header' ignore missing with { title: title } %}
+{% set isLocalIntegration = craft.app.view.doesTemplateExist('form-builder/_includes/icons/integrations-' ~ type) %}
+
+{% block content %}
+
+    {{ actionInput('form-builder/integrations/save-entry') }}
+
+    {{ forms.textField({
+        label: "Name"|t('form-builder'),
+        id: 'name',
+        name: 'name',
+        first: true,
+        autofocus: true,
+        autocorrect: false,
+        autocapitalize: false,
+        value: entry.name,
+        errors: (entry.getErrors('name'))
+    }) }}
+
+    <hr>
+    {{ redirectInput('form-builder/integrations') }}
+
+    {% if entry.id %}
+        {{ hiddenInput('id', entry.id) }}
+    {% endif %}
+
+    {{ hiddenInput('type', type) }}
+
+    {% if isLocalIntegration %}
+        <h2>{{ "Options"|t('form-builder') }}</h2>
+        {% include 'form-builder/integrations/_type/'~ type ~'/_edit' ignore missing with { entry: entry } %}
+    {% else %}
+        {% include 'form-builder-integrations/types/'~ type ~'/_edit' ignore missing with { entry: entry } %}
+    {% endif %}
+
+    {# TODO: add delete button #}
+    {#{% if currentUser.can('fb:deleteIntegrations') %}#}
+    {#{% if entry.id is defined %}#}
+    {#<div class="pane meta delete-form-meta last">#}
+    {#<a href="#" class="btns btn-danger delete-form" data-id="{{ entry.id }}">{{ "Delete Integration" |t('form-builder') }}</a>#}
+    {#</div>#}
+    {#{% endif %}#}
+    {#{% endif %}#}
+
 {% endblock %}
 
-{% block main %}
-    <div id="content-container">
+{% block details %}
+    <div id="settings" class="meta">
+        {{ forms.textField({
+            label: "Handle"|t('form-builder'),
+            value: entry.handle,
+            id: 'handle',
+            name: 'handle',
+            autocorrect: false,
+            errors: (entry.getErrors('handle'))
+        }) }}
 
-        <input type="hidden" name="action" value="form-builder/integrations/save-entry">
-        {{ redirectInput('form-builder/integrations') }}
-
-        {% if entry.id %}
-            <input type="hidden" name="id" value="{{ entry.id }}">
-            <input type="hidden" name="type" value="{{ entry.type }}">
-        {% endif %}
-
-
-        <div id="content">
-            <section class="flex-container">
-                {% if isLocalIntegration %}
-                    <div class="widget full-col">
-                        <header class="pad">
-                            <h2>{{ "Options"|t('form-builder') }}</h2>
-                        </header>
-                        <div class="body">
-                            {% include 'form-builder/integrations/_type/'~ entry.type ~'/_edit' ignore missing with { entry: entry } %}
-                        </div>
-                    </div>
-                {% else %}
-                    {% include 'form-builder-integrations/types/'~ entry.type ~'/_edit' ignore missing with { entry: entry } %}
-                {% endif %}
-            </section>
-        </div>
+        {{ forms.lightswitchField({
+            label: "Enabled"|t('form-builder'),
+            id: "status",
+            name: "status",
+            on: entry.status ? 1 : 0
+        }) }}
     </div>
-
-    <div id="details">
-        <div id="settings">
-            <section class="form-settings-tout cmp-tout theme-white">
-                <header>
-                    <span class="tout-title">{{ "Settings" |t('form-builder') }}</span>
-                </header>
-                <div class="body">
-                    <div class="fb-field ">
-                        <label for="name" class="input-hint">{{ 'NAME'|t('form-builder') }}</label>
-                        <input type="text" id="name" class="text input-control" name="name" value="{{ entry.name }}" autocomplete="off">
-                    </div>
-
-                    <div class="fb-field ">
-                        <label for="handle" class="input-hint">{{ 'HANDLE'|t('form-builder') }}</label>
-                        <input type="text" id="handle" class="text input-control" name="handle" value="{{ entry.handle }}" autocomplete="off">
-                    </div>
-
-                    <div class="fb-field">
-                        <label for="statusId" class="input-hint">{{ "STATUS" |t('form-builder') }}</label>
-                        <div class="select">
-                            <select id="status" name="status">
-                                <option value="enabled" {% if entry.status == 'enabled' %}selected{% endif %}>{{ 'Enabled'|t('form-builder') }}</option>
-                                <option value="disabled" {% if entry.status == 'disabled' %}selected{% endif %}>{{ 'Disabled'|t('form-builder') }}</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-
-            </section>
-
-            <div class="pane meta save-form-meta last">
-                <button type="submit" class="btns btn-info save-form">{{ "Save Integration" |t('form-builder') }}<span class="btn-hint">&#8984; + S</span></button>
-            </div>
-
-            {# TODO: add delete button #}
-            {#{% if currentUser.can('fb:deleteIntegrations') %}#}
-                {#{% if entry.id is defined %}#}
-                    {#<div class="pane meta delete-form-meta last">#}
-                        {#<a href="#" class="btns btn-danger delete-form" data-id="{{ entry.id }}">{{ "Delete Integration" |t('form-builder') }}</a>#}
-                    {#</div>#}
-                {#{% endif %}#}
-            {#{% endif %}#}
-        </div>
-    </div>
-
 {% endblock %}
 
 {% js %}

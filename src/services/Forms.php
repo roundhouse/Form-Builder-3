@@ -18,9 +18,11 @@ use craft\db\Query;
 use craft\helpers\MigrationHelper;
 use craft\helpers\StringHelper;
 
+use roundhouse\formbuilder\FormBuilder;
 use roundhouse\formbuilder\elements\Form;
 use roundhouse\formbuilder\elements\Entry;
 use roundhouse\formbuilder\models\FormStatus as FormStatusModel;
+use roundhouse\formbuilder\plugin\Table;
 use roundhouse\formbuilder\records\FormStatus as FormStatusRecord;
 use roundhouse\formbuilder\records\Form as FormRecord;
 use roundhouse\formbuilder\errors\FormNotFoundException;
@@ -118,9 +120,9 @@ class Forms extends Component
      */
     public function save(Form $form): bool
     {
-        $isNewForm = !$form->id;
+        $isNew = !$form->id;
 
-        if (!$isNewForm) {
+        if (!$isNew) {
             $formRecord = FormRecord::findOne($form->id);
 
             if (!$formRecord) {
@@ -136,39 +138,33 @@ class Forms extends Component
             return false;
         }
 
-        $formRecord->name               = $form->name;
-        $formRecord->handle             = $form->handle;
-        $formRecord->statusId           = $form->statusId;
-        $formRecord->groupId            = $form->groupId;
-        $formRecord->options            = Json::encode($form->options);
-        $formRecord->spam               = Json::encode($form->spam);
-        $formRecord->integrations      = Json::encode($form->integrations);
-        $formRecord->settings           = Json::encode($form->settings);
-
         $fieldLayout = $form->getFieldLayout();
         $form->oldHandle = $formRecord->getOldHandle();
         $form->oldFieldLayoutId = $formRecord->getOldFieldLayoutId();
 
-        $transaction = Craft::$app->getDb()->beginTransaction();
-
+        $transaction = Craft::$app->db->beginTransaction();
+        
         try {
             Craft::$app->getFields()->saveLayout($fieldLayout);
             $form->fieldLayoutId = $fieldLayout->id;
             $formRecord->fieldLayoutId = $fieldLayout->id;
 
-            if (!Craft::$app->getElements()->saveElement($form, false)) {
-                throw new Exception('Couldn’t save the form.');
-            }
-
-            if ($isNewForm) {
+            if ($isNew) {
                 $formRecord->id = $form->id;
+
+                $fieldLayout = $form->getFieldLayout();
+
+                // Save field layout
+                Craft::$app->getFields()->saveLayout($fieldLayout);
             }
 
-            $formRecord->save(false);
+            if (!Craft::$app->getElements()->saveElement($form)) {
+                return false;
+            }
 
             $transaction->commit();
 
-        } catch (\Throwable $e) {
+        } catch(\Exception $e) {
             $transaction->rollBack();
 
             throw $e;
@@ -214,19 +210,10 @@ class Forms extends Component
                 Craft::$app->getElements()->deleteElement($entry);
             }
 
-            // Delete element
-            $success = Craft::$app->elements->deleteElementById($form->id);
-
-            if (!$success) {
-                $transaction->rollback();
-
-                return false;
-            }
-
             // Delete form record
             Craft::$app->getDb()->createCommand()
                 ->delete(
-                    '{{%formbuilder_forms}}',
+                    Table::FORMS,
                     ['id' => $form->id])
                 ->execute();
 

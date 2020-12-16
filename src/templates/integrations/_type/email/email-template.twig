@@ -138,6 +138,7 @@
                                 {% set value = attribute(entry, field.handle) %}
 
                                     {% if value is iterable %}
+                                        {% set matrixBlockQuery = [] %}
                                         {% set valueClass = value|getClass %}
 
                                         <p style="margin: 0 0 10px 0; padding: 10px; border:1px dashed #E9EFF4; border-radius: 5px; background: rgba(233, 239, 244, 0.2);">
@@ -150,6 +151,9 @@
                                                         {% if not loop.last %}, {% endif %}
                                                     {% endif %}
                                                 {% endfor %}
+                                            {% case "MatrixBlockQuery" %}
+                                                {% set matrixBlockQuery = matrixBlockQuery|merge(value) %}
+                                                {% hook 'fb-email-template-matrixBlockQuery-hook' %}
                                         {% endswitch %}
                                         </p>
                                     {% else %}
@@ -178,6 +182,10 @@
                                     {% endif %}
                             {% endfor %}
                         {% endif %}
+                        {% hook 'fb-email-template-section-hook' %}
+                        <p style="margin: 0 0 10px 0; padding: 10px; border:1px dashed #E9EFF4; border-radius: 5px; background: rgba(233, 239, 244, 0.2);">
+                            <a href="{{ entry.url }}">View Submission</a>
+                        </p>
                     </td>
                 </tr>
 

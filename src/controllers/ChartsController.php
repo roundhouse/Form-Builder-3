@@ -12,12 +12,17 @@ namespace roundhouse\formbuilder\controllers;
 
 use Craft;
 use craft\controllers\ElementIndexesController;
+use craft\db\Query;
 use craft\helpers\DateTimeHelper;
 use craft\helpers\ChartHelper;
+use craft\web\Controller;
+use yii\web\Response;
+use Exception;
 
 use roundhouse\formbuilder\FormBuilder;
+use roundhouse\formbuilder\plugin\Table;
 
-class ChartsController extends ElementIndexesController
+class ChartsController extends Controller
 {
     // Protected Properties
     // =========================================================================
@@ -30,72 +35,117 @@ class ChartsController extends ElementIndexesController
     /**
      * Get all submissions for specified date
      *
-     * @return \yii\web\Response
-     * @throws \yii\base\Exception
-     * @throws \yii\web\BadRequestHttpException
+     * @return Response
+     * @throws Exception
      */
-    public function actionGetEntriesCount()
+    public function actionGetEntriesCount(): Response
     {
-        $this->requirePostRequest();
-        $this->requireAcceptsJson();
+        $formId = Craft::$app->getRequest()->getBodyParam('formId');
+        $startDateParam = Craft::$app->getRequest()->getRequiredBodyParam('startDate');
+        $endDateParam = Craft::$app->getRequest()->getRequiredBodyParam('endDate');
 
-        $request = Craft::$app->getRequest();
+        $startDate = DateTimeHelper::toDateTime($startDateParam);
+        $endDate = DateTimeHelper::toDateTime($endDateParam);
 
-        $startDateParam = $request->getBodyParam('startDate');
-        $endDateParam = $request->getBodyParam('endDate');
-        $formId = $request->getBodyParam('formId');
-
-        $startDate = DateTimeHelper::toDateTime($startDateParam, true);
-        $endDate = DateTimeHelper::toDateTime($endDateParam, true);
-        $endDate->modify('+1 day');
-
-        $intervalUnit = ChartHelper::getRunChartIntervalUnit($startDate, $endDate);
-
-        if ($formId) {
-            $query = clone $this->getElementQuery()
-                ->where(['formId' => $formId])
-                ->search(null);
-        } else {
-            $query = clone $this->getElementQuery()
-                ->search(null);
+        if ($startDate === false || $endDate === false) {
+            throw new Exception('There was a problem calculating the start and end dates');
         }
 
+        // Start at midnight on the start date, end at midnight after the end date
+        $timeZone = new \DateTimeZone(Craft::$app->getTimeZone());
+        $startDate = new \DateTime($startDate->format('Y-m-d'), $timeZone);
+        $endDate = new \DateTime($endDate->modify('+1 day')->format('Y-m-d'), $timeZone);
 
+        $intervalUnit = 'day';
 
-        $dataTable = ChartHelper::getRunChartDataFromQuery($query, $startDate, $endDate, 'formbuilder_entries.postedOn', 'count', '[[formbuilder_entries.postedOn]]', [
-            'intervalUnit' => $intervalUnit,
-            'valueLabel' => FormBuilder::t('Entries'),
-            'valueType' => 'number',
+        // Prep the query
+        $query = (new Query())
+            ->from([Table::ENTRIES . ' entries']);
+
+        if ($formId) {
+            $query->where(['formId' => $formId]);
+        }
+        
+        $dataTable = ChartHelper::getRunChartDataFromQuery($query, $startDate, $endDate, 'entries.postedOn', 'count', '*', [
+           'intervalUnit' => $intervalUnit,
+           'valueLabel' =>  FormBuilder::t('Entries')
         ]);
 
         $total = 0;
 
-        foreach($dataTable['rows'] as $row) {
-            $total = $total + $row[1];
+        foreach ($dataTable['rows'] as $row) {
+            $total += $row[1];
         }
-
-        $totalHtml = Craft::$app->getFormatter()->asInteger($total);
-
-        $formats = [
-            'shortDateFormats' => [
-                'day' => '%-m/%-d',
-                'month' => '%-m/%Y',
-                'year' => '%Y',
-            ],
-            'currencyFormat' => '$,.2f',
-            'number' => ',',
-            'numberFormat' => ',.0f',
-            'percentFormat' => ',.2%'
-        ];
 
         return $this->asJson([
             'dataTable' => $dataTable,
             'total' => $total,
-            'totalHtml' => $totalHtml,
-
-            'formats' => $formats,
-            'orientation' => Craft::$app->locale->getOrientation(),
+            'totalHtml' => Craft::$app->getFormatter()->asInteger($total),
+            'formats' => ChartHelper::formats(),
+            'orientation' => Craft::$app->getLocale()->getOrientation(),
             'scale' => $intervalUnit
         ]);
+
+//        $this->requirePostRequest();
+//        $this->requireAcceptsJson();
+//
+//        $request = Craft::$app->getRequest();
+//
+//        $startDateParam = $request->getBodyParam('startDate');
+//        $endDateParam = $request->getBodyParam('endDate');
+//        $formId = $request->getBodyParam('formId');
+//
+//        $startDate = DateTimeHelper::toDateTime($startDateParam, true);
+//        $endDate = DateTimeHelper::toDateTime($endDateParam, true);
+//        $endDate->modify('+1 day');
+//
+//        $intervalUnit = ChartHelper::getRunChartIntervalUnit($startDate, $endDate);
+//
+//        if ($formId) {
+//            $query = clone $this->getElementQuery()
+//                ->where(['formId' => $formId])
+//                ->search(null);
+//        } else {
+//            $query = clone $this->getElementQuery()
+//                ->search(null);
+//        }
+//
+//
+//
+//        $dataTable = ChartHelper::getRunChartDataFromQuery($query, $startDate, $endDate, 'formbuilder_entries.postedOn', 'count', '[[formbuilder_entries.postedOn]]', [
+//            'intervalUnit' => $intervalUnit,
+//            'valueLabel' => FormBuilder::t('Entries'),
+//            'valueType' => 'number',
+//        ]);
+//
+//        $total = 0;
+//
+//        foreach($dataTable['rows'] as $row) {
+//            $total = $total + $row[1];
+//        }
+//
+//        $totalHtml = Craft::$app->getFormatter()->asInteger($total);
+//
+//        $formats = [
+//            'shortDateFormats' => [
+//                'day' => '%-m/%-d',
+//                'month' => '%-m/%Y',
+//                'year' => '%Y',
+//            ],
+//            'currencyFormat' => '$,.2f',
+//            'number' => ',',
+//            'numberFormat' => ',.0f',
+//            'percentFormat' => ',.2%'
+//        ];
+//
+//        return $this->asJson([
+//            'dataTable' => $dataTable,
+//            'total' => $total,
+//            'totalHtml' => $totalHtml,
+//
+//            'formats' => $formats,
+//            'orientation' => Craft::$app->locale->getOrientation(),
+//            'scale' => $intervalUnit
+//        ]);
     }
 }

@@ -1,6 +1,4 @@
-{% import "form-builder/_includes/_components" as components %}
-
-{% set templatePath = 'form-builder/integrations/_type/email/fields/' %}
+{% import "_includes/forms" as forms %}
 
 <section class="cmp-tout-alt" id="integration-{{ type }}-{{ index }}" data-type="{{ type }}">
 
@@ -29,10 +27,137 @@
 
     <div class="body">
         <div class="fields">
-            {% include templatePath ~ 'submission' ignore missing %}
-            {% include templatePath ~ 'to-email' ignore missing %}
-            {% include templatePath ~ 'from-email' ignore missing %}
-            {% include templatePath ~ 'subject' ignore missing %}
+            {% import "_includes/forms" as forms %}
+
+            {% set includeSubmission = 'integrations[email]['~ index ~'][includeSubmission]' %}
+            {% set enableIncludeSubmission = attribute(form.integrations.email, index).includeSubmission is defined and attribute(form.integrations.email, index).includeSubmission ? 1 : 0 %}
+            {{ forms.lightswitchField({
+                label: "Include Submission"|t('form-builder'),
+                instructions: "Should we include submission data in the email?"|t('form-builder'),
+                id: "include-submission-for-email",
+                name: includeSubmission,
+                on: enableIncludeSubmission
+            }) }}
+
+            {% set includeFileAttachments = 'integrations[email]['~ index ~'][includeFileAttachments]' %}
+            {% set enableIncludeFileAttachments = attribute(form.integrations.email, index).includeFileAttachments is defined and attribute(form.integrations.email, index).includeFileAttachments ? 1 : 0 %}
+            {{ forms.lightswitchField({
+                label: "Include File Attachments"|t('form-builder'),
+                instructions: "Should we include file attachments in the email?"|t('form-builder'),
+                id: "include-file-attachments-for-email",
+                name: includeFileAttachments,
+                on: enableIncludeFileAttachments
+            }) }}
+
+            {% set sendCopyToSender = 'integrations[email]['~ index ~'][sendCopyToSender]' %}
+            {% set enableSendCopyToSender = attribute(form.integrations.email, index).sendCopyToSender is defined and attribute(form.integrations.email, index).sendCopyToSender ? 1 : 0 %}
+            {{ forms.lightswitchField({
+                label: "Send Copy To Sender"|t('form-builder'),
+                instructions: "Should we send a copy of this submission to sender?"|t('form-builder'),
+                id: "include-send-to-sender",
+                name: sendCopyToSender,
+                on: enableSendCopyToSender
+            }) }}
+
+            {% set availableFields = form.fieldLayoutId is defined and form.fieldLayoutId ? craft.app.getFields.getLayoutById(form.fieldLayoutId).getFields() : null %}
+            {% set fieldsOption = [] %}
+            {% set fieldsOption = [{'label': 'Select Field', 'value': ''}] %}
+            {% for field in availableFields %}
+                {% set fieldsOption = fieldsOption|merge([{ 'label': field.name, 'value': field.handle }]) %}
+            {% endfor %}
+            {{ forms.selectField({
+                label: "Sender Email Field"|t('form-builder'),
+                instructions: "Please map an email field from dropdown."|t('form-builder'),
+                value: attribute(form.integrations.email, index).senderEmail is defined and attribute(form.integrations.email, index).senderEmail ? attribute(form.integrations.email, index).senderEmail : '',
+                name: 'integrations[email]['~ index ~'][senderEmail]',
+                options: fieldsOption,
+                id: 'include-send-to-sender-email'
+            }) }}
+
+            {{ forms.textField({
+                label: "Sender Subject"|t('form-builder'),
+                value: attribute(form.integrations.email, index).senderSubject is defined and attribute(form.integrations.email, index).senderSubject != '' ? attribute(form.integrations.email, index).senderSubject : 'Copy of your email from ' ~ currentSite.name,
+                id: 'sender-subject-for-email',
+                name: 'integrations[email]['~ index ~'][senderSubject]',
+                size: 80,
+                instructions: "Enter subject line for sender."|t('form-builder')
+            }) }}
+
+            {% js %}
+                setTimeout(function() {
+                    var checked = $('#include-send-to-sender').attr('aria-checked')
+                    if (checked == 'true') {
+                        $('#include-send-to-sender-email-field').slideDown(100);
+                        $('#sender-subject-for-email-field').slideDown(100);
+                    } else {
+                        $('#include-send-to-sender-email-field').slideUp(40);
+                        $('#sender-subject-for-email-field').slideUp(100);
+                    }
+                }, 1000);
+
+                $('#include-send-to-sender').on('click', function(e) {
+                    var checked = $(this).attr('aria-checked')
+                    if (checked == 'true') {
+                        $('#include-send-to-sender-email-field').slideDown(100);
+                        $('#sender-subject-for-email-field').slideDown(100);
+                    } else {
+                        $('#include-send-to-sender-email-field').slideUp(40);
+                        $('#sender-subject-for-email-field').slideUp(100);
+                    }
+                });
+            {% endjs %}
+
+            {% set toEmailName = 'integrations[email]['~ index ~'][toEmail]' %}
+            {{ forms.textField({
+                type: 'email',
+                label: "To Email"|t('form-builder'),
+                value: attribute(form.integrations.email, index).toEmail is defined and attribute(form.integrations.email, index).toEmail != '' ? attribute(form.integrations.email, index).toEmail : '',
+                id: 'to-email',
+                name: toEmailName,
+                size: 80,
+                instructions: "The recipient’s email address"|t('form-builder')
+            }) }}
+
+            {% set fromEmailName = 'integrations[email]['~ index ~'][fromEmail]' %}
+            {{ forms.textField({
+                type: 'email',
+                label: "From Email"|t('form-builder'),
+                value: attribute(form.integrations.email, index).fromEmail is defined and attribute(form.integrations.email, index).fromEmail != '' ? attribute(form.integrations.email, index).fromEmail : '',
+                id: 'from-email',
+                name: fromEmailName,
+                size: 80,
+                instructions: "The sender’s email address. Defaults to the System Email Address defined in Settings → Email."|t('form-builder')
+            }) }}
+
+            {% set fromNameName = 'integrations[email]['~ index ~'][fromName]' %}
+            {{ forms.textField({
+                label: "From Name"|t('form-builder'),
+                value: attribute(form.integrations.email, index).fromName is defined and attribute(form.integrations.email, index).fromName != '' ? attribute(form.integrations.email, index).fromName : '',
+                id: 'from-name',
+                name: fromNameName,
+                size: 80,
+                instructions: "The sender’s from name. Defaults to the System From Name defined in Settings → Email."|t('form-builder')
+            }) }}
+
+            {% set subjectName = 'integrations[email]['~ index ~'][subject]' %}
+            {{ forms.textField({
+                label: "Subject"|t('form-builder'),
+                value: attribute(form.integrations.email, index).subject is defined and attribute(form.integrations.email, index).subject != '' ? attribute(form.integrations.email, index).subject : '',
+                id: 'subject-for-email',
+                name: subjectName,
+                size: 80,
+                instructions: "Enter custom subject line."|t('form-builder')
+            }) }}
+
+            {% set customTemplateName = 'integrations[email]['~ index ~'][customTemplate]' %}
+            {{ forms.textField({
+                label: "Custom Template"|t('form-builder'),
+                value: attribute(form.integrations.email, index).customTemplate is defined and attribute(form.integrations.email, index).customTemplate != '' ? attribute(form.integrations.email, index).customTemplate : '',
+                id: 'customTemplate-for-email',
+                name: customTemplateName,
+                size: 80,
+                instructions: "Enter custom template path."|t('form-builder')
+            }) }}
         </div>
     </div>
 

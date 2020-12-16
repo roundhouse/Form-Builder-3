@@ -1,0 +1,10 @@
+{% extends "_layouts/elementindex" %}
+{% block head %}
+    {{ parent() }}
+
+    <script>
+        FormBuilder = {
+            pageTitle: '{{ _context.title is defined ? _context.title : '' }}'
+        }
+    </script>
+{% endblock %}

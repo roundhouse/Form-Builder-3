@@ -1,6 +1,6 @@
 {% for entry in entries %}
-    {% set postDate = entry.dateCreated.date |timeAgo(entry.dateCreated.date) %}
-    
+    {% set postDate = entry.dateCreated|date(("Y-m-d")) |timeAgo(entry.dateCreated|date("Y-m-d")) %}
+
     <a href="{{ entry.url }}" class="item">
         <div class="item-title">{{ entry.title }}</div>
         <div class="item-meta">

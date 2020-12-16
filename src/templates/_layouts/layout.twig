@@ -1,0 +1,39 @@
+{% extends "_layouts/cp" %}
+
+{% if title is not defined %}
+    {% set title = craft.fb.getPluginName() %}
+{% endif %}
+
+{% block head %}
+    {{ parent() }}
+
+    <script>
+        FormBuilder = {
+            pageTitle: '{{ _context.title is defined ? _context.title : '' }}'
+        }
+    </script>
+{% endblock %}
+
+{% set content %}
+    {% block mainContent %}{% endblock %}
+
+    <hr>
+
+    <div id="main-footer" class="flex-container">
+        <div class="col">
+            {% block footerAction %}{% endblock %}
+        </div>
+
+        <div class="col">
+            <a class="plugin-credit" href="#" target="_blank">
+                <div class="credit-pill">
+                    <div class="credit-mask">
+                        <div class="credit-wrap">
+                            {% include 'form-builder/_includes/icons/logo.svg' %}
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+{% endset %}

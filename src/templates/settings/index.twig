@@ -1,105 +1,64 @@
-{% extends "_layouts/cp" %}
+{% extends "form-builder/_layouts/layout" %}
 {% import "_includes/forms" as forms %}
 
 {% set title = "Settings"|t('form-builder') %}
 {% set bodyClass = 'formbuilder fb-settings' %}
 {% set selectedSubnavItem = "settings" %}
 
-{% block header %}
-    {% include 'form-builder/_includes/_header' ignore missing with { title: title } %}
-{% endblock %}
-
 {% block content %}
-    <input type="hidden" name="action" value="plugins/save-plugin-settings">
-    <input type="hidden" name="pluginHandle" value="{{ plugin.handle }}">
+    {{ actionInput('plugins/save-plugin-settings') }}
+    {{ hiddenInput('pluginHandle', plugin.handle) }}
     {{ redirectInput('form-builder/settings') }}
 
-    <section class="flex-container">
-        <div class="half-col">
-            <div class="widget">
-                <header class="pad">
-                    <h2>{{ "Plugin Settings"|t('form-builder') }}</h2>
-                </header>
-                <div class="body">
-                    <div class="list settings-list">
-                        <div class="list-item">
-                            <div class="fb-field ">
-                                <div class="input-hint">PLUGIN NAME</div>
-                                <div class="input">
-                                    <input type="text" class="options-submitButton-text" name="settings[pluginName]" value="{{ settings.pluginName }}">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+    {{ forms.textField({
+        label: "Plugin Name"|t('form-builder'),
+        id: 'plugin-name',
+        name: 'settings[pluginName]',
+        first: true,
+        autofocus: true,
+        value: settings.pluginName,
+        errors: (settings.getErrors('pluginName'))
+    }) }}
+
+{% endblock %}
+
+{% block details %}
+    {% if hasUpdate %}
+        <div class="meta">
+            <br>
+            <p>Plugin needs an update!</p>
+            <br>
+        </div>
+    {% endif %}
+
+    {% set isMigrationsAvailable = craft.fbMigration.isMigrationsAvailable() %}
+    {% if isMigrationsAvailable %}
+        <div class="meta">
+            <div class="data">
+                <h class="heading">{{ "Migrations"|t('form-builder') }}</h>
+                <div class="value">
+                    <a href="{{ url('form-builder/settings/migration') }}" class="btn">{{ 'View Migrations'|t('form-builder') }}</a>
                 </div>
             </div>
+        </div>
+    {% endif %}
 
-            <button type="submit" class="btns btn-info">Update Settings</button>
+    <div class="meta">
+        <div class="data">
+            <h5 class="heading">Plugin Version</h5>
+            <div class="value">{{ plugin.getVersion() }}</div>
         </div>
 
-        {% set isMigrationsAvailable = craft.fbMigration.isMigrationsAvailable() %}
-
-        <div class="half-col">
-            {% if isMigrationsAvailable %}
-                <div class="widget available-migrations">
-                    <header class="pad">
-                        <h2>{{ "Migrations"|t('form-builder') }}</h2>
-                    </header>
-                    <div class="body ">
-                        <div class="list pad">
-                            <p>{{ 'Migrations available!'|t('form-builder') }}</p>
-                            <a href="{{ url('form-builder/settings/migration') }}" class="btns btn-info" style="display: inline-block;">{{ 'View Migrations'|t('form-builder') }}</a>
-                        </div>
-                    </div>
-                </div>
-            {% endif %}
-
-            <div class="widget">
-                <header class="pad">
-                    <h2>{{ "Plugin Information"|t('form-builder') }}</h2>
-                </header>
-
-                <div class="body">
-                    <div class="list">
-                        <div class="list-item pad">
-                            <div class="item-meta">
-                                <span class="item-meta-icon"><i class="far fa-cog"></i></span>
-                                <span class="item-meta-title">{{ "Current Version "|t('form-builder') }} {{ plugin.getVersion() }}</span>
-                                <span class="item-meta-right"><a href="{{ plugin.changelogUrl }}" target="_blank">{{ "View Changelog"|t('form-builder') }}</a></span>
-                            </div>
-                            <div class="item-title">
-                                {% if hasUpdate %}
-                                    <span class="plugin-warning">
-                                            <i class="far fa-exclamation-circle"></i>
-                                            Plugin needs an update!
-                                        </span>
-                                {% else %}
-                                    <span class="plugin-success">
-                                            <i class="far fa-check-circle"></i>
-                                            Plugin is up to date.
-                                        </span>
-                                {% endif %}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="widget changelog">
-                <header class="pad">
-                    <h2>{{ "Changelog"|t('form-builder') }}</h2>
-                </header>
-
-                <div class="body">
-                    <div class="list">
-                        <div class="list-item">
-                            {{ changelog |raw }}
-                        </div>
-                    </div>
-                </div>
-            </div>
-
+        <div class="data">
+            <h5 class="heading">Website</h5>
+            <div class="value"><a href="https://formbuilder.tools" target="_blank">formbuilder.tools</a></div>
         </div>
 
-    </section>
+        <div class="data">
+            <h5 class="heading">Docs</h5>
+            <div class="value"><a href="https://docs.formbuilder.tools" target="_blank">docs.formbuilder.tools</a></div>
+        </div>
+    </div>
+
+
 {% endblock %}
