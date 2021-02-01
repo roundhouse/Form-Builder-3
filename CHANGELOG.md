@@ -1,5 +1,10 @@
 # Form Builder Changelog
 
+## 3.2.0.1 - 2021-01-31
+
+### Fixed
+- Composer version bump
+
 ## 3.2.0 - 2021-01-31
 
 ### Fixed
