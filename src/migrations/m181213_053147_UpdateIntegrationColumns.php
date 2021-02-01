@@ -4,6 +4,7 @@ namespace roundhouse\formbuilder\migrations;
 
 use Craft;
 use craft\db\Migration;
+use roundhouse\formbuilder\plugin\Table;
 
 /**
  * m181213_053147_UpdateIntegrationColumns migration.
@@ -15,10 +16,10 @@ class m181213_053147_UpdateIntegrationColumns extends Migration
      */
     public function safeUp()
     {
-        $this->addColumn('{{%formbuilder_integrations}}', 'category', $this->string()->after('handle'));
-        $this->addColumn('{{%formbuilder_integrations}}', 'token', $this->string()->after('status'));
-        $this->addColumn('{{%formbuilder_integrations}}', 'frontend', $this->boolean()->after('status'));
-        $this->addColumn('{{%formbuilder_integrations}}', 'allowMultiple', $this->boolean()->after('status')->defaultValue(0));
+        $this->addColumn(Table::INTEGRATIONS, 'category', $this->string()->after('handle'));
+        $this->addColumn(Table::INTEGRATIONS, 'token', $this->string()->after('status'));
+        $this->addColumn(Table::INTEGRATIONS, 'frontend', $this->boolean()->after('status'));
+        $this->addColumn(Table::INTEGRATIONS, 'allowMultiple', $this->boolean()->after('status')->defaultValue(0));
     }
 
     /**

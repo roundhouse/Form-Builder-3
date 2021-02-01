@@ -26,6 +26,7 @@
                         <div class="widget-heading">
                             <h2>{{ "Recent Submissions"|t('form-builder') }}</h2>
                             <a href="{{ url('form-builder/entries') }}" class="link">See all</a>
+                            <hr>
                         </div>
                         <div class="body">
                             {% set recentEntries = craft.fb.entries({
@@ -47,6 +48,7 @@
                                             <a href="{{ entry.url }}">{{ entry.title }}</a>
                                         </div>
                                     </div>
+                                    <hr>
                                 {% else %}
                                     <div class="list-item">
                                         <div class="item-title">
@@ -64,6 +66,6 @@
     </div>
 {% endblock %}
 
-{% js %}
-    new window.FormBuilder.GetEntriesCount('recent-submissions-chart-widget');
-{% endjs %}
+{#{% js %}#}
+{#    new window.FormBuilder.GetEntriesCount('recent-submissions-chart-widget');#}
+{#{% endjs %}#}

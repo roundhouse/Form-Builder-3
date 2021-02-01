@@ -91,15 +91,11 @@
         errors: (form.getErrors('name'))
     }) }}
 
-{#    {% include "_includes/fieldlayoutdesigner" with {#}
-{#        fieldLayout: form.getFieldLayout(),#}
-{#        customizableTabs: true,#}
-{#        form: form#}
-{#    } only %}#}
-
+    <h2>{{ 'Form Fields'|t('form-builder') }}</h2>
     {% include "form-builder/forms/_includes/fields/fieldlayoutdesigner" ignore missing with {
         fieldLayout: form.getFieldLayout(),
         customizableTabs: true,
+        customizableUi: false,
         form: form
     } only %}
 
@@ -151,150 +147,6 @@
             </div>
         </section>
     {% endif %}
-
-    {#        {% set availableFields = form.fieldLayoutId is defined and form.fieldLayoutId ? form.getFieldLayout().getFields() : null %}#}
-
-    {#        {% set fieldsOption = [] %}#}
-    {#        {% set fieldsOption = [{label: 'Select Field', value: ''}] %}#}
-    {#        {% for field in availableFields %}#}
-    {#            {% set type = field |getClass(field) %}#}
-    {#            {% if type == 'PlainText' or type == 'Email' %}#}
-    {#                {% set fieldsOption = fieldsOption|merge([{ label: field.name, value: field.handle }]) %}#}
-    {#            {% endif %}#}
-    {#        {% endfor %}#}
-
-    {#        {% set errors = form.getErrors() %}#}
-
-    {#        {% set tabs = [#}
-    {#            {#}
-    {#                tabId: 0,#}
-    {#                class: 'tab',#}
-    {#                label: 'Fields',#}
-    {#                url: '#tab-fields'#}
-    {#            },#}
-    {#            {#}
-    {#                tabId: 1,#}
-    {#                class: 'tab',#}
-    {#                label: 'Settings',#}
-    {#                url: '#tab-fields-settings'#}
-    {#            }#}
-    {#        ] %}#}
-
-    {#        <div id="content">#}
-    {#            {% include 'form-builder/forms/_includes/fields/fields' ignore missing %}#}
-
-    {#            #}{# INTEGRATIONS #}
-    {#            {% if currentUser.can('fb:accessIntegrations') %}#}
-    {#                {% set availableIntegrations = craft.fb.isIntegrations() %}#}
-    {#                {% set integrations = form.getIntegrations() %}#}
-
-    {#                <section class="integrations">#}
-    {#                    <header>#}
-    {#                        <h2>{{ "Integrations"|t('form-builder') }}</h2>#}
-    {#                        #}{#<p>{{ "Send notifications or save submission to 3rd party services."|t('form-builder') }}</p>#}
-    {#                    </header>#}
-
-    {#                    {% if availableIntegrations %}#}
-    {#                        <a href="#" class="btns btn-small btn-info add-integrations-item" {% if form.id is defined %}data-form-id="{{ form.id }}"{% endif %}><span><i class="fas fa-plus"></i> {{ 'Add Integration'|t('form-builder') }}</span></a>#}
-    {#                    {% endif %}#}
-
-    {#                    <div class="integration-body">#}
-    {#                        <div id="formbuilder-integrations-container">#}
-    {#                            {% for type, elements in integrations %}#}
-    {#                                {% set isMultiple = elements|isMulti %}#}
-
-    {#                                {% if isMultiple %}#}
-    {#                                    {% for index, element in elements %}#}
-    {#                                        {% if element.integration is defined %}#}
-    {#                                            {% if craft.app.view.doesTemplateExist('form-builder/integrations/_type/' ~ type ~ '/integration-section') %}#}
-    {#                                                {% include 'form-builder/integrations/_type/' ~ type ~ '/integration-section' ignore missing with { integration: element.integration, type: type, index: index} %}#}
-    {#                                            {% else %}#}
-    {#                                                {% include 'form-builder-integrations/types/' ~ type ~ '/integration-section' ignore missing with { integration: element.integration, type: type, index: index} %}#}
-    {#                                            {% endif %}#}
-    {#                                        {% endif %}#}
-    {#                                    {% endfor %}#}
-    {#                                {% else %}#}
-    {#                                    {% if craft.app.view.doesTemplateExist('form-builder/integrations/_type/' ~ type ~ '/integration-section') %}#}
-    {#                                        {% include 'form-builder/integrations/_type/' ~ type ~ '/integration-section' ignore missing with { integration: elements.integration, type: elements.integration.type, index: loop.index} %}#}
-    {#                                    {% else %}#}
-    {#                                        {% include 'form-builder-integrations/types/' ~ type ~ '/integration-section' ignore missing with { integration: elements.integration, type: elements.integration.type, index: loop.index} %}#}
-    {#                                    {% endif %}#}
-    {#                                {% endif %}#}
-
-    {#                            {% endfor %}#}
-    {#                        </div>#}
-    {#                    </div>#}
-    {#                </section>#}
-    {#            {% endif %}#}
-    {#        </div>#}
-    {#    </div>#}
-
-    {#    <div id="details">#}
-    {#        <div id="settings">#}
-    {#            <section class="form-settings-tout cmp-tout theme-white">#}
-    {#                <header>#}
-    {#                    <span class="tout-title">{{ "Settings" |t('form-builder') }}</span>#}
-    {#                    <a href="{{ docLinks['formSettings'] }}" class="docs-link" target="_blank"><i#}
-    {#                                class="fas fa-info"></i></a>#}
-    {#                </header>#}
-    {#                <div class="body">#}
-    {#                    {% include 'form-builder/forms/_includes/settings/basic-settings' ignore missing %}#}
-    {#                </div>#}
-    {#            </section>#}
-
-    {#            <section class="form-options-tout cmp-tout theme-white">#}
-    {#                <header>#}
-    {#                    <span class="tout-title">{{ "Database" |t('form-builder') }}</span>#}
-    {#                    <a href="{{ docLinks['formDatabase'] }}" class="docs-link" target="_blank"><i#}
-    {#                                class="fas fa-info"></i></a>#}
-    {#                </header>#}
-    {#                <div class="body">#}
-    {#                    {% include 'form-builder/forms/_includes/settings/save-entries' ignore missing %}#}
-    {#                </div>#}
-    {#            </section>#}
-
-    {#            <section class="form-options-tout cmp-tout theme-white">#}
-    {#                <header>#}
-    {#                    <span class="tout-title">{{ "Options" |t('form-builder') }}</span>#}
-    {#                    <a href="{{ docLinks['formOptions'] }}" class="docs-link" target="_blank"><i#}
-    {#                                class="fas fa-info"></i></a>#}
-    {#                </header>#}
-    {#                <div class="body">#}
-    {#                    {% include 'form-builder/forms/_includes/options/submit-button' ignore missing %}#}
-    {#                    {% include 'form-builder/forms/_includes/options/redirect' ignore missing %}#}
-    {#                    {% include 'form-builder/forms/_includes/options/messages' ignore missing %}#}
-    {#                    #}{# {% include 'form-builder/forms/_includes/options/ajax' ignore missing %} #}
-    {#                    #}{# {% include 'form-builder/forms/_includes/options/terms-conditions' ignore missing %} #}
-    {#                </div>#}
-    {#            </section>#}
-
-    {#            <section class="spam-protection-tout cmp-tout theme-white">#}
-    {#                <header>#}
-    {#                    <span class="tout-title">{{ "Spam Protection" |t('form-builder') }}</span>#}
-    {#                    <a href="{{ docLinks['formSpamProtection'] }}" class="docs-link" target="_blank"><i#}
-    {#                                class="fas fa-info"></i></a>#}
-    {#                </header>#}
-    {#                <div class="body">#}
-    {#                    {% include 'form-builder/forms/_includes/spam/honeypot' ignore missing %}#}
-    {#                    {% include 'form-builder/forms/_includes/spam/timed' ignore missing %}#}
-    {#                </div>#}
-    {#            </section>#}
-
-    {#            <div class="pane meta save-form-meta last">#}
-    {#                <button type="submit" class="btns btn-info save-form">{{ "Save Form" |t('form-builder') }}<span#}
-    {#                            class="btn-hint">&#8984; + S</span></button>#}
-    {#            </div>#}
-
-    {#                {% if currentUser.can('fb:deleteForms') %}#}
-    {#                    {% if formId is defined %}#}
-    {#                        <div class="pane meta delete-form-meta last">#}
-    {#                            <a href="#" class="btns btn-danger delete-form"#}
-    {#                               data-id="{{ form.id }}">{{ "Delete Form" |t('form-builder') }}</a>#}
-    {#                        </div>#}
-    {#                    {% endif %}#}
-    {#                {% endif %}#}
-    {#        </div>#}
-    {#    </div>#}
 
 {% endblock %}
 

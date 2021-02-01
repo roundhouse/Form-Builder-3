@@ -23,14 +23,15 @@
 {% endblock %}
 
 {% block sidebar %}
-
-    <div class="group-selector">
-        <div class="btngroup">
-            <a href="#" class="btn submit add icon" id="newgroupbtn">{{ "New Group"|t('form-builder') }}</a>
-        </div>
-    </div>
+{#    <div class="group-selector">#}
+{#        <div class="btngroup">#}
+{#            <a href="#" class="btn submit add icon" id="newgroupbtn">{{ "New Group"|t('form-builder') }}</a>#}
+{#        </div>#}
+{#    </div>#}
 
     {{ parent() }}
+
+    <a href="#" class="n" id="newgroupbtn">{{ "New Form Group"|t('form-builder') }}</a>
 {% endblock %}
 
 {#{% set sources = craft.app.elementIndexes.getSources(elementType, 'index') %}#}

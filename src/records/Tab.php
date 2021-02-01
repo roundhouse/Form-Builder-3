@@ -11,6 +11,8 @@
 namespace roundhouse\formbuilder\records;
 
 use craft\db\ActiveRecord;
+use craft\records\FieldLayoutField;
+use craft\records\FieldLayoutTab;
 use yii\db\ActiveQueryInterface;
 
 class Tab extends ActiveRecord

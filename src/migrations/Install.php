@@ -12,7 +12,11 @@ namespace roundhouse\formbuilder\migrations;
 
 use Craft;
 use craft\config\DbConfig;
+use craft\db\Connection;
 use craft\db\Migration;
+use craft\db\Table as CraftTable;
+
+use roundhouse\formbuilder\plugin\Table;
 
 class Install extends Migration
 {
@@ -61,7 +65,7 @@ class Install extends Migration
     protected function createTables()
     {
         // Forms
-        $this->createTable('{{%formbuilder_forms}}', [
+        $this->createTable(Table::FORMS, [
                 'id' => $this->integer()->notNull(),
                 'name' => $this->string()->notNull(),
                 'handle' => $this->string()->notNull(),
@@ -81,7 +85,7 @@ class Install extends Migration
         );
 
         // Form Groups
-        $this->createTable('{{%formbuilder_formgroup}}', [
+        $this->createTable(Table::FORM_GROUP, [
                 'id' => $this->primaryKey(),
                 'name' => $this->string()->notNull(),
                 'settings' => $this->text(),
@@ -92,7 +96,7 @@ class Install extends Migration
         );
 
         // Form Statuses
-        $this->createTable('{{%formbuilder_formstatus}}', [
+        $this->createTable(Table::FORM_STATUS, [
                 'id' => $this->primaryKey(),
                 'name' => $this->string()->notNull(),
                 'handle' => $this->string()->notNull(),
@@ -106,7 +110,7 @@ class Install extends Migration
         );
 
         // Entries
-        $this->createTable('{{%formbuilder_entries}}', [
+        $this->createTable(Table::ENTRIES, [
                 'id' => $this->integer()->notNull(),
                 'title' => $this->string()->notNull(),
                 'options' => $this->text(),
@@ -125,7 +129,7 @@ class Install extends Migration
         );
 
         // Entry's Note
-        $this->createTable('{{%formbuilder_entries_notes}}', [
+        $this->createTable(Table::ENTRIES_NOTES, [
                 'id' => $this->primaryKey(),
                 'note' => $this->text(),
                 'entryId' => $this->integer()->notNull(),
@@ -137,7 +141,7 @@ class Install extends Migration
         );
 
         // Entry Statuses
-        $this->createTable('{{%formbuilder_entrystatus}}', [
+        $this->createTable(Table::ENTRY_STATUS, [
                 'id' => $this->primaryKey(),
                 'name' => $this->string()->notNull(),
                 'handle' => $this->string()->notNull(),
@@ -151,7 +155,7 @@ class Install extends Migration
         );
 
         // Fields
-        $this->createTable('{{%formbuilder_fields}}', [
+        $this->createTable(Table::FIELDS, [
                 'id' => $this->primaryKey(),
                 'fieldId' => $this->integer()->notNull(),
                 'fieldLayoutId' => $this->integer(),
@@ -164,7 +168,7 @@ class Install extends Migration
         );
 
         // Tabs
-        $this->createTable('{{%formbuilder_tabs}}', [
+        $this->createTable(Table::TABS, [
                 'id' => $this->primaryKey(),
                 'name' => $this->string()->notNull(),
                 'tabId' => $this->integer()->notNull(),
@@ -177,7 +181,7 @@ class Install extends Migration
             ]
         );
 
-        $this->createTable('{{%formbuilder_integrations}}', [
+        $this->createTable(Table::INTEGRATIONS, [
             'id' => $this->primaryKey(),
             'name' => $this->string()->notNull(),
             'handle' => $this->string()->notNull(),
@@ -200,16 +204,18 @@ class Install extends Migration
      */
     protected function createIndexes()
     {
-        $this->createIndex($this->db->getIndexName('{{%formbuilder_forms}}', 'name', true), '{{%formbuilder_forms}}', 'name', true);
-        $this->createIndex($this->db->getIndexName('{{%formbuilder_forms}}', 'handle', true), '{{%formbuilder_forms}}', 'handle', true);
-        $this->createIndex($this->db->getIndexName('{{%formbuilder_forms}}', 'fieldLayoutId', true), '{{%formbuilder_forms}}', 'fieldLayoutId', true);
-        $this->createIndex($this->db->getIndexName('{{%formbuilder_formgroup}}', 'name', true), '{{%formbuilder_formgroup}}', 'name', true);
+        $indexName = $this->db->getIndexName();
+
+        $this->createIndex($indexName, Table::FORMS, 'name', true);
+        $this->createIndex($indexName, Table::FORMS, 'handle', true);
+        $this->createIndex($indexName, Table::FORMS, 'fieldLayoutId', true);
+        $this->createIndex($indexName, Table::FORM_GROUP, 'name', true);
 
         // Additional commands depending on the db driver
         switch ($this->driver) {
-            case DbConfig::DRIVER_MYSQL:
+            case Connection::DRIVER_MYSQL;
                 break;
-            case DbConfig::DRIVER_PGSQL:
+            case Connection::DRIVER_PGSQL:
                 break;
         }
     }
@@ -219,25 +225,26 @@ class Install extends Migration
      */
     protected function addForeignKeys()
     {
-        $this->addForeignKey($this->db->getForeignKeyName('{{%formbuilder_forms}}', 'id'), '{{%formbuilder_forms}}', 'id', '{{%elements}}', 'id', 'CASCADE', null);
-        $this->addForeignKey($this->db->getForeignKeyName('{{%formbuilder_forms}}', 'fieldLayoutId'), '{{%formbuilder_forms}}', 'fieldLayoutId', '{{%fieldlayouts}}', 'id', 'CASCADE', null);
-        $this->addForeignKey($this->db->getForeignKeyName('{{%formbuilder_forms}}', 'groupId'), '{{%formbuilder_forms}}', 'groupId', '{{%formbuilder_formgroup}}', 'id', 'CASCADE', null);
-        $this->addForeignKey($this->db->getForeignKeyName('{{%formbuilder_forms}}', 'statusId'), '{{%formbuilder_forms}}', 'statusId', '{{%formbuilder_formstatus}}', 'id', 'CASCADE', null);
+        $foreignKeyName = $this->db->getForeignKeyName();
 
-        $this->addForeignKey($this->db->getForeignKeyName('{{%formbuilder_entries}}', 'id'), '{{%formbuilder_entries}}', 'id', '{{%elements}}', 'id', 'CASCADE', null);
-        $this->addForeignKey($this->db->getForeignKeyName('{{%formbuilder_entries}}', 'formId'), '{{%formbuilder_entries}}', 'formId', '{{%formbuilder_forms}}', 'id', 'CASCADE', null);
-        $this->addForeignKey($this->db->getForeignKeyName('{{%formbuilder_entries}}', 'statusId'), '{{%formbuilder_entries}}', 'statusId', '{{%formbuilder_entrystatus}}', 'id', 'CASCADE', null);
+        $this->addForeignKey($foreignKeyName, Table::FORMS, 'id', CraftTable::ELEMENTS, 'id', 'CASCADE', null);
+        $this->addForeignKey($foreignKeyName, Table::FORMS, 'fieldLayoutId', CraftTable::FIELDLAYOUTS, 'id', 'CASCADE', null);
+        $this->addForeignKey($foreignKeyName, Table::FORMS, 'groupId', Table::FORM_GROUP, 'id', 'CASCADE', null);
+        $this->addForeignKey($foreignKeyName, Table::FORMS, 'statusId', Table::ENTRY_STATUS, 'id', 'CASCADE', null);
 
-        $this->addForeignKey($this->db->getForeignKeyName('{{%formbuilder_fields}}', 'fieldLayoutId'), '{{%formbuilder_fields}}', 'fieldLayoutId', '{{%fieldlayouts}}', 'id', 'CASCADE', null);
-        $this->addForeignKey($this->db->getForeignKeyName('{{%formbuilder_fields}}', 'fieldId'), '{{%formbuilder_fields}}', 'fieldId', '{{%fields}}', 'id', 'CASCADE', null);
-        $this->addForeignKey($this->db->getForeignKeyName('{{%formbuilder_fields}}', 'formId'), '{{%formbuilder_fields}}', 'formId', '{{%formbuilder_forms}}', 'id', 'CASCADE', null);
+        $this->addForeignKey($foreignKeyName, Table::ENTRIES, 'id', CraftTable::ELEMENTS, 'id', 'CASCADE', null);
+        $this->addForeignKey($foreignKeyName, Table::ENTRIES, 'formId', Table::FORMS, 'id', 'CASCADE', null);
+        $this->addForeignKey($foreignKeyName, Table::ENTRIES, 'statusId', Table::ENTRY_STATUS, 'id', 'CASCADE', null);
 
-        $this->addForeignKey($this->db->getForeignKeyName('{{%formbuilder_tabs}}', 'layoutId'), '{{%formbuilder_tabs}}', 'layoutId', '{{%fieldlayouts}}', 'id', 'CASCADE', null);
-        $this->addForeignKey($this->db->getForeignKeyName('{{%formbuilder_tabs}}', 'tabId'), '{{%formbuilder_tabs}}', 'tabId', '{{%fieldlayouttabs}}', 'id', 'CASCADE', null);
-        $this->addForeignKey($this->db->getForeignKeyName('{{%formbuilder_tabs}}', 'formId'), '{{%formbuilder_tabs}}', 'formId', '{{%formbuilder_forms}}', 'id', 'CASCADE', null);
+        $this->addForeignKey($foreignKeyName, Table::FIELDS, 'fieldLayoutId', CraftTable::FIELDLAYOUTS, 'id', 'CASCADE', null);
+        $this->addForeignKey($foreignKeyName, Table::FIELDS, 'fieldId', CraftTable::FIELDS, 'id', 'CASCADE', null);
+        $this->addForeignKey($foreignKeyName, Table::FIELDS, 'formId', Table::FORMS, 'id', 'CASCADE', null);
 
-        $this->addForeignKey($this->db->getForeignKeyName('{{%formbuilder_entries_notes}}', 'entryId'), '{{%formbuilder_entries_notes}}', 'entryId', '{{%formbuilder_entries}}', 'id', 'CASCADE', null);
-        $this->addForeignKey($this->db->getForeignKeyName('{{%formbuilder_entries_notes}}', 'authorId'), '{{%formbuilder_entries_notes}}', 'authorId', '{{%users}}', 'id', 'CASCADE', null);
+        $this->addForeignKey($foreignKeyName, Table::TABS, 'layoutId', CraftTable::FIELDLAYOUTS, 'id', 'CASCADE', null);
+        $this->addForeignKey($foreignKeyName, Table::TABS, 'formId', Table::FORMS, 'id', 'CASCADE', null);
+
+        $this->addForeignKey($foreignKeyName, Table::ENTRIES_NOTES, 'entryId', Table::ENTRIES, 'id', 'CASCADE', null);
+        $this->addForeignKey($foreignKeyName, Table::ENTRIES_NOTES, 'authorId', CraftTable::USERS, 'id', 'CASCADE', null);
     }
 
     /**
@@ -260,6 +267,6 @@ class Install extends Migration
         $this->dropTableIfExists('{{%formbuilder_formgroup}}');
         $this->dropTableIfExists('{{%formbuilder_formstatus}}');
 
-        $this->dropTableIfExists('{{%formbuilder_integrations}}');
+        $this->dropTableIfExists(Table::INTEGRATIONS);
     }
 }

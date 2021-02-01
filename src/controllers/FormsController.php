@@ -84,22 +84,8 @@ class FormsController extends Controller
         $view->registerAssetBundle(FormBuilderAsset::class);
         $view->registerAssetBundle(FormAsset::class);
 
-        if (isset($variables["form"]->fieldLayoutId)) {
-            $view->registerJs('LD.layoutId=' . $variables["form"]->fieldLayoutId);
-            $view->registerJs('LD.formId=' . $variables["form"]->id);
-        }
-        $view->registerJs('LD.setup()');
-
-        $view->registerJs('LD_Fields.fields=' . Json::encode(FormBuilder::$plugin->fields->getFields(), JSON_UNESCAPED_UNICODE));
-        $view->registerJs('LD_Fields.options=' . Json::encode(FormBuilder::$plugin->fields->getAllFieldOptions(), JSON_UNESCAPED_UNICODE));
-        $view->registerJs('LD_Fields.setup()');
-
-        $view->registerJs('LD_Tabs.tabs=' . Json::encode(FormBuilder::$plugin->tabs->getTabs(), JSON_UNESCAPED_UNICODE));
-        $view->registerJs('LD_Tabs.options=' . Json::encode(FormBuilder::$plugin->tabs->getAllTabOptions(), JSON_UNESCAPED_UNICODE));
-        $view->registerJs('LD_Tabs.setup()');
+        $view->registerJs('new FormEdit()');
         $view->registerJs('initFLD();');
-
-        $view->registerJs('new window.FormBuilder.FormEdit()');
 
         if ($variables['form']) {
             $variables['title'] = 'Edit ' . $variables['form']->name;
@@ -164,7 +150,6 @@ class FormsController extends Controller
         $this->requirePermission('fb:editForms');
         $this->requirePermission('fb:deleteForms');
         $this->requirePostRequest();
-//        $this->requireAcceptsJson();
 
         $request = Craft::$app->getRequest();
         $formId = $request->getRequiredBodyParam('id');
@@ -187,8 +172,6 @@ class FormsController extends Controller
             Craft::$app->getUrlManager()->setRouteParams([
                 'form' => $form
             ]);
-
-            return null;
         }
 
         if ($request->getAcceptsJson()) {
@@ -200,12 +183,6 @@ class FormsController extends Controller
         Craft::$app->getSession()->setNotice(Craft::t('form-builder', 'Form deleted'));
 
         return $this->redirectToPostedUrl($form);
-
-//        $success = FormBuilder::$plugin->forms->delete($formId);
-//
-//        return $this->asJson([
-//            'success' => $success
-//        ]);
     }
 
 

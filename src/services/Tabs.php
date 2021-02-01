@@ -14,6 +14,7 @@ use Craft;
 use craft\records\FieldLayoutTab;
 use craft\helpers\Json;
 use craft\base\Component;
+use roundhouse\formbuilder\objects\TabOptions;
 
 use roundhouse\formbuilder\models\Tab;
 use roundhouse\formbuilder\records\Tab as TabRecord;
@@ -63,26 +64,44 @@ class Tabs extends Component
         return $output;
     }
 
+    /**
+     * Get tab options by payload
+     *
+     * @param $layoutId
+     * @param $tabId
+     * @param $tabName
+     * @return array|\yii\db\ActiveRecord|null
+     */
+    public function getTabOptionsByPayload($layoutId, $tabId, $tabName)
+    {
+        return TabRecord::find()->where([
+            'layoutId'=> $layoutId,
+            'tabId'=> $tabId,
+            'name' => $tabName,
+        ])->one();
+    }
+
 
     /**
      * Save tab options
      *
-     * @param $layoutTab
      * @param $tab
+     * @param $newTabId
+     * @param $postOptions
      * @param $formId
      * @param $layoutId
      * @return bool
      * @throws \Throwable
+     * @throws \yii\base\InvalidConfigException
      * @throws \yii\db\Exception
      */
-    public function save($layoutTab, $tab, $formId, $layoutId) : bool
+    public function save($tab, $newTabId , $postOptions, $formId, $layoutId) : bool
     {
         $tabModel               = new TabModel();
-        $tabModel->name         = $layoutTab->name;
-        $tabModel->tabId        = $layoutTab->id;
+        $tabModel->tabId        = $newTabId;
+        $tabModel->name         = $tab['tabName'];
         $tabModel->layoutId     = $layoutId;
         $tabModel->formId       = $formId;
-        $tabModel->options      = $tab['options'];
 
         $tabModel->validate();
 
@@ -91,23 +110,37 @@ class Tabs extends Component
         }
 
         $tabRecord              = new TabRecord();
-        $tabRecord->tabId       = $layoutTab->id;
-        $tabRecord->name        = $layoutTab->name;
+        $tabRecord->tabId       = $newTabId;
+        $tabRecord->name        = $tab['tabName'];
         $tabRecord->layoutId    = $layoutId;
         $tabRecord->formId      = $formId;
-        $tabRecord->options     = $tab['options'];
 
-        $transaction = Craft::$app->getDb()->beginTransaction();
+        // Validate class and id
+        $options = Craft::createObject(TabOptions::class);
 
-        try {
-            $tabRecord->save(false);
-            $tabModel->id = $tabRecord->id;
+        if (isset($postOptions['class']) && $postOptions['class'] !== '') {
+            $options->class = $postOptions['class'];
+        }
 
-            $transaction->commit();
-        } catch (\Throwable $e) {
-            $transaction->rollBack();
+        if (isset($postOptions['id']) && $postOptions['id'] !== '') {
+            $options->id = $postOptions['id'];
+        }
 
-            throw $e;
+        $tabRecord->options = $options;
+
+        if (!$options->isClassEmpty() || !$options->isIdEmpty()) {
+            $transaction = Craft::$app->getDb()->beginTransaction();
+
+            try {
+                $tabRecord->save(false);
+                $tabModel->id = $tabRecord->id;
+
+                $transaction->commit();
+            } catch (\Throwable $e) {
+                $transaction->rollBack();
+
+                throw $e;
+            }
         }
 
         return true;
@@ -130,6 +163,40 @@ class Tabs extends Component
         }
         
         return $tabRecord;
+    }
+
+    public function getRealTabIdByName($tabName, $fieldLayoutId)
+    {
+        $record = FieldLayoutTab::find()->where([
+            'name' => $tabName,
+            'layoutId' => $fieldLayoutId
+        ])->one();
+
+        if ($record) {
+            return $record->id;
+        }
+
+        return null;
+    }
+
+    /**
+     * Remove records
+     *
+     * @param $formId
+     * @param $fieldLayoutId
+     * @throws \Throwable
+     * @throws \yii\db\StaleObjectException
+     */
+    public function removeUnusedRecords($formId, $fieldLayoutId)
+    {
+        $existingRecords = TabRecord::find()->where([
+            'formId' => $formId,
+            'layoutId' => $fieldLayoutId
+        ])->all();
+
+        foreach ($existingRecords as $record) {
+            $record->delete();
+        }
     }
 
     // Private Methods

@@ -8,11 +8,11 @@
 
 {%- set formClass = [
     options.formClass is defined ? options.formClass : form.handle ~ '-form',
-    (formSettings.fields.global.formClass is defined and formSettings.fields.global.formClass != '' ? formSettings.fields.global.formClass : null)
+    (formOptions.formClass is defined and formOptions.formClass != '' ? formOptions.formClass : null)
 ]|filter|join(' ') %}
 {% set formId = form.handle ~ '-form' %}
-{% if formSettings.fields.global.formId is defined and formSettings.fields.global.formId != '' %}
-    {% set formId = formSettings.fields.global.formId %}
+{% if formOptions.formId is defined and formOptions.formId != '' %}
+    {% set formId = formOptions.formId %}
 {% endif %}
 {% if options.formId is defined ? options.formId %}
     {% set formId = options.formId %}

@@ -1,5 +1,12 @@
 # Form Builder Changelog
 
+## 3.2.0 - 2021-01-31
+
+### Fixed
+- Now compatible with the new field layout designer
+- Fixed UI issues
+- Fixed Integrations
+
 ## 3.1.4.4 - 2020-11-03
 
 ### Fixed

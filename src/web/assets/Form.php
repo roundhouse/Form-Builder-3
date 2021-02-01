@@ -24,15 +24,15 @@ class Form extends AssetBundle
         ];
 
         $this->js = [
-            'js/modal.js',
-            'js/fields.js',
             'js/forms.js',
-            'js/field-designer.js',
-            'js/tab-designer.js',
-            'js/designer.js',
-            'js/option.js',
-            'js/tags.js',
+            'js/field-layout-designer.js',
             'js/integrations.js'
+//            'js/modal.js',
+//            'js/fields.js',
+//            'js/tab-designer.js',
+//            'js/designer.js',
+//            'js/option.js',
+//            'js/tags.js',
         ];
 
         parent::init();

@@ -1,9 +1,5 @@
 {% set id = random(3000) %}
 
-<header class="hud-header">
-    <h2>{{ 'Available Integration'|t('form-builder') }}</h2>
-</header>
-
 <div class="hud-body">
     {% for integration in integrations %}
         <a href="{{ url('form-builder/integrations/' ~ integration.id) }}" class="fb-field integration-add-link"
@@ -13,6 +9,14 @@
            data-handle="{{ integration.handle }}"
            data-type="{{ integration.type }}"
            data-status="{{ integration.status }}">
+
+            <div class="status-container">
+                {% if integration.status == 'enabled' %}
+                    <div class="status on" title="{{ 'Enabled'|t('form-builder') }}"></div>
+                {% else %}
+                    <div class="status off" title="{{ 'Disabled'|t('form-builder') }}"></div>
+                {% endif %}
+            </div>
 
             <div class="tout-title">
                 {% if craft.app.view.doesTemplateExist('form-builder/_includes/icons/integrations-' ~ integration.type) %}
@@ -24,13 +28,10 @@
                 <span class="type-title">{{ integration.type }}</span>
             </div>
             <span class="integration-title">{{ integration.name }}</span>
-            <div class="status-container">
-                {% if integration.status == 'enabled' %}
-                    <div class="status on" title="{{ 'Enabled'|t('form-builder') }}"></div>
-                {% else %}
-                    <div class="status off" title="{{ 'Disabled'|t('form-builder') }}"></div>
-                {% endif %}
-            </div>
         </a>
+
+        {% if not loop.last %}
+            <hr>
+        {% endif %}
     {% endfor %}
 </div>

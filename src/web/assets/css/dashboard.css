@@ -1,45 +1,7 @@
-<<<<<<< HEAD
-.chart-explorer-container {
+#widget-recent-submissions-chart-widget .chart {
   position: relative;
   height: 130px;
   width: 100%;
   padding-bottom: 80px;
   margin-bottom: 25px;
-=======
-#widget-recent-submissions-chart-widget .chart-header {
-  display: flex;
-  align-items: center;
-  padding: 20px 20px 30px 20px;
-  box-sizing: border-box;
-}
-#widget-recent-submissions-chart-widget .timeline-wrapper {
-  margin-left: auto;
-}
-#widget-recent-submissions-chart-widget .timeline-wrapper button:first-child {
-  margin-right: 10px;
-}
-#widget-recent-submissions-chart-widget .loader {
-  position: absolute;
-  top: 65%;
-  left: 50%;
-  margin-top: -10px;
-  margin-left: -10px;
-}
-#widget-recent-submissions-chart-widget .total {
-  display: flex;
-  font-size: 12px;
-  text-transform: uppercase;
-}
-#widget-recent-submissions-chart-widget .total p {
-  letter-spacing: 0.1em;
-}
-#widget-recent-submissions-chart-widget .total .total-value-wrapper {
-  margin-right: 5px;
-  letter-spacing: 0.1em;
-}
-#widget-recent-submissions-chart-widget .chart-explorer-container {
-  position: relative;
-  height: 130px;
-  width: 100%;
->>>>>>> 7563784db208997d8d94bce838797d53454daca3
 }

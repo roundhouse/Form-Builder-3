@@ -12,6 +12,7 @@ namespace roundhouse\formbuilder\migrations;
 
 use Craft;
 use craft\db\Migration;
+use roundhouse\formbuilder\plugin\Table;
 
 /**
  * m181024_173921_AddIntegrationsTable migration.
@@ -23,7 +24,7 @@ class m181024_173921_AddIntegrationsTable extends Migration
      */
     public function safeUp()
     {
-        $this->createTable('{{%formbuilder_integrations}}', [
+        $this->createTable(Table::INTEGRATIONS, [
             'id' => $this->primaryKey(),
             'name' => $this->string()->notNull(),
             'handle' => $this->string()->notNull(),
@@ -44,7 +45,7 @@ class m181024_173921_AddIntegrationsTable extends Migration
      */
     public function safeDown()
     {
-        $this->dropTableIfExists('{{%formbuilder_integrations}}');
+        $this->dropTableIfExists(Table::INTEGRATIONS);
 
         return true;
     }

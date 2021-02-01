@@ -1,218 +1,194 @@
-{% set allowed = form.getAllowedFieldTypes %}
+{% import '_includes/forms' as forms %}
 
-{% if customizableTabs is not defined %}{% set customizableTabs = true %}{% endif %}
-{% if not customizableTabs and pretendTabName is not defined %}
-    {% set pretendTabName = "Content"|t('app') %}
-{% endif %}
+{% set customizableTabs = customizableTabs ?? true %}
+{% set customizableUi = customizableUi ?? true %}
+{% set pretendTabName = pretendTabName ?? 'Content'|t('app') %}
+{% set fieldLayout = fieldLayout ?? create('craft\\models\\FieldLayout') %}
 
 {% set groups = craft.app.fields.getAllGroups() %}
 
 {% do view.registerTranslations('app', [
-    "Rename",
-    "Delete",
-    "Make required",
-    "Make not required",
-    "Remove",
-    "Give your tab a name.",
+    'Apply',
+    'Delete',
+    'Give your tab a name.',
+    'Move to the left',
+    'Move to the right',
+    'Remove',
+    'Rename',
+    'Required',
+    '{pct} width',
 ]) %}
 
-{% macro tab(form, customizableTabs, tab, tabName, tabFields) %}
-    {% set allowed = form.getAllowedFieldTypes %}
-
+{% macro tab(tabId, tabName, elements, context, index) %}
     <div class="fld-tab">
         <div class="tabs">
-            <div class="tab sel{% if customizableTabs %} draggable{% endif %} tab-id-{{ tab.id }}" data-id="{{ tab.id }}">
+            <div class="tab sel{% if context.customizableTabs %} draggable{% endif %}" data-target="fields-{{ tabId }}" data-index="{{ index }}" data-id="{{ tabId }}">
                 <span>{{ tabName }}</span>
-                {% if customizableTabs %}
-                    <a class="settings icon" title="{{ 'Edit'|t('app') }}"></a>
+                {% if context.customizableTabs %}
+                    <a class="settings icon" title="{{ 'Edit'|t('app') }}" aria-label="{{ 'Edit'|t('app') }}"></a>
                 {% endif %}
             </div>
+            <div class="tab" data-target="options-{{ tabId }}">
+                <div class="tab-toggle">Options</div>
+            </div>
         </div>
-        <div class="fld-tabcontent">
-            {% for field in tabFields %}
-                {% set fieldType = field|getClass %}
-                <div class="fld-field{% if field.required %} fld-required{% endif %} {% if fieldType not in allowed %}not-available{% endif %}" data-id="{{ field.id }}">
-                    <a class="settings icon" title="{{ 'Edit'|t('app') }}"></a>
-                    <span class="field-icon">
-                        {% if fieldType == 'PlainText' %}
-                            <i class="far fa-i-cursor"></i>
-                        {% elseif fieldType == 'Email' %}
-                            <i class="far fa-at"></i>
-                        {% elseif fieldType == 'Number' %}
-                            <i class="far fa-hashtag"></i>
-                        {% elseif fieldType == 'Assets' %}
-                            <i class="far fa-upload"></i>
-                        {% elseif fieldType == 'Url' %}
-                            <i class="far fa-globe"></i>
-                        {% elseif fieldType == 'Checkboxes' %}
-                            <i class="far fa-check-square"></i>
-                        {% elseif fieldType == 'RadioButtons' %}
-                            <i class="far fa-check-circle"></i>
-                        {% elseif fieldType == 'MultiSelect' %}
-                            <i class="far fa-check-square"></i>
-                        {% elseif fieldType == 'Color' %}
-                            <i class="far fa-paint-brush"></i>
-                        {% elseif fieldType == 'Date' %}
-                            <i class="far fa-calendar-alt"></i>
-                        {% elseif fieldType == 'Dropdown' %}
-                            <i class="far fa-caret-square-down"></i>
-                        {% else %}
-                            <i class="far fa-ban"></i>
-                        {% endif %}
-                    </span>
-                    <span>{{ field.name|t('site') }}</span>
-                    <input class="id-input" type="hidden" name="fieldLayout[{{ tabName|e('url') }}][]" value="{{ field.id }}">
-                    {% if field.required %}<input class="required-input" type="hidden" name="requiredFields[]" value="{{ field.id }}">{% endif %}
-                </div>
+        <div class="fld-tabcontent tab-content" id="target-fields-{{ tabId }}">
+            {% for element in elements %}
+                {{ _self.elementSelector(element, false) }}
             {% endfor %}
+        </div>
+        <div class="tab-content hidden" id="target-options-{{ tabId }}">
+            <div>
+                {% set tabOptions = craft.fbTabs.getTabOptionsByPayload(context.fieldLayout.id, tabId, tabName) %}
+
+                {% if tabOptions.options is defined %}
+                    {% set options = tabOptions.options |json_decode %}
+                {% endif %}
+
+                {{ hiddenInput('form-builder[tabs]['~ index ~'][tabName]', tabName) }}
+                {{ hiddenInput('form-builder[tabs]['~ index ~'][oldTabId]', tabId) }}
+
+                {{ forms.textField({
+                    label: 'Class',
+                    name: 'form-builder[tabs]['~ index ~'][options][class]',
+                    value: options is defined ? options.class : '',
+                }) }}
+                {{ forms.textField({
+                    label: 'ID',
+                    name: 'form-builder[tabs]['~ index ~'][options][id]',
+                    value: options is defined ? options.id : '',
+                }) }}
+            </div>
         </div>
     </div>
 {% endmacro %}
 
-<div id="fieldlayoutsettings">
-    {% if form.settings.fields.global.formClass is defined %}
-        <input type="hidden" name="settings[fields][global][formClass]" value="{{ form.settings.fields.global.formClass }}">
+{% macro elementSelector(element, forLibrary, attr) %}
+    {% if element is instance of('craft\\fieldlayoutelements\\BaseField') %}
+        {% set attr = {
+            class: [
+                not forLibrary and element.required ? 'fld-required' : null,
+            ]|filter,
+            data: {
+                keywords: forLibrary ? element.keywords()|join(' ')|lower : false,
+            },
+        }|merge(attr ?? {}, recursive=true) %}
     {% endif %}
-    {% if form.settings.fields.global.formId is defined %}
-        <input type="hidden" name="settings[fields][global][formId]" value="{{ form.settings.fields.global.formId }}">
+    {% set settingsHtml = element.settingsHtml() %}
+    {{ element.selectorHtml()|attr({
+        class: [
+            'fld-element',
+            forLibrary ? 'unused' : null,
+        ]|filter,
+        data: {
+            type: className(element),
+            config: element.toArray(),
+            'has-custom-width': element.hasCustomWidth(),
+            'settings-html': (settingsHtml ? settingsHtml|namespaceAttributes("element#{random()}") : null) ?: false,
+        },
+    }|merge(attr ?? {}, recursive=true)) }}
+{% endmacro %}
+
+{% macro fieldSelectors(groupName, groupFields, context) %}
+    {% set showGroup = groupFields|contains(f => not context.fieldLayout.isFieldIncluded(f.attribute())) %}
+    <div class="fld-field-group{% if not showGroup %} hidden{% endif %}" data-name="{{ groupName|replace('"', '')|lower }}">
+        <h6>{{ groupName }}</h6>
+        {% for field in groupFields %}
+            {{ _self.elementSelector(field, true, {
+                class: [
+                    context.fieldLayout.isFieldIncluded(field.attribute()) ? 'hidden' : null,
+                ],
+            }) }}
+        {% endfor %}
+    </div>
+{% endmacro %}
+
+{% if fieldLayout.id %}
+    {{ hiddenInput('fieldLayoutId', fieldLayout.id, {id: 'field-layout-id'}) }}
+    {% if form.id %}
+        {{ hiddenInput('form-builder[formId]', form.id) }}
     {% endif %}
-    {% if form.settings.fields.global.inputClass is defined %}
-        <input type="hidden" name="settings[fields][global][inputClass]" value="{{ form.settings.fields.global.inputClass }}">
-    {% endif %}
-    {% if form.settings.fields.global.inputTemplate is defined %}
-        <input type="hidden" name="settings[fields][global][inputTemplate]" value="{{ form.settings.fields.global.inputTemplate }}">
-    {% endif %}
-</div>
+{% endif %}
 
+{% set tabs = fieldLayout.getTabs() %}
 
-<div id="fieldlayoutform" class="fieldlayoutform">
-
-    <h2 class="first">{{ "Design your field layout"|t('app') }}</h2>
-
-
-    {#    {% if customizableTabs %}#}
-    {#        <div class="newtabbtn-container buttons">#}
-    {#            <div class="btn btns btn-info"><i class="fas fa-plus"></i><span class="txt">{{ "Add Fieldset"|t('form-builder') }}</span></div>#}
-    {#        </div>#}
-    {#    {% endif %}#}
-
-    <div class="fld-tabs">
-        {% if fieldLayout %}
-            {% import _self as macros %}
-
+<div id="fieldlayoutform" class="layoutdesigner">
+    <div class="fld-workspace">
+        <div class="fld-tabs">
             {% if customizableTabs %}
-                {% for tab in fieldLayout.getTabs() %}
-                    {{ macros.tab(form, customizableTabs, tab, tab.name, tab.getFields()) }}
+                {% for tab in tabs %}
+                    {% set tabId = craft.fbTabs.getRealTabIdByName(tab.name, fieldLayout.id) %}
+
+                    {{ _self.tab(tabId, tab.name, tab.elements, _context, loop.index0) }}
                 {% endfor %}
             {% else %}
-                {{ macros.tab(form, customizableTabs, tab, pretendTabName, fieldLayout.getFields()) }}
+                {% set elements = [] %}
+                {% for tab in tabs %}
+                    {% for element in tab.elements %}
+                        {% set elements = elements|push(element) %}
+                    {% endfor %}
+                {% endfor %}
+                {{ _self.tab(null, pretendTabName, elements, _context, loop.index0) }}
             {% endif %}
 
+        </div>
 
-            {% if  form.fieldLayoutId %}
-                {{ hiddenInput('form-builder[layoutId]', form.fieldLayoutId) }}
-            {% endif %}
-
-            {% if form.id %}
-                {{ hiddenInput('form-builder[formId]', form.id) }}
-            {% endif %}
+        {% if customizableTabs %}
+            <button type="button" class="fld-new-tab-btn btn add icon">{{ "New Tab"|t('app') }}</button>
         {% endif %}
     </div>
 
-    {% if customizableTabs %}
-        <div class="newtabbtn-container">
-            <div class="btn add icon">{{ "Add Fieldset"|t('form-builder') }}</div>
-        </div>
+    {% if tabs %}
+        {% set tabOptions = craft.fbTabs.getAllTabOptions() %}
+        {% set fieldOptions = craft.fbFields.getAllFieldOptionsByLayoutId(fieldLayout.id, form.id) %}
+        <span data-data="{{ tabOptions|json_encode }}" id="tab-options-data"></span>
+        <span data-data="{{ fieldOptions|json_encode }}" id="field-options-data"></span>
     {% endif %}
 
-    <div class="unusedfields">
-        {% for group in groups %}
-            {% set totalUnselected = 0 %}
-            {% for field in group.fields %}
-                {% if not fieldLayout or field.id not in fieldLayout.getFieldIds() %}
-                    {% set totalUnselected = totalUnselected + 1 %}
-                {% endif %}
-            {% endfor %}
-
-            <div class="fld-tab unused{% if totalUnselected == 0 %} hidden{% endif %}">
-                <div class="tabs">
-                    <div class="tab sel{% if customizableTabs %} draggable{% endif %}"><span>{{ group.name }}</span></div>
-                </div>
-                <div class="fld-tabcontent">
-                    {% for field in group.fields %}
-                        {% set fieldType = field|getClass %}
-                        {% set selected = fieldLayout and field.id in fieldLayout.getFieldIds() %}
-                        <div class="fld-field unused{% if selected %} hidden{% endif %} {% if fieldType not in allowed %}not-available{% endif %}" data-id="{{ field.id }}">
-                            <span class="field-icon">
-                            {% if fieldType == 'PlainText' %}
-                                <i class="far fa-i-cursor"></i>
-                            {% elseif fieldType == 'Email' %}
-                                <i class="far fa-at"></i>
-                            {% elseif fieldType == 'Number' %}
-                                <i class="far fa-hashtag"></i>
-                            {% elseif fieldType == 'Assets' %}
-                                <i class="far fa-upload"></i>
-                            {% elseif fieldType == 'Url' %}
-                                <i class="far fa-globe"></i>
-                            {% elseif fieldType == 'Checkboxes' %}
-                                <i class="far fa-check-square"></i>
-                            {% elseif fieldType == 'RadioButtons' %}
-                                <i class="far fa-check-circle"></i>
-                            {% elseif fieldType == 'MultiSelect' %}
-                                <i class="far fa-check-square"></i>
-                            {% elseif fieldType == 'Color' %}
-                                <i class="far fa-paint-brush"></i>
-                            {% elseif fieldType == 'Date' %}
-                                <i class="far fa-calendar-alt"></i>
-                            {% elseif fieldType == 'Dropdown' %}
-                                <i class="far fa-caret-square-down"></i>
-                            {% else %}
-                                {% if fieldType not in allowed %}
-                                    <i class="far fa-ban"></i>
-                                {% else %}
-                                    <i class="far fa-i-cursor"></i>
-                                {% endif %}
-                            {% endif %}
-                            </span>
-                            <span>{{ field.name|t('site') }}</span>
-                        </div>
-                    {% endfor %}
-                </div>
+    <div class="fld-sidebar">
+        {% if customizableUi %}
+            <div class="btngroup small fullwidth" role="listbox" aria-label="{{ 'Layout element types'|t('app') }}" tabindex="0">
+                <button type="button" class="btn small active" role="option" aria-selected="true" data-library="field" tabindex="-1">{{ 'Fields'|t('app') }}</button>
+                <button type="button" class="btn small" role="option" aria-selected="false" data-library="ui" tabindex="-1">{{ 'UI Elements'|t('app') }}</button>
             </div>
-        {% endfor %}
+        {% endif %}
+
+        <div class="fld-field-library">
+            <div class="texticon search icon clearable">
+                {{ forms.text({
+                    class: 'fullwidth',
+                    inputmode: 'search',
+                    placeholder: "Search"|t('app')
+                }) }}
+                <div class="clear hidden" title="{{ 'Clear'|t('app') }}" aria-label="{{ 'Clear'|t('app') }}"></div>
+            </div>
+
+            {{ _self.fieldSelectors('Standard Fields'|t('app'), fieldLayout.getAvailableStandardFields(), _context) }}
+
+            {% for groupName, groupFields in fieldLayout.getAvailableCustomFields() %}
+                {{ _self.fieldSelectors(groupName, groupFields, _context) }}
+            {% endfor %}
+        </div>
+
+        {% if customizableUi %}
+            <div class="fld-ui-library hidden">
+                {% for element in fieldLayout.getAvailableUiElements() %}
+                    {{ _self.elementSelector(element, true) }}
+                {% endfor %}
+            </div>
+        {% endif %}
     </div>
-
-
 </div>
+
+{% set jsSettings = {
+    customizableTabs: customizableTabs,
+    customizableUi: customizableUi,
+    elementPlacementInputName: 'elementPlacements[__TAB_NAME__][]'|namespaceInputName,
+    elementConfigInputName: 'elementConfigs[__ELEMENT_KEY__]'|namespaceInputName,
+} %}
 
 {% js %}
     var initFLD = function() {
-    new Craft.FieldLayoutDesigner('#{{ "fieldlayoutform"|namespaceInputId }}', {
-    customizableTabs: {{ customizableTabs ? 'true' : 'false' }},
-    fieldInputName: '{{ "fieldLayout[__TAB_NAME__][]"|namespaceInputName|e("js") }}',
-    requiredFieldInputName: '{{ "requiredFields[]"|namespaceInputName|e("js") }}'
-    });
+        new Craft.FieldLayoutDesigner("#{{ 'fieldlayoutform'|namespaceInputId }}", {{ jsSettings|json_encode|raw }});
     };
-
-    {#    {% if tab is defined %}#}
-
-    {#        var $fldTab = $('#{{ ("tab-"~tab)|namespaceInputId }}');#}
-
-    {#        if ($fldTab.hasClass('sel'))#}
-    {#        {#}
-    {#        initFLD();#}
-    {#        }#}
-    {#        else#}
-    {#        {#}
-    {#        $fldTab.on('activate.fld', function() {#}
-    {#        initFLD();#}
-    {#        $fldTab.off('activate.fld');#}
-    {#        });#}
-    {#        }#}
-
-    {#    {% else %}#}
-
-    {#        initFLD();#}
-
-    {#    {% endif %}#}
 {% endjs %}

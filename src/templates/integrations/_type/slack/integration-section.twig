@@ -14,18 +14,20 @@
                 <a href="#" class="delete-btn" data-target="integration-{{ type }}-{{ index }}">Remove</a>
             </span>
             <div class="integration-info">
-                <span class="integration-title">{{ integration.name }}</span>
-                <div class="status-container">
-                    {% if integration.status == 'enabled' %}
-                        <div class="status on" title="Enabled"></div>
-                    {% else %}
-                        <div class="status off" title="Disabled"></div>
-                    {% endif %}
-                    <div class="status-title">{{ integration.status |pascal }}</div>
-                </div>
+                <h3 class="integration-title">{{ integration.name }}</h3>
+{#                <div class="status-container">#}
+{#                    {% if integration.status == 'enabled' %}#}
+{#                        <div class="status on" title="Enabled"></div>#}
+{#                    {% else %}#}
+{#                        <div class="status off" title="Disabled"></div>#}
+{#                    {% endif %}#}
+{#                    <div class="status-title">{{ integration.status |pascal }}</div>#}
+{#                </div>#}
             </div>
         </div>
     </header>
+
+    <hr>
 
     <div class="body">
         <div class="fields">

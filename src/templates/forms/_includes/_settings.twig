@@ -24,34 +24,29 @@
     }) }}
 
     {{ forms.textField({
-        label: "Form Class"|t('app'),
-        id: 'formClass',
-        name: 'settings[fields][global][formClass]',
-        value: form.settings.fields.global.formClass is defined ? form.settings.fields.global.formClass,
-        placeholder: form.handle is defined and form.handle != '' ? form.handle ~ '-form' : '',
+        label: "Form Class"|t('form-builder'),
+        name: 'options[formClass]',
+        value: form.options.formClass is defined ? form.options.formClass : '',
     }) }}
 
     {{ forms.textField({
-        label: "Form ID"|t('app'),
-        id: 'formId',
-        name: 'settings[fields][global][formId]',
-        value: form.settings.fields.global.formId is defined ? form.settings.fields.global.formId,
-        placeholder: form.handle is defined and form.handle != '' ? form.handle ~ '-form' : '',
+        label: "Form ID"|t('form-builder'),
+        name: 'options[formId]',
+        value: form.options.formId is defined ? form.options.formId : '',
     }) }}
 
     {{ forms.textField({
-        label: "Global Input Class"|t('app'),
-        id: 'inputClass',
-        name: 'settings[fields][global][inputClass]',
-        value: form.settings.fields.global.inputClass is defined ? form.settings.fields.global.inputClass,
+        label: "Input Class"|t('form-builder'),
+        name: 'options[inputClass]',
+        value: form.options.inputClass is defined ? form.options.inputClass : '',
     }) }}
 
     {{ forms.textField({
-        label: "Global Input Templates"|t('app'),
-        id: 'inputTemplate',
-        class: 'global-input-template',
-        name: 'settings[fields][global][inputTemplate]',
-        value: form.settings.fields.global.inputTemplate is defined ? form.settings.fields.global.inputTemplate,
+        label: "Input Template Path"|t('form-builder'),
+        instructions: 'All input fields will use this custom template path',
+        id: 'input-template-path',
+        name: 'options[inputTemplate]',
+        value: form.options.inputTemplate is defined ? form.options.inputTemplate : '',
     }) }}
     <span class="field input-path-response"></span>
 

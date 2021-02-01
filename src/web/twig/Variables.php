@@ -216,9 +216,10 @@ class Variables
         // Get field type
         $fieldType = $this->getFieldTypeByClass(get_class($field));
         $settings = $form->settings;
+        $globalOptions = $form->options;
 
-        if (isset($settings['fields']['global']['inputTemplate']) && $settings['fields']['global']['inputTemplate'] !== '') {
-            $customPath = $settings['fields']['global']['inputTemplate'];
+        if (isset($globalOptions['inputTemplate']) && $globalOptions['inputTemplate'] !== '') {
+            $customPath = $globalOptions['inputTemplate'];
             Craft::$app->view->setTemplatesPath(Craft::$app->getPath()->getSiteTemplatesPath() . '/' . $customPath);
             FormBuilder::log('Using custom input fields');
         } else {
@@ -251,6 +252,7 @@ class Variables
         if (isset($field->initialRows)) {
             $variables['rows'] = $field->initialRows;
         }
+
         $fieldOptions = FormBuilder::$plugin->fields->getFieldRecordByFieldId($field->id, $form->id);
         if ($fieldOptions) {
             $options = Json::decode($fieldOptions->options);
@@ -261,9 +263,10 @@ class Variables
                 $variables['id'] = $options['id'];
             }
         }
-        if (isset($settings['fields']['global']['inputClass'])) {
+
+        if (isset($globalOptions['inputClass'])) {
             $availableClasses = $variables['class'];
-            $variables['class'] = $availableClasses . ' ' . $settings['fields']['global']['inputClass'];
+            $variables['class'] = $availableClasses . ' ' . $globalOptions['inputClass'];
         }
 
         // Get input html

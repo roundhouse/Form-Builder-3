@@ -34,6 +34,8 @@ use roundhouse\formbuilder\events\AllowedFieldTypesEvent;
 use roundhouse\formbuilder\fields\Forms;
 use roundhouse\formbuilder\services\Forms as FormsService;
 use roundhouse\formbuilder\services\Migrations as MigrationsService;
+use roundhouse\formbuilder\services\Tabs as TabsService;
+use roundhouse\formbuilder\services\Fields as FieldsService;
 use roundhouse\formbuilder\web\twig\Variables;
 use roundhouse\formbuilder\web\twig\Extensions;
 use roundhouse\formbuilder\models\Settings;
@@ -233,12 +235,20 @@ class FormBuilder extends Plugin
             Fields::EVENT_AFTER_SAVE_FIELD_LAYOUT,
             function(FieldLayoutEvent $event) {
                 $layout = $event->layout;
+                $tabs = $layout->getTabs();
                 $request = Craft::$app->getRequest();
-                $post = $request->getBodyParam('form-builder');
 
-                if ($post) {
-                    if (isset($post['field'])) {
-                        foreach ($post['field'] as $fieldId => $field) {
+                $formBuilder = $request->getBodyParam('form-builder');
+
+                if ($formBuilder) {
+                    // Remove records
+                    FormBuilder::$plugin->fields->removeUnusedRecords($formBuilder['formId'], $layout->id);
+                    FormBuilder::$plugin->tabs->removeUnusedRecords($formBuilder['formId'], $layout->id);
+
+                    if (isset($formBuilder['field'])) {
+
+                        // Update fields
+                        foreach ($formBuilder['field'] as $fieldId => $field) {
                             $fieldModel = new FieldModel();
                             $fieldModel->fieldId = $fieldId;
 
@@ -246,8 +256,8 @@ class FormBuilder extends Plugin
                                 $fieldModel->fieldLayoutId = $layout->id;
                             }
 
-                            if (isset($post['formId'])) {
-                                $fieldModel->formId = $post['formId'];
+                            if (isset($formBuilder['formId'])) {
+                                $fieldModel->formId = $formBuilder['formId'];
                             }
 
                             if (isset($field['options'])) {
@@ -258,24 +268,32 @@ class FormBuilder extends Plugin
                         }
                     }
 
-                    if (isset($post['tab'])) {
-                        // Clean up old tab options
-                        Craft::$app->getDb()->createCommand()
-                            ->delete('{{%formbuilder_tabs}}', ['layoutId' => $layout->id])
-                            ->execute();
-
-                        foreach ($layout->getTabs() as $key => $value) {
-                            if (isset(array_values($post['tab'])[$key]['options'])) {
-                                FormBuilder::$plugin->tabs->save($value, array_values($post['tab'])[$key], $post['formId'], $layout->id);
-                            }
-
-                        }
+                    // Tabs got saved, loop through $POSTED tabs and map correct data
+                    foreach ($formBuilder['tabs'] as $tab) {
+                        $newTabId = $this->_getNewTabIdByTabName($tabs, $tab['tabName']);
+                        FormBuilder::$plugin->tabs->save($tab, $newTabId, $tab['options'], $formBuilder['formId'], $layout->id);
                     }
                 }
 
                 unset($_POST['form-builder']);
             }
         );
+    }
+
+    /**
+     * Return new tab id
+     *
+     * @param $tabs
+     * @param $tabName
+     * @return mixed
+     */
+    private function _getNewTabIdByTabName($tabs, $tabName)
+    {
+        foreach ($tabs as $tab) {
+            if ($tabName === $tab->name) {
+                return $tab->id;
+            }
+        }
     }
 
     /**
@@ -360,6 +378,8 @@ class FormBuilder extends Plugin
                 $variable->set('fb', Variables::class);
                 $variable->set('fbMigration', MigrationsService::class);
                 $variable->set('fbForms', FormsService::class);
+                $variable->set('fbTabs', TabsService::class);
+                $variable->set('fbFields', FieldsService::class);
             }
         );
     }

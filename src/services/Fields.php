@@ -17,6 +17,7 @@ use yii\base\Exception;
 use roundhouse\formbuilder\FormBuilder;
 use roundhouse\formbuilder\models\Field;
 use roundhouse\formbuilder\records\Field as FieldRecord;
+use yii\helpers\ArrayHelper;
 
 class Fields extends Component
 {
@@ -54,6 +55,35 @@ class Fields extends Component
         $output = [];
 
         foreach ($field as $field) {
+            $output[$field->id] = [
+                'fieldLayoutId' => $field->fieldLayoutId,
+                'fieldId' => $field->fieldId,
+                'options' => $field->options
+            ];
+        }
+
+        return $output;
+    }
+
+    /**
+     * Get all fields by field layout id
+     *
+     * @param $layoutId
+     * @param $formId
+     * @return array|\yii\db\ActiveRecord[]
+     */
+    public function getAllFieldOptionsByLayoutId($layoutId, $formId)
+    {
+        $records = FieldRecord::find()
+            ->where([
+                'fieldLayoutId' => $layoutId,
+                'formId' => $formId
+            ])
+            ->all();
+
+        $output = [];
+
+        foreach ($records as $field) {
             $output[$field->id] = [
                 'fieldLayoutId' => $field->fieldLayoutId,
                 'fieldId' => $field->fieldId,
@@ -129,6 +159,26 @@ class Fields extends Component
         }
 
         return true;
+    }
+
+    /**
+     * Remove records
+     *
+     * @param $formId
+     * @param $fieldLayoutId
+     * @throws \Throwable
+     * @throws \yii\db\StaleObjectException
+     */
+    public function removeUnusedRecords($formId, $fieldLayoutId)
+    {
+        $existingRecords = FieldRecord::find()->where([
+            'formId' => $formId,
+            'fieldLayoutId' => $fieldLayoutId
+        ])->all();
+
+        foreach ($existingRecords as $record) {
+            $record->delete();
+        }
     }
 
     // Private Methods

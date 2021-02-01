@@ -59,13 +59,16 @@ class ChartsController extends Controller
         $intervalUnit = 'day';
 
         // Prep the query
+//        $query = (new Query())
+//            ->from([Table::ENTRIES . ' entries']);
+
         $query = (new Query())
-            ->from([Table::ENTRIES . ' entries']);
+            ->from(['entries' => Table::ENTRIES]);
 
         if ($formId) {
             $query->where(['formId' => $formId]);
         }
-        
+
         $dataTable = ChartHelper::getRunChartDataFromQuery($query, $startDate, $endDate, 'entries.postedOn', 'count', '*', [
            'intervalUnit' => $intervalUnit,
            'valueLabel' =>  FormBuilder::t('Entries')
@@ -80,10 +83,11 @@ class ChartsController extends Controller
         return $this->asJson([
             'dataTable' => $dataTable,
             'total' => $total,
-            'totalHtml' => Craft::$app->getFormatter()->asInteger($total),
+
             'formats' => ChartHelper::formats(),
             'orientation' => Craft::$app->getLocale()->getOrientation(),
-            'scale' => $intervalUnit
+            'scale' => $intervalUnit,
+            'totalHtml' => Craft::$app->getFormatter()->asInteger($total),
         ]);
 
 //        $this->requirePostRequest();
